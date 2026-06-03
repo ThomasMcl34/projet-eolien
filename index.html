@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Projets Éoliens</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#EEF2F7;--surface:#fff;--surface2:#F4F6FA;
+  --border:#D8DEE9;--border2:#C4CCDA;
+  --text:#1C2333;--text2:#5A6478;--text3:#9AA3B2;
+  --blue:#1A5FAD;--blue-light:#E3EDFA;--blue-mid:#3B82D4;
+  --green:#2D7A3A;--green-light:#E3F5E7;
+  --amber:#7A4800;--amber-light:#FEF0D0;
+  --gray-light:#ECEEF2;--gray:#7A8299;
+  --accent:#4F6FBF;--red:#A32D2D;
+  --top-h:auto;
+  --radius-lg:12px;--shadow:0 1px 4px rgba(30,50,100,.07);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text);background:var(--bg);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+
+/* TABS */
+.tabs-bar{height:38px;display:flex;align-items:center;gap:2px;padding:6px 10px 0;border-bottom:1px solid var(--border);overflow-x:auto;background:linear-gradient(180deg,#dce4f0,#cdd8ea);flex-shrink:0}
+.tabs-bar::-webkit-scrollbar{height:0}
+.tab{padding:5px 13px;border-radius:6px 6px 0 0;border:1px solid transparent;cursor:pointer;white-space:nowrap;font-size:11.5px;color:#4a5570;background:transparent}
+.tab:hover{background:rgba(255,255,255,.6)}
+.tab.active{background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface);color:var(--text);font-weight:600}
+.tab-add{padding:5px 9px;border-radius:6px 6px 0 0;border:1px dashed var(--border2);cursor:pointer;color:#4a5570;background:transparent;font-size:14px;display:flex;align-items:center}
+.tab-add:hover{background:rgba(255,255,255,.5)}
+
+/* PAGE LAYOUT */
+.page{display:flex;flex-direction:column;gap:8px;padding:8px;flex:1;overflow:hidden;min-height:0}
+
+/* TOP ROW : fiche + frise côte à côte, même hauteur fixe */
+.top-row{display:flex;gap:8px;flex-shrink:0}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow)}
+
+/* FICHE */
+.fiche-card{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.section-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.field{display:flex;flex-direction:column;gap:2px}
+.field label{font-size:10px;color:var(--text2);font-weight:500}
+.field input,.field select,.field textarea{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:11.5px;background:var(--surface2);color:var(--text);width:100%;outline:none;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue-mid);background:#fff;box-shadow:0 0 0 2px rgba(59,130,212,.12)}
+.field textarea{resize:none;line-height:1.4}
+.inline2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.rp-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px;background:var(--blue-light);border-radius:7px;border:1px solid #c3d9f5;margin-top:2px}
+
+/* FRISE / CHECKLIST card — prend le reste */
+.timeline-card{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative}
+
+/* VUE FRISE */
+.frise-view{display:flex;flex-direction:column;height:100%}
+.milestones{display:flex;align-items:flex-start;position:relative;margin-top:8px;flex:1}
+.milestones::before{content:'';position:absolute;top:13px;left:16px;right:16px;height:3px;background:var(--border);z-index:0;border-radius:2px}
+.ms-progress{position:absolute;top:13px;left:16px;height:3px;background:linear-gradient(90deg,#2D7A3A,#3B82D4);z-index:1;border-radius:2px;transition:width .4s ease;pointer-events:none}
+.ms{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2}
+.ms-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);margin-bottom:5px;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.1);cursor:pointer}
+.ms-dot:hover{border-color:var(--blue-mid);background:var(--blue-light);transform:scale(1.2)}
+.ms.has-date .ms-dot{background:var(--blue-mid);border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,212,.18)}
+.ms.passed .ms-dot{background:var(--green);border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.2)}
+.ms.sel .ms-dot{box-shadow:0 0 0 4px rgba(59,130,212,.3);transform:scale(1.25)}
+.ms-name{font-size:9.5px;color:var(--text2);text-align:center;line-height:1.25;margin-bottom:4px;font-weight:500}
+.ms.sel .ms-name{color:var(--blue);font-weight:700}
+.ms-date-area{text-align:center}
+.ms-date-area .dp{color:var(--text3);border:1px dashed var(--border2);border-radius:3px;padding:1px 5px;cursor:pointer;font-size:9.5px;display:inline-block}
+.ms-date-area .dp:hover{border-color:var(--blue-mid);color:var(--blue-mid)}
+.ms-date-area .dv{color:var(--blue);font-weight:600;font-size:9.5px;cursor:pointer;display:inline-block}
+.ms-date-area input[type=date]{font-size:9.5px;border:1px solid var(--blue-mid);border-radius:4px;padding:2px 4px;background:#fff;color:var(--text);width:100px}
+
+/* VUE CHECKLIST (remplace frise) */
+.checklist-inline{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.cl-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
+.cl-topbar-left{display:flex;align-items:center;gap:8px}
+.cl-ms-name{font-size:11px;font-weight:700;color:var(--blue)}
+.cl-count{font-size:10px;color:var(--text3)}
+.btn-cl-close{border:none;background:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 5px;border-radius:4px;line-height:1}
+.btn-cl-close:hover{background:var(--surface2);color:var(--text)}
+.cl-body{flex:1;overflow-y:auto}
+.cl-body::-webkit-scrollbar{width:3px}
+.cl-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cl-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)}
+.cl-item:last-child{border-bottom:none}
+.cl-item input[type=checkbox]{width:13px;height:13px;cursor:pointer;flex-shrink:0;accent-color:#2D7A3A}
+.cl-item span{flex:1;font-size:11.5px;line-height:1.4;color:#A32D2D;font-weight:500}
+.cl-item.done span{text-decoration:line-through;color:#9AA3B2;font-weight:400;color:#7A8A70}
+.cl-del{font-size:12px;color:var(--text3);cursor:pointer;padding:0 4px;border:none;background:none;opacity:0;border-radius:4px}
+.cl-item:hover .cl-del{opacity:1}
+.add-row{display:flex;gap:5px;margin-top:6px;flex-shrink:0}
+.add-row input{flex:1;padding:3px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--surface2);color:var(--text);outline:none}
+.add-row input:focus{border-color:var(--blue-mid)}
+.add-row button{padding:3px 9px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px}
+.add-row button:hover{background:var(--surface2)}
+
+/* TÂCHES — pleine largeur */
+.tasks-card{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.tasks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
+.btn-arc-view{font-size:10.5px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px}
+.btn-arc-view:hover{background:var(--border)}
+.btn-add-task{font-size:11px;padding:4px 12px;border:1px solid var(--blue);border-radius:6px;background:var(--blue-mid);color:#fff;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:4px}
+.btn-add-task:hover{background:var(--blue)}
+.task-table-wrap{flex:1;overflow-y:auto;min-height:0;border:1px solid var(--border);border-radius:8px}
+.task-table-wrap::-webkit-scrollbar{width:3px}
+.task-table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+table.tasks{width:100%;border-collapse:collapse;table-layout:fixed}
+table.tasks th{font-size:10px;font-weight:700;color:var(--text2);text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2);z-index:1;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+table.tasks td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.tasks tr:last-child td{border-bottom:none}
+table.tasks tr:hover td{filter:brightness(.97)}
+.col-type{width:95px}.col-name{width:auto;min-width:80px}.col-date{width:96px}.col-state{width:108px}.col-prio{width:72px}.col-com{width:auto;min-width:120px}.col-act{width:90px}
+
+/* Row colors: border-left accent + subtle bg */
+tr.row-prio td{background:#FFF0F0}
+tr.row-prio td:first-child{border-left:4px solid #D94040}
+tr.row-ac td{background:#FFFDE8}
+tr.row-ac td:first-child{border-left:4px solid #E0C030}
+tr.row-ec td{background:#EBF4FF}
+tr.row-ec td:first-child{border-left:4px solid #3B82D4}
+tr.row-fi td{background:#F0FBF2;opacity:.75}
+tr.row-fi td:first-child{border-left:4px solid #2D7A3A}
+
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.b-ac{background:#ECEEF2;color:#5A6478}
+.b-ec{background:#DAEEFF;color:#1A5FAD;border:1px solid #B8D8F5}
+.b-fi{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2}
+.b-prio-y{background:#FFE8B0;color:#7A4800;border:1px solid #F5CC70}
+.b-prio-n{background:#ECEEF2;color:#7A8299}
+.type-pill{display:inline-flex;padding:1px 6px;border-radius:20px;font-size:9.5px;background:var(--blue-light);border:1px solid #c3d9f5;color:var(--blue);font-weight:500;margin:1px}
+
+.sel-wrap{position:relative;display:flex;align-items:center}
+.sel-wrap select{width:100%;padding:3px 20px 3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none}
+.sel-wrap::after{content:'▾';position:absolute;right:6px;pointer-events:none;font-size:9px;color:var(--text3)}
+.sel-wrap select:focus{border-color:var(--blue-mid)}
+.sel-wrap.s-ac select{background:#ECEEF2;color:#5A6478}
+.sel-wrap.s-ec select{background:#DAEEFF;color:#1A5FAD}
+.sel-wrap.s-fi select{background:#D6F0DC;color:#236630}
+.sel-wrap.p-y select{background:#FFE8B0;color:#7A4800}
+.sel-wrap.p-n select{background:#ECEEF2;color:#7A8299}
+
+td input[type=text]{width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit}
+td input[type=date]{width:100%;padding:3px 4px;border:1px solid var(--border);border-radius:5px;font-size:10.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;min-width:90px}
+td input:focus{border-color:var(--blue-mid);background:#fff}
+
+.td-com{position:relative;max-width:0;overflow:hidden}
+.td-com input{width:100%}
+.act-btns{display:flex;gap:4px;align-items:center}
+.abtn{border:none;cursor:pointer;font-size:10.5px;padding:3px 8px;border-radius:5px;font-weight:500;font-family:inherit;white-space:nowrap}
+.abtn-del{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
+.abtn-del:hover{background:#F5C8C8}
+.abtn-arc{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2}
+.abtn-arc:hover{background:#BEE8C8}
+.abtn-restore{background:var(--blue-light);color:var(--blue);border:1px solid #B8D8F5}
+.abtn-restore:hover{background:#C8DCEE}
+
+.type-wrap{position:relative}
+.type-trigger{cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;min-height:24px;padding:2px 6px;border:1px solid var(--border);border-radius:5px;background:var(--surface2);gap:2px}
+.type-trigger:hover{border-color:var(--blue-mid)}
+.type-dropdown{display:none;position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px;z-index:999;min-width:160px;box-shadow:0 4px 20px rgba(30,50,100,.12)}
+.type-dropdown.open{display:block}
+.type-opt{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:11.5px}
+.type-opt:hover{background:var(--surface2)}
+.type-opt input{width:13px;height:13px;accent-color:var(--blue-mid);cursor:pointer}
+.type-sep{border:none;border-top:1px solid var(--border);margin:5px 0}
+.add-type-row{display:flex;gap:4px;padding:4px 8px 2px}
+.add-type-row input{flex:1;padding:3px 7px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--surface2);color:var(--text);outline:none}
+.add-type-row button{padding:2px 9px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;width:320px;box-shadow:0 8px 32px rgba(20,40,100,.14)}
+.modal h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.modal input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12.5px;background:var(--surface2);color:var(--text);margin-bottom:12px;outline:none;font-family:inherit}
+.modal input:focus{border-color:var(--blue-mid)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-btns button{padding:6px 16px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
+.modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
+.modal-btns .primary:hover{background:var(--blue)}
+
+.arc-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.com-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.35);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.com-overlay.open{display:flex}
+.com-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;width:560px;max-width:92%;box-shadow:0 8px 32px rgba(20,40,100,.18);display:flex;flex-direction:column;gap:0}
+.com-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.com-header-title{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em}
+.com-close{border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:2px 8px;border-radius:6px;line-height:1}
+.com-close:hover{background:var(--surface2)}
+.com-toolbar{display:flex;align-items:center;gap:4px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;flex-wrap:wrap}
+.com-tb-btn{border:1px solid var(--border);background:#fff;cursor:pointer;border-radius:5px;padding:3px 8px;font-size:12px;color:var(--text);line-height:1.4;transition:.12s}
+.com-tb-btn:hover{background:var(--blue-light);border-color:var(--blue-mid)}
+.com-tb-sep{width:1px;height:18px;background:var(--border);margin:0 2px}
+.com-colors{display:flex;gap:3px;align-items:center}
+.com-color{width:16px;height:16px;border-radius:50%;border:1.5px solid transparent;cursor:pointer;transition:.1s}
+.com-color:hover{transform:scale(1.2);border-color:var(--border2)}
+.com-editor{min-height:160px;max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:0 0 8px 8px;padding:10px 12px;font-size:13px;line-height:1.6;outline:none;color:var(--text);background:#fff}
+.com-editor:focus{border-color:var(--blue-mid)}
+.com-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.com-btn-save{padding:6px 16px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit}
+.com-btn-save:hover{background:var(--blue)}
+.com-btn-cancel{padding:6px 14px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
+.com-btn-cancel:hover{background:var(--surface2)}
+.arc-overlay.open{display:flex}
+.arc-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:820px;max-width:96%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.14)}
+.arc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
+.arc-hdr h3{font-size:13px;font-weight:700}
+.arc-close{border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:2px 8px;border-radius:6px}
+.arc-close:hover{background:var(--surface2)}
+.arc-body{flex:1;overflow-y:auto}
+.arc-empty{color:var(--text3);font-size:12px;text-align:center;padding:28px}
+.empty-tasks{text-align:center;color:var(--text3);font-size:11.5px;padding:22px}
+</style>
+</head>
+<body>
+<div class="tabs-bar" id="tabs-bar"></div>
+<div id="page-container" style="flex:1;overflow:hidden;display:flex;flex-direction:column"></div>
+
+<div class="modal-bg" id="modal-proj">
+  <div class="modal">
+    <h3>Nouveau projet</h3>
+    <input type="text" id="new-proj-name" placeholder="Nom du projet…">
+    <div class="modal-btns">
+      <button onclick="closeModal()">Annuler</button>
+      <button class="primary" onclick="addProject()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<div class="arc-overlay" id="arc-overlay">
+  <div class="arc-panel">
+    <div class="arc-hdr">
+      <h3>Tâches archivées — <span id="arc-proj-name"></span></h3>
+      <button class="arc-close" onclick="closeArc()">×</button>
+    </div>
+    <div class="arc-body" id="arc-body"></div>
+  </div>
+</div>
+
+<script>
+const MS=[{id:'depot',name:'Dépôt'},{id:'pac',name:'Dernier PAC'},{id:'p4',name:'Psg P4'},{id:'rtb',name:'RTB'},{id:'ic',name:'IC'},{id:'ntp',name:'NTP'},{id:'soc',name:'SOC'},{id:'toc',name:'TOC'}];
+const DCL={
+  depot:['Layout','Coordonnées','PBI / solution intrasite','RS / accès identifié','Risques connus','Contacts associés aux "obstacles" connus','Rendus ingés'],
+  pac:['PBI final figé','Solution extrasite figée','Rendus ingés'],
+  p4:['PUT créé','Autorisations','Risques maîtrisés'],
+  rtb:['Foncier définitif','Solution Racco','Choix machine','Dates Jalons importants connues','Autorisations finales','Permission de voiries dérisquée'],
+  ic:['Planning','Budget','Retour AO'],
+  ntp:['Planning','Budget','Retour AO complets','Choix prestataires','Commandes prêtes à être lancées'],
+  soc:[],
+  toc:[]
+};
+const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
+
+function mkP(id,name,type,machines,demolish,renew){
+  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[]};
+}
+
+let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
+  projects:[
+    mkP('lascombes','R. Lascombes','rp',6,2,4),
+    mkP('lestrade','R. Lestrade','rp',5,5,5),
+    mkP('canet','R. Canet','rp',4,4,4),
+    mkP('segur','R. Ségur','rp',5,5,5),
+    mkP('ventajou','Ventajou','gf',8,0,0),
+    mkP('plo','Plo de Laurier','gf',6,0,0),
+    mkP('jaladeaux','R. Jaladeaux','rp',7,7,7),
+    mkP('melusine','Mélusine','gf',5,0,0),
+    mkP('pericaud','Pl. de Péricaud','gf',6,0,0)
+  ],
+  activeId:'lascombes',activeMil:null,taskTypes:[...BASE_TYPES]
+};
+S.projects.forEach(p=>{
+  if(!p.tasks)p.tasks=[];
+  if(!p.archivedTasks)p.archivedTasks=[];
+  if(p.location===undefined)p.location='';
+});
+if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
+
+const save=()=>localStorage.setItem('ew_v9',JSON.stringify(S));
+const proj=()=>S.projects.find(p=>p.id===S.activeId);
+const getCL=mid=>{const p=proj();if(!p.checklists[mid])p.checklists[mid]=DCL[mid].map((t,i)=>({id:i,text:t,done:false}));return p.checklists[mid]};
+const fmt=d=>{if(!d)return'';const[y,m,j]=d.split('-');return`${j}/${m}/${y}`};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const rowCls=t=>t.prio?'row-prio':t.state==='fi'?'row-fi':t.state==='ec'?'row-ec':'row-ac';
+
+function renderTabs(){
+  const bar=document.getElementById('tabs-bar');bar.innerHTML='';
+  S.projects.forEach(p=>{
+    const t=document.createElement('div');
+    t.className='tab'+(p.id===S.activeId?' active':'');
+    t.textContent=p.name;
+    t.onclick=()=>{S.activeId=p.id;S.activeMil=null;save();render()};
+    bar.appendChild(t);
+  });
+  const a=document.createElement('div');a.className='tab-add';
+  a.textContent='+';
+  a.onclick=()=>document.getElementById('modal-proj').classList.add('open');
+  bar.appendChild(a);
+  // export/import buttons
+  const tools=document.createElement('div');
+  tools.style.cssText='margin-left:auto;display:flex;gap:4px;padding-bottom:2px;flex-shrink:0';
+  tools.innerHTML=`
+    <button onclick="exportData()" style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Exporter toutes les données">⬇ Exporter</button>
+    <label style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Importer des données">⬆ Importer<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+  `;
+  bar.appendChild(tools);
+}
+
+function renderPage(){
+  const p=proj();const isRP=p.type==='rp';
+
+  // frise HTML — progress logic
+  const today = new Date(); today.setHours(0,0,0,0);
+  // find last passed milestone index
+  let lastPassedIdx = -1;
+  MS.forEach((m,i)=>{ const d=p.dates[m.id]; if(d && new Date(d)<=today) lastPassedIdx=i; });
+  // progress % within current segment
+  let progressStyle = '';
+  if(lastPassedIdx >= 0) {
+    const nextIdx = lastPassedIdx+1;
+    let pct = 0;
+    if(nextIdx < MS.length && p.dates[MS[nextIdx].id]) {
+      const lastD = new Date(p.dates[MS[lastPassedIdx].id]);
+      const nextD = new Date(p.dates[MS[nextIdx].id]);
+      const total = nextD - lastD;
+      const elapsed = today - lastD;
+      pct = Math.min(100, Math.max(0, (elapsed/total)*100));
+    }
+    const segW = 100/(MS.length-1);
+    const filled = (lastPassedIdx * segW) + (pct * segW / 100);
+    progressStyle = `width:${filled}%`;
+  }
+
+  const msHtml=MS.map((m,i)=>{
+    const d=p.dates[m.id]||'';const sel=S.activeMil===m.id;
+    const passed = d && new Date(d)<=today;
+    return`<div class="ms${d?' has-date':''}${sel?' sel':''}${passed?' passed':''}">
+      <div class="ms-dot" onclick="selMil('${m.id}')"></div>
+      <div class="ms-name">${m.name}</div>
+      <div class="ms-date-area">
+        ${d
+          ?`<span class="dv" onclick="openDateInput('${m.id}',this)">${fmt(d)}</span>`
+          :`<span class="dp" onclick="openDateInput('${m.id}',this)">+ date</span>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+  const progressBar = lastPassedIdx>=0 ? `<div class="ms-progress" style="${progressStyle}"></div>` : '';
+
+  // checklist HTML
+  let clHtml='';
+  if(S.activeMil){
+    const ms=MS.find(m=>m.id===S.activeMil);
+    const cl=getCL(S.activeMil);
+    const done=cl.filter(x=>x.done).length;
+    clHtml=`<div class="checklist-inline">
+      <div class="cl-topbar">
+        <div class="cl-topbar-left">
+          <span class="cl-ms-name">Checklist — ${ms.name}</span>
+          <span class="cl-count">${done} / ${cl.length}</span>
+        </div>
+        <button class="btn-cl-close" title="Fermer" onclick="selMil('${ms.id}')">✕</button>
+      </div>
+      <div class="cl-body">${cl.map(it=>`
+        <div class="cl-item${it.done?' done':''}" data-id="${it.id}">
+          <input type="checkbox" ${it.done?'checked':''} onchange="toggleCL('${S.activeMil}',${it.id})">
+          <span>${esc(it.text)}</span>
+          <button class="cl-del" onclick="delCL('${S.activeMil}',${it.id})" style="font-size:13px;line-height:1">✕</button>
+        </div>`).join('')}
+      </div>
+      <div class="add-row">
+        <input type="text" id="ni" placeholder="Ajouter un élément…" onkeydown="if(event.key==='Enter')addCL('${S.activeMil}')">
+        <button onclick="addCL('${S.activeMil}')">+</button>
+      </div>
+    </div>`;
+  }
+
+  const taskRows=p.tasks.length
+    ?p.tasks.map(t=>taskRow(t,false)).join('')
+    :`<tr><td colspan="7" class="empty-tasks">Aucune tâche — cliquez sur « Nouvelle tâche »</td></tr>`;
+
+  document.getElementById('page-container').innerHTML=`
+  <div class="page">
+    <div class="top-row">
+      <div class="card fiche-card">
+        <div class="section-title">Fiche projet</div>
+        <div class="field"><label>Nom</label><input type="text" value="${esc(p.name)}" oninput="uf('name',this.value)"></div>
+        <div class="field"><label>Type</label>
+          <select onchange="uf('type',this.value)">
+            <option value="gf"${!isRP?' selected':''}>Greenfield</option>
+            <option value="rp"${isRP?' selected':''}>Renouvellement</option>
+          </select>
+        </div>
+        <div class="field"><label>Machines</label>
+          ${isRP
+            ?`<div class="rp-row">
+                <div class="field"><label>À démanteler</label><input type="number" min="0" max="50" value="${p.demolish}" oninput="uf('demolish',+this.value)"></div>
+                <div class="field"><label>À construire</label><input type="number" min="0" max="50" value="${p.renew}" oninput="uf('renew',+this.value)"></div>
+              </div>`
+            :`<input type="number" min="1" max="50" value="${p.machines}" oninput="uf('machines',+this.value)">`
+          }
+        </div>
+        <div class="field"><label>Localisation</label>
+          <textarea rows="2" placeholder="Commune, département, région…" oninput="uf('location',this.value)">${esc(p.location)}</textarea>
+        </div>
+      </div>
+
+      <div class="card timeline-card">
+        <div class="section-title">Frise chronologique</div>
+        <div class="milestones">${progressBar}${msHtml}</div>
+        ${clHtml}
+      </div>
+    </div>
+
+    <div class="card tasks-card">
+      <div class="tasks-header">
+        <div class="section-title">Tâches</div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button class="btn-arc-view" onclick="openArc()">📁 Archivées (${p.archivedTasks.length})</button>
+          <button class="btn-add-task" onclick="addTask()">+ Nouvelle tâche</button>
+        </div>
+      </div>
+      <div class="task-table-wrap">
+        <table class="tasks">
+          <thead><tr>
+            <th class="col-type">Type</th>
+            <th class="col-name">Nom</th>
+            <th class="col-date">Échéance</th>
+            <th class="col-state">État</th>
+            <th class="col-prio">Priorité</th>
+            <th class="col-com">Commentaire</th>
+            <th class="col-act">Actions</th>
+          </tr></thead>
+          <tbody>${taskRows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openDateInput(mid, el){
+  const p=proj();
+  const inp=document.createElement('input');
+  inp.type='date';
+  inp.value=p.dates[mid]||'';
+  inp.style.cssText='font-size:9.5px;border:1px solid var(--blue-mid);border-radius:4px;padding:2px 4px;background:#fff;color:var(--text);width:100px';
+  inp.onchange=()=>{p.dates[mid]=inp.value;save();renderPage()};
+  inp.onblur=()=>renderPage();
+  el.replaceWith(inp);
+  inp.focus();
+}
+
+function selMil(mid){
+  S.activeMil=S.activeMil===mid?null:mid;
+  save();renderPage();
+}
+
+function taskRow(t,archived){
+  const stBadge={ac:'<span class="badge b-ac">À commencer</span>',ec:'<span class="badge b-ec">En cours</span>',fi:'<span class="badge b-fi">Fini</span>'}[t.state]||'';
+  const prioBadge=t.prio?'<span class="badge b-prio-y">Oui</span>':'<span class="badge b-prio-n">Non</span>';
+  const pills=(t.types||[]).map(tp=>`<span class="type-pill">${tp}</span>`).join('');
+  if(archived){
+    return`<tr class="${rowCls(t)}">
+      <td>${pills||'—'}</td><td>${esc(t.name)||'—'}</td><td>${fmt(t.date)||'—'}</td>
+      <td>${stBadge}</td><td>${prioBadge}</td>
+      <td style="font-size:10.5px;color:var(--text2)">${esc(t.comment)}</td>
+      <td><div class="act-btns"><button class="abtn abtn-restore" onclick="restoreTask('${t.id}')">Restaurer</button></div></td>
+    </tr>`;
+  }
+  const sc={ac:'s-ac',ec:'s-ec',fi:'s-fi'}[t.state]||'s-ac';
+  const pc=t.prio?'p-y':'p-n';
+  return`<tr class="${rowCls(t)}" id="tr-${t.id}">
+    <td><div class="type-wrap"><div class="type-trigger" onclick="openDD('${t.id}',this)">${pills||'<span style="color:var(--text3);font-size:10px">Choisir…</span>'}</div></div></td>
+    <td><input type="text" value="${esc(t.name)}" placeholder="Nom de la tâche" onchange="upTask('${t.id}','name',this.value)"></td>
+    <td onclick="editTaskDate('${t.id}',this)" style="cursor:pointer;white-space:nowrap">
+      <span style="font-size:11px;color:${t.date?'var(--text)':'var(--text3)'};">${t.date?fmt(t.date):'+ date'}</span>
+    </td>
+    <td><div class="sel-wrap ${sc}"><select onchange="upTask('${t.id}','state',this.value)">
+      <option value="ac"${t.state==='ac'?' selected':''}>À commencer</option>
+      <option value="ec"${t.state==='ec'?' selected':''}>En cours</option>
+      <option value="fi"${t.state==='fi'?' selected':''}>Fini</option>
+    </select></div></td>
+    <td><div class="sel-wrap ${pc}"><select onchange="upTask('${t.id}','prio',this.value==='1')">
+      <option value="0"${!t.prio?' selected':''}>Non</option>
+      <option value="1"${t.prio?' selected':''}>Oui</option>
+    </select></div></td>
+    <td onclick="openCom('${t.id}')" style="cursor:pointer;max-width:0;overflow:hidden">
+      <div style="font-size:11px;color:${t.comment?'var(--text)':'var(--text3)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 0" title="${esc(t.comment)}">${t.commentHtml?t.comment||'…':'…'}</div>
+    </td>
+    <td><div class="act-btns">
+      ${t.state==='fi'?`<button class="abtn abtn-arc" onclick="archTask('${t.id}')">Archiver</button>`:''}
+      <button class="abtn abtn-del" onclick="delTask('${t.id}')">Supprimer</button>
+    </div></td>
+  </tr>`;
+}
+
+function editTaskDate(id, td){
+  // remove any existing picker
+  const old=document.getElementById('task-date-picker');if(old)old.remove();
+  const p=proj(); const t=p.tasks.find(x=>x.id===id); if(!t) return;
+  const rect=td.getBoundingClientRect();
+  const wrap=document.createElement('div');
+  wrap.id='task-date-picker';
+  wrap.style.cssText='position:fixed;z-index:999;background:#fff;border:1px solid var(--blue-mid);border-radius:8px;padding:10px;box-shadow:0 4px 16px rgba(30,50,100,.15);top:'+(rect.bottom+4)+'px;left:'+rect.left+'px';
+  const inp=document.createElement('input');
+  inp.type='date'; inp.value=t.date||'';
+  inp.style.cssText='font-size:12px;border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);background:#fff;display:block';
+  const btnRow=document.createElement('div');
+  btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;justify-content:flex-end';
+  const btnOk=document.createElement('button');
+  btnOk.textContent='OK';
+  btnOk.style.cssText='padding:3px 10px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px';
+  const btnClear=document.createElement('button');
+  btnClear.textContent='Effacer';
+  btnClear.style.cssText='padding:3px 10px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;font-size:11px';
+  btnOk.onclick=()=>{t.date=inp.value;save();wrap.remove();renderPage()};
+  btnClear.onclick=()=>{t.date='';save();wrap.remove();renderPage()};
+  btnRow.appendChild(btnClear);btnRow.appendChild(btnOk);
+  wrap.appendChild(inp);wrap.appendChild(btnRow);
+  document.body.appendChild(wrap);
+  inp.focus();
+  setTimeout(()=>document.addEventListener('click',function handler(e){
+    if(!wrap.contains(e.target)&&e.target!==td){wrap.remove();document.removeEventListener('click',handler);}
+  }),100);
+}
+function exportData(){
+  const json=JSON.stringify(S, null, 2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=url;a.download='projets-eoliens-'+date+'.json';
+  a.click();URL.revokeObjectURL(url);
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.projects||!Array.isArray(data.projects)){alert('Fichier invalide');return;}
+      S=data;
+      // ensure arrays
+      S.projects.forEach(p=>{
+        if(!p.tasks)p.tasks=[];
+        if(!p.archivedTasks)p.archivedTasks=[];
+        if(p.location===undefined)p.location='';
+      });
+      if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
+      save();render();
+      alert('Données importées avec succès !');
+    } catch(err){alert('Erreur lors de la lecture du fichier.');}
+  };
+  reader.readAsText(file);
+  e.target.value=''; // reset input
+}
+let _comTaskId=null;
+function openCom(id){
+  const p=proj();const t=p.tasks.find(x=>x.id===id);if(!t)return;
+  _comTaskId=id;
+  const ed=document.getElementById('com-editor');
+  ed.innerHTML=t.commentHtml||'';
+  document.getElementById('com-overlay').classList.add('open');
+  setTimeout(()=>ed.focus(),50);
+}
+function closeCom(){
+  document.getElementById('com-overlay').classList.remove('open');
+  _comTaskId=null;
+}
+function closeComIfOutside(e){
+  if(e.target===document.getElementById('com-overlay'))closeCom();
+}
+function saveCom(){
+  if(!_comTaskId)return;
+  const p=proj();const t=p.tasks.find(x=>x.id===_comTaskId);if(!t)return;
+  const ed=document.getElementById('com-editor');
+  t.commentHtml=ed.innerHTML;
+  t.comment=ed.innerText;
+  save();closeCom();renderPage();
+}
+function fmt2(cmd,val){
+  document.getElementById('com-editor').focus();
+  document.execCommand(cmd,false,val||null);
+}
+function addTask(){const p=proj();p.tasks.unshift({id:'t'+Date.now(),types:[],name:'',date:'',state:'ac',prio:false,comment:''});save();renderPage()}
+function upTask(id,f,v){const p=proj();const t=p.tasks.find(x=>x.id===id);if(t){t[f]=v;save();}if(f==='state'||f==='prio')renderPage();}
+function delTask(id){const p=proj();p.tasks=p.tasks.filter(x=>x.id!==id);save();renderPage()}
+function archTask(id){const p=proj();const i=p.tasks.findIndex(x=>x.id===id);if(i<0)return;p.archivedTasks.unshift(p.tasks.splice(i,1)[0]);save();renderPage()}
+function restoreTask(id){const p=proj();const i=p.archivedTasks.findIndex(x=>x.id===id);if(i<0)return;p.tasks.unshift(p.archivedTasks.splice(i,1)[0]);save();openArc()}
+
+function openDD(tid,el){
+  closeDD();
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);if(!t)return;
+  const rect=el.getBoundingClientRect();
+  const dd=document.createElement('div');dd.className='type-dropdown open';dd.id='type-dd';
+  dd.style.top=(rect.bottom+4)+'px';dd.style.left=rect.left+'px';
+  dd.innerHTML=S.taskTypes.map(tp=>`<label class="type-opt"><input type="checkbox" ${(t.types||[]).includes(tp)?'checked':''} onchange="togType('${tid}','${tp}',this.checked)"><span>${tp}</span></label>`).join('')
+    +`<hr class="type-sep"><div class="add-type-row"><input type="text" id="nti" placeholder="Nouveau type…" onkeydown="if(event.key==='Enter')addType('${tid}')"><button onclick="addType('${tid}')">+</button></div>`;
+  document.body.appendChild(dd);
+  setTimeout(()=>document.addEventListener('click',closeDDOut),10);
+}
+function closeDDOut(e){if(!document.getElementById('type-dd')?.contains(e.target))closeDD()}
+function closeDD(){const dd=document.getElementById('type-dd');if(dd)dd.remove();document.removeEventListener('click',closeDDOut)}
+function togType(tid,tp,checked){
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);if(!t)return;
+  if(checked){if(!t.types.includes(tp))t.types.push(tp);}else{t.types=t.types.filter(x=>x!==tp);}
+  save();
+  const trig=document.querySelector(`#tr-${tid} .type-trigger`);
+  if(trig)trig.innerHTML=t.types.map(tp=>`<span class="type-pill">${tp}</span>`).join('')||'<span style="color:var(--text3);font-size:10px">Choisir…</span>';
+}
+function addType(tid){
+  const inp=document.getElementById('nti');if(!inp||!inp.value.trim())return;
+  const tp=inp.value.trim();if(!S.taskTypes.includes(tp))S.taskTypes.push(tp);
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);if(t&&!t.types.includes(tp))t.types.push(tp);
+  save();closeDD();renderPage();
+}
+
+function openArc(){
+  const p=proj();
+  document.getElementById('arc-proj-name').textContent=p.name;
+  document.getElementById('arc-body').innerHTML=p.archivedTasks.length
+    ?`<table class="tasks" style="width:100%"><thead><tr><th class="col-type">Type</th><th class="col-name">Nom</th><th class="col-date">Échéance</th><th class="col-state">État</th><th class="col-prio">Priorité</th><th class="col-com">Commentaire</th><th class="col-act">Actions</th></tr></thead><tbody>${p.archivedTasks.map(t=>taskRow(t,true)).join('')}</tbody></table>`
+    :'<div class="arc-empty">Aucune tâche archivée</div>';
+  document.getElementById('arc-overlay').classList.add('open');
+}
+function closeArc(){document.getElementById('arc-overlay').classList.remove('open');save();renderPage()}
+
+function toggleCL(mid,id){const p=proj();const it=getCL(mid).find(x=>x.id===id);if(it)it.done=!it.done;save();const el=document.querySelector(`.cl-item[data-id="${id}"]`);if(el)el.classList.toggle('done',it.done);}
+function delCL(mid,id){const p=proj();p.checklists[mid]=getCL(mid).filter(x=>x.id!==id);save();renderPage()}
+function addCL(mid){const inp=document.getElementById('ni');if(!inp||!inp.value.trim())return;getCL(mid).push({id:Date.now(),text:inp.value.trim(),done:false});save();renderPage()}
+
+function uf(f,v){
+  const p=proj();p[f]=v;
+  if(f==='type')S.activeMil=null;
+  save();
+  if(f==='location')return;
+  if(f==='name')renderTabs();
+  renderPage();
+}
+function addProject(){
+  const inp=document.getElementById('new-proj-name');const name=inp.value.trim();if(!name)return;
+  const id='p'+Date.now();S.projects.push(mkP(id,name,'gf',1,0,0));
+  S.activeId=id;S.activeMil=null;save();closeModal();render();
+}
+function closeModal(){document.getElementById('modal-proj').classList.remove('open');document.getElementById('new-proj-name').value=''}
+document.getElementById('new-proj-name').addEventListener('keydown',e=>{if(e.key==='Enter')addProject()});
+
+function render(){renderTabs();renderPage()}
+render();
+</script>
+<div class="com-overlay" id="com-overlay" onclick="closeComIfOutside(event)">
+  <div class="com-panel" id="com-panel">
+    <div class="com-header">
+      <span class="com-header-title">Commentaire</span>
+      <button class="com-close" onclick="closeCom()">×</button>
+    </div>
+    <div class="com-toolbar">
+      <button class="com-tb-btn" onclick="fmt2('bold')" title="Gras"><b>G</b></button>
+      <button class="com-tb-btn" onclick="fmt2('italic')" title="Italique"><i>I</i></button>
+      <button class="com-tb-btn" onclick="fmt2('underline')" title="Souligné"><u>S</u></button>
+      <button class="com-tb-btn" onclick="fmt2('strikeThrough')" title="Barré"><s>B</s></button>
+      <div class="com-tb-sep"></div>
+      <div class="com-colors">
+        <div class="com-color" style="background:#1C2333" onclick="fmt2('foreColor','#1C2333')" title="Noir"></div>
+        <div class="com-color" style="background:#A32D2D" onclick="fmt2('foreColor','#A32D2D')" title="Rouge"></div>
+        <div class="com-color" style="background:#2D7A3A" onclick="fmt2('foreColor','#2D7A3A')" title="Vert"></div>
+        <div class="com-color" style="background:#1A5FAD" onclick="fmt2('foreColor','#1A5FAD')" title="Bleu"></div>
+        <div class="com-color" style="background:#8A5200" onclick="fmt2('foreColor','#8A5200')" title="Ambre"></div>
+        <div class="com-color" style="background:#9AA3B2" onclick="fmt2('foreColor','#9AA3B2')" title="Gris"></div>
+      </div>
+    </div>
+    <div class="com-editor" id="com-editor" contenteditable="true"></div>
+    <div class="com-footer">
+      <button class="com-btn-cancel" onclick="closeCom()">Annuler</button>
+      <button class="com-btn-save" onclick="saveCom()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
