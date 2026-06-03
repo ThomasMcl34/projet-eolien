@@ -238,6 +238,7 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .arc-empty{color:var(--text3);font-size:12px;text-align:center;padding:28px}
 .empty-tasks{text-align:center;color:var(--text3);font-size:11.5px;padding:22px}
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="tabs-bar" id="tabs-bar"></div>
@@ -330,6 +331,8 @@ function renderTabs(){
   tools.innerHTML=`
     <button onclick="exportData()" style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Exporter toutes les données">⬇ Exporter</button>
     <label style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Importer des données">⬆ Importer<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+    <button id="drive-btn" onclick="driveAuth()" style="font-size:10px;padding:3px 9px;border:1px solid #c3d9f5;border-radius:5px;background:rgba(227,237,250,.8);color:#1A5FAD;cursor:pointer;font-weight:500">☁ Drive</button>
+    <button id="drive-btn" onclick="driveAuth()" style="font-size:10px;padding:3px 9px;border:1px solid #c3d9f5;border-radius:5px;background:rgba(227,237,250,.8);color:#1A5FAD;cursor:pointer;font-weight:500" title="Sauvegarder sur Google Drive">☁ Drive</button>
   `;
   bar.appendChild(tools);
 }
@@ -728,6 +731,106 @@ document.getElementById('new-proj-name').addEventListener('keydown',e=>{if(e.key
 
 function render(){renderTabs();renderPage()}
 render();
+
+// Sauvegarde auto à la fermeture
+window.addEventListener('beforeunload', function(e){
+  if(_driveToken){ driveBackup(); }
+});
+
+// ── GOOGLE DRIVE BACKUP ──
+const GDRIVE_CLIENT_ID = '979935964281-k56ro4m4q3rbk0bhqg191sdcvps69jei.apps.googleusercontent.com';
+const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+let _driveToken = null;
+
+function driveAuth(){
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GDRIVE_CLIENT_ID,
+    scope: GDRIVE_SCOPE,
+    callback: (resp) => {
+      if(resp.error){ alert('Erreur de connexion Google : ' + resp.error); return; }
+      _driveToken = resp.access_token;
+      updateDriveBtn(true);
+      driveBackup();
+    }
+  });
+  client.requestAccessToken();
+}
+
+function updateDriveBtn(connected){
+  const btn = document.getElementById('drive-btn');
+  if(!btn) return;
+  if(connected){
+    btn.textContent = '☁ Sauvegarde Drive';
+    btn.style.background = 'rgba(214,240,220,.9)';
+    btn.style.borderColor = '#a8dcb2';
+    btn.style.color = '#236630';
+    btn.onclick = driveBackup;
+  }
+}
+
+async function driveBackup(){
+  if(!_driveToken){ driveAuth(); return; }
+  const btn = document.getElementById('drive-btn');
+  if(btn){ btn.textContent = '☁ Sauvegarde…'; btn.style.opacity='.7'; }
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'_'+pad(now.getHours())+'h'+pad(now.getMinutes());
+  const filename = 'projets-eoliens-'+dateStr+'.json';
+  const content = JSON.stringify(S, null, 2);
+
+  try {
+    // Find or create folder "Sauvegardes Gestion Projets"
+    const folderName = 'Sauvegardes Gestion Projets';
+    let folderId = await getDriveFolderId(folderName);
+    if(!folderId) folderId = await createDriveFolder(folderName);
+
+    // Upload file
+    await uploadToDrive(filename, content, folderId);
+
+    if(btn){ btn.textContent = '☁ Sauvegardé ✓'; btn.style.opacity='1'; }
+    setTimeout(()=>{ if(btn){ btn.textContent='☁ Sauvegarde Drive'; btn.style.opacity='1'; } }, 3000);
+  } catch(e){
+    console.error(e);
+    if(btn){ btn.textContent='☁ Erreur Drive'; btn.style.opacity='1'; }
+    if(e.message==='401'){ _driveToken=null; driveAuth(); }
+  }
+}
+
+async function getDriveFolderId(name){
+  const q = encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+    headers:{ Authorization: 'Bearer '+_driveToken }
+  });
+  if(r.status===401) throw new Error('401');
+  const d = await r.json();
+  return d.files && d.files.length ? d.files[0].id : null;
+}
+
+async function createDriveFolder(name){
+  const r = await fetch('https://www.googleapis.com/drive/v3/files', {
+    method:'POST',
+    headers:{ Authorization:'Bearer '+_driveToken, 'Content-Type':'application/json' },
+    body: JSON.stringify({ name, mimeType:'application/vnd.google-apps.folder' })
+  });
+  if(r.status===401) throw new Error('401');
+  const d = await r.json();
+  return d.id;
+}
+
+async function uploadToDrive(filename, content, folderId){
+  const meta = { name: filename, parents: [folderId] };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'}));
+  form.append('file', new Blob([content], {type:'application/json'}));
+  const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method:'POST',
+    headers:{ Authorization:'Bearer '+_driveToken },
+    body: form
+  });
+  if(r.status===401) throw new Error('401');
+  return r.json();
+}
 </script>
 <div class="link-modal-bg" id="link-modal-bg" onclick="closeLinkModalIfOutside(event)">
   <div class="link-modal" id="link-modal">
