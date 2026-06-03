@@ -170,6 +170,32 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .add-type-row button{padding:2px 9px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.link-modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:250;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.link-modal-bg.open{display:flex}
+.link-modal{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:380px;box-shadow:0 8px 32px rgba(20,40,100,.15)}
+.link-modal h3{font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text)}
+.link-modal .lm-field{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.link-modal .lm-field label{font-size:10px;color:var(--text2);font-weight:500}
+.link-modal .lm-field input{padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit}
+.link-modal .lm-field input:focus{border-color:var(--blue-mid);background:#fff}
+.link-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.link-modal-btns button{padding:5px 14px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
+.link-modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
+.link-modal-btns .primary:hover{background:var(--blue)}
+/* links card */
+.links-card{flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.links-list{display:flex;flex-direction:column;gap:4px}
+.link-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border)}
+.link-item:hover{border-color:var(--border2);background:#f0f4fa}
+.link-item a{flex:1;font-size:11.5px;color:var(--blue);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.link-item a:hover{text-decoration:underline}
+.link-edit-btn{border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3);padding:2px 5px;border-radius:4px;flex-shrink:0}
+.link-edit-btn:hover{background:var(--border);color:var(--text)}
+.link-del-btn{border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:2px 5px;border-radius:4px;flex-shrink:0;opacity:0}
+.link-item:hover .link-del-btn{opacity:1}
+.link-del-btn:hover{background:#fdeaea;color:var(--red)}
+.btn-add-link{font-size:10.5px;padding:3px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;align-self:flex-start;margin-top:2px}
+.btn-add-link:hover{background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)}
 .modal-bg.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;width:320px;box-shadow:0 8px 32px rgba(20,40,100,.14)}
 .modal h3{font-size:14px;font-weight:700;margin-bottom:14px}
@@ -253,7 +279,7 @@ const DCL={
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[]};
+  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -274,6 +300,7 @@ S.projects.forEach(p=>{
   if(!p.tasks)p.tasks=[];
   if(!p.archivedTasks)p.archivedTasks=[];
   if(p.location===undefined)p.location='';
+  if(!p.links)p.links=[];
 });
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
@@ -406,6 +433,18 @@ function renderPage(){
         </div>
       </div>
 
+      <div class="card links-card">
+        <div class="section-title">Liens</div>
+        <div class="links-list" id="links-list">
+          ${p.links.length ? p.links.map((l,i)=>`
+            <div class="link-item">
+              <a href="${esc(l.url)}" target="_blank" title="${esc(l.url)}">${esc(l.name)}</a>
+              <button class="link-edit-btn" onclick="openLinkModal(${i})" title="Modifier">✏️</button>
+              <button class="link-del-btn" onclick="deleteLink(${i})" title="Supprimer">✕</button>
+            </div>`).join('') : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun lien</span>'}
+        </div>
+        <button class="btn-add-link" onclick="openLinkModal()">+ Ajouter un lien</button>
+      </div>
       <div class="card timeline-card">
         <div class="section-title">Frise chronologique</div>
         <div class="milestones">${progressBar}${msHtml}</div>
@@ -555,6 +594,47 @@ function importData(e){
   reader.readAsText(file);
   e.target.value=''; // reset input
 }
+let _linkEditIdx=null;
+function openLinkModal(idx){
+  _linkEditIdx=(idx!==undefined)?idx:null;
+  const p=proj();
+  const title=document.getElementById('link-modal-title');
+  const nameInp=document.getElementById('link-name-inp');
+  const urlInp=document.getElementById('link-url-inp');
+  if(_linkEditIdx!==null){
+    const l=p.links[_linkEditIdx];
+    title.textContent='Modifier le lien';
+    nameInp.value=l.name||'';
+    urlInp.value=l.url||'';
+  } else {
+    title.textContent='Ajouter un lien';
+    nameInp.value='';urlInp.value='';
+  }
+  document.getElementById('link-modal-bg').classList.add('open');
+  setTimeout(()=>nameInp.focus(),50);
+}
+function closeLinkModal(){
+  document.getElementById('link-modal-bg').classList.remove('open');
+  _linkEditIdx=null;
+}
+function closeLinkModalIfOutside(e){
+  if(e.target===document.getElementById('link-modal-bg'))closeLinkModal();
+}
+function saveLink(){
+  const name=document.getElementById('link-name-inp').value.trim();
+  const url=document.getElementById('link-url-inp').value.trim();
+  if(!name||!url)return;
+  const p=proj();
+  let finalUrl=url;
+  if(!/^https?:\/\//i.test(finalUrl))finalUrl='https://'+finalUrl;
+  if(_linkEditIdx!==null){p.links[_linkEditIdx]={name,url:finalUrl};}
+  else{p.links.push({name,url:finalUrl});}
+  save();closeLinkModal();renderPage();
+}
+function deleteLink(idx){
+  const p=proj();p.links.splice(idx,1);save();renderPage();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('link-modal-bg').classList.contains('open'))saveLink();});
 let _comTaskId=null;
 function openCom(id){
   const p=proj();const t=p.tasks.find(x=>x.id===id);if(!t)return;
@@ -649,7 +729,18 @@ document.getElementById('new-proj-name').addEventListener('keydown',e=>{if(e.key
 function render(){renderTabs();renderPage()}
 render();
 </script>
-<div class="com-overlay" id="com-overlay" onclick="closeComIfOutside(event)">
+<div class="link-modal-bg" id="link-modal-bg" onclick="closeLinkModalIfOutside(event)">
+  <div class="link-modal" id="link-modal">
+    <h3 id="link-modal-title">Ajouter un lien</h3>
+    <div class="lm-field"><label>Nom affiché</label><input type="text" id="link-name-inp" placeholder="ex: Dossier Lascombes…"></div>
+    <div class="lm-field"><label>URL</label><input type="text" id="link-url-inp" placeholder="https://…"></div>
+    <div class="link-modal-btns">
+      <button onclick="closeLinkModal()">Annuler</button>
+      <button class="primary" onclick="saveLink()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="com-overlay"  id="com-overlay" onclick="closeComIfOutside(event)">
   <div class="com-panel" id="com-panel">
     <div class="com-header">
       <span class="com-header-title">Commentaire</span>
