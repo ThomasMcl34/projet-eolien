@@ -55,24 +55,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 
 /* VUE FRISE */
 .frise-view{display:flex;flex-direction:column;height:100%}
-.milestones{display:flex;align-items:flex-start;position:relative;margin-top:8px;flex:1}
-.milestones::before{content:'';position:absolute;top:13px;left:16px;right:16px;height:3px;background:var(--border);z-index:0;border-radius:2px}
-.ms-progress{position:absolute;top:13px;left:16px;height:3px;background:linear-gradient(90deg,#2D7A3A,#3B82D4);z-index:1;border-radius:2px;transition:width .4s ease;pointer-events:none}
-.ms{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2}
-.ms-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);margin-bottom:5px;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.1);cursor:pointer}
-.ms-dot:hover{border-color:var(--blue-mid);background:var(--blue-light);transform:scale(1.2)}
-.ms.has-date .ms-dot{background:var(--blue-mid);border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,212,.18)}
-.ms.passed .ms-dot{background:var(--green);border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,58,.2)}
-.ms.sel .ms-dot{box-shadow:0 0 0 4px rgba(59,130,212,.3);transform:scale(1.25)}
-.ms-name{font-size:9.5px;color:var(--text2);text-align:center;line-height:1.25;margin-bottom:4px;font-weight:500}
+.milestones{display:flex;align-items:flex-start;position:relative;padding:0 8px}
+.frise-arrow{position:absolute;top:14px;left:20px;right:14px;height:0;border-top:1.5px solid var(--border2);z-index:0;pointer-events:none}
+.frise-arrow::after{content:'';position:absolute;right:-1px;top:-5px;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--border2)}
+.frise-green{position:absolute;top:14px;left:20px;height:0;border-top:1.5px solid #3B6D11;z-index:1;pointer-events:none}
+.ms{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2;gap:4px}
+.ms-diamond-wrap{position:relative;width:18px;height:18px;flex-shrink:0}
+.ms-dot{width:18px;height:18px;border-radius:3px;transform:rotate(45deg);border:2px solid var(--border2);background:var(--surface);transition:all .15s;cursor:pointer}
+.ms-check{font-size:8px;color:#fff;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);line-height:1;font-weight:700;pointer-events:none}
+.ms.ms-nodate .ms-dot{background:#f0f1f4;border-color:#c8cdd8}
+.ms.ms-future .ms-dot{background:#fff0f0;border-color:#e07070;box-shadow:0 0 0 3px rgba(200,50,50,.1)}
+.ms.ms-passed .ms-dot{background:#3B6D11;border-color:#27500A;box-shadow:0 0 0 3px #EAF3DE}
+.ms.sel .ms-dot{box-shadow:0 0 0 4px rgba(59,130,212,.25);transform:rotate(45deg) scale(1.15)}
+.ms-name{font-size:9.5px;color:var(--text2);text-align:center;line-height:1.25;font-weight:500;white-space:nowrap}
+.ms.ms-passed .ms-name{color:#3B6D11;font-weight:600}
+.ms.ms-future .ms-name{color:#c03030}
 .ms.sel .ms-name{color:var(--blue);font-weight:700}
 .ms-date-area{text-align:center}
-.ms-date-area .dp{color:var(--text3);border:1px dashed var(--border2);border-radius:3px;padding:1px 5px;cursor:pointer;font-size:9.5px;display:inline-block}
+.ms-date-area .dp{color:var(--text3);border:1px dashed var(--border2);border-radius:3px;padding:1px 4px;cursor:pointer;font-size:9px;display:inline-block}
 .ms-date-area .dp:hover{border-color:var(--blue-mid);color:var(--blue-mid)}
-.ms-date-area .dv{color:var(--blue);font-weight:600;font-size:9.5px;cursor:pointer;display:inline-block}
-.ms-date-area input[type=date]{font-size:9.5px;border:1px solid var(--blue-mid);border-radius:4px;padding:2px 4px;background:#fff;color:var(--text);width:100px}
-
-/* VUE CHECKLIST (remplace frise) */
+.ms-date-area .dv{font-weight:600;font-size:9px;cursor:pointer;display:inline-block}
+.ms.ms-passed .ms-date-area .dv{color:#3B6D11}
+.ms.ms-future .ms-date-area .dv{color:#c03030}
+.ms-warn{font-size:8px;color:#c03030;text-align:center}
+/* checklist inline */
 .checklist-inline{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .cl-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
 .cl-topbar-left{display:flex;align-items:center;gap:8px}
@@ -80,14 +86,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .cl-count{font-size:10px;color:var(--text3)}
 .btn-cl-close{border:none;background:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 5px;border-radius:4px;line-height:1}
 .btn-cl-close:hover{background:var(--surface2);color:var(--text)}
-.cl-body{flex:1;overflow-y:auto}
+.cl-body{max-height:110px;overflow-y:auto}
 .cl-body::-webkit-scrollbar{width:3px}
 .cl-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.cl-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)}
+.cl-item{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--border)}
 .cl-item:last-child{border-bottom:none}
-.cl-item input[type=checkbox]{width:13px;height:13px;cursor:pointer;flex-shrink:0;accent-color:#2D7A3A}
+.cl-item input[type=checkbox]{width:13px;height:13px;cursor:pointer;flex-shrink:0;accent-color:var(--blue-mid)}
 .cl-item span{flex:1;font-size:11.5px;line-height:1.4;color:#A32D2D;font-weight:500}
-.cl-item.done span{text-decoration:line-through;color:#9AA3B2;font-weight:400;color:#7A8A70}
+.cl-item.done span{text-decoration:line-through;color:#9AA3B2;font-weight:400}
 .cl-del{font-size:12px;color:var(--text3);cursor:pointer;padding:0 4px;border:none;background:none;opacity:0;border-radius:4px}
 .cl-item:hover .cl-del{opacity:1}
 .add-row{display:flex;gap:5px;margin-top:6px;flex-shrink:0}
@@ -147,15 +153,34 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 
 .td-com{position:relative;max-width:0;overflow:hidden}
 .td-com input{width:100%}
-.act-btns{display:flex;gap:4px;align-items:center}
+.act-btns{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+/* Study progress */
+.study-row{padding:8px 10px 10px;border-top:1px solid var(--border);background:inherit}
+.study-jalons{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.study-jalon{display:flex;flex-direction:column;align-items:center;gap:2px}
+.study-badge{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:10.5px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all .15s;white-space:nowrap;user-select:none;line-height:1.4}
+.study-badge.sj-idle{background:#f0f1f4;color:#7a8299;border-color:#d0d4de}
+.study-badge.sj-todo{background:#FFF0F0;color:#A32D2D;border-color:#F0B8B8;cursor:pointer}
+.study-badge.sj-todo:hover{background:#fde0e0;border-color:#E24B4A}
+.study-badge.sj-idle:hover{background:#e3edfa;border-color:var(--blue-mid);color:var(--blue)}
+.study-badge.sj-current{background:var(--blue-mid);color:#fff;border-color:var(--blue);box-shadow:0 2px 8px rgba(59,130,212,.25)}
+.study-badge.sj-passed{background:#E3F5E7;color:#2D7A3A;border-color:#a8dcb2}
+.study-badge.sj-disabled{background:#f5f5f5;color:#bbb;border-color:#e0e0e0;cursor:not-allowed;text-decoration:line-through}
+.study-sep{font-size:14px;color:var(--border2);line-height:1;flex-shrink:0;align-self:center;margin-bottom:14px}
+.study-sep.passed{color:#2D7A3A}
+.study-toggle{font-size:9px;color:var(--text3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-align:center}
+.study-toggle:hover{color:var(--red)}
+
+.act-btns{display:flex;gap:4px;align-items:center;justify-content:flex-end}
 .abtn{border:none;cursor:pointer;font-size:10.5px;padding:3px 8px;border-radius:5px;font-weight:500;font-family:inherit;white-space:nowrap}
 .abtn-del{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
 .abtn-del:hover{background:#F5C8C8}
+.abtn-x{width:26px;height:26px;border-radius:5px;background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8;cursor:pointer;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:.12s;flex-shrink:0}
+.abtn-x:hover{background:#A32D2D;color:#fff;border-color:#A32D2D}
 .abtn-arc{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2}
 .abtn-arc:hover{background:#BEE8C8}
 .abtn-restore{background:var(--blue-light);color:var(--blue);border:1px solid #B8D8F5}
 .abtn-restore:hover{background:#C8DCEE}
-
 .type-wrap{position:relative}
 .type-trigger{cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;min-height:24px;padding:2px 6px;border:1px solid var(--border);border-radius:5px;background:var(--surface2);gap:2px}
 .type-trigger:hover{border-color:var(--blue-mid)}
@@ -170,6 +195,17 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .add-type-row button{padding:2px 9px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+/* Risks */
+.risk-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.risk-faible{background:#FFFDE8;color:#8A6A00;border:1px solid #F5D800}
+.risk-modere{background:#FFF3E0;color:#8A4500;border:1px solid #FF9800}
+.risk-fort{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
+.risk-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative}
+.risk-item:hover{border-color:var(--border2);background:#f0f4fa}
+.risk-com-icon{font-size:13px;color:var(--text3);cursor:pointer;flex-shrink:0;position:relative}
+.risk-com-icon:hover{color:var(--blue)}
+.risk-tooltip{display:none;position:absolute;right:24px;top:-4px;background:var(--text);color:#fff;font-size:10.5px;padding:5px 9px;border-radius:7px;max-width:200px;line-height:1.4;z-index:50;white-space:pre-wrap;pointer-events:none;text-align:left}
+.risk-com-icon:hover .risk-tooltip{display:block}
 .link-modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:250;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .link-modal-bg.open{display:flex}
 .link-modal{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:380px;box-shadow:0 8px 32px rgba(20,40,100,.15)}
@@ -277,10 +313,17 @@ const DCL={
   soc:[],
   toc:[]
 };
+const STUDY_JALONS=[
+  {id:'consultation',label:'Consultation',skippable:false},
+  {id:'devis',label:'Devis',skippable:false},
+  {id:'contrat',label:'Contrat',skippable:true},
+  {id:'admin',label:'Adm. chantier',skippable:true},
+  {id:'livrable',label:'Livrable',skippable:false}
+];
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[]};
+  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -302,6 +345,7 @@ S.projects.forEach(p=>{
   if(!p.archivedTasks)p.archivedTasks=[];
   if(p.location===undefined)p.location='';
   if(!p.links)p.links=[];
+  if(!p.risks)p.risks=[];
 });
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
@@ -340,33 +384,27 @@ function renderTabs(){
 function renderPage(){
   const p=proj();const isRP=p.type==='rp';
 
-  // frise HTML — progress logic
+  // frise HTML
   const today = new Date(); today.setHours(0,0,0,0);
-  // find last passed milestone index
-  let lastPassedIdx = -1;
-  MS.forEach((m,i)=>{ const d=p.dates[m.id]; if(d && new Date(d)<=today) lastPassedIdx=i; });
-  // progress % within current segment
-  let progressStyle = '';
-  if(lastPassedIdx >= 0) {
-    const nextIdx = lastPassedIdx+1;
-    let pct = 0;
-    if(nextIdx < MS.length && p.dates[MS[nextIdx].id]) {
-      const lastD = new Date(p.dates[MS[lastPassedIdx].id]);
-      const nextD = new Date(p.dates[MS[nextIdx].id]);
-      const total = nextD - lastD;
-      const elapsed = today - lastD;
-      pct = Math.min(100, Math.max(0, (elapsed/total)*100));
-    }
-    const segW = 100/(MS.length-1);
-    const filled = (lastPassedIdx * segW) + (pct * segW / 100);
-    progressStyle = `width:${filled}%`;
-  }
 
   const msHtml=MS.map((m,i)=>{
-    const d=p.dates[m.id]||'';const sel=S.activeMil===m.id;
-    const passed = d && new Date(d)<=today;
-    return`<div class="ms${d?' has-date':''}${sel?' sel':''}${passed?' passed':''}">
-      <div class="ms-dot" onclick="selMil('${m.id}')"></div>
+    const d=p.dates[m.id]||'';
+    const sel=S.activeMil===m.id;
+    const prevD=i>0?p.dates[MS[i-1].id]:'';
+    const dateObj=d?new Date(d):null;
+    const passed=dateObj&&dateObj<=today;
+    const future=dateObj&&dateObj>today;
+    const badOrder=d&&prevD&&new Date(d)<new Date(prevD);
+    let cls='ms';
+    if(!d) cls+=' ms-nodate';
+    else if(passed) cls+=' ms-passed';
+    else if(future) cls+=' ms-future';
+    if(sel) cls+=' sel';
+    return`<div class="${cls}" data-mid="${m.id}">
+      <div class="ms-diamond-wrap">
+        <div class="ms-dot" onclick="selMil('${m.id}')"></div>
+        ${passed?'<span class="ms-check">✓</span>':''}
+      </div>
       <div class="ms-name">${m.name}</div>
       <div class="ms-date-area">
         ${d
@@ -374,9 +412,10 @@ function renderPage(){
           :`<span class="dp" onclick="openDateInput('${m.id}',this)">+ date</span>`
         }
       </div>
+      ${badOrder?`<div class="ms-warn">⚠ ordre</div>`:''}
     </div>`;
   }).join('');
-  const progressBar = lastPassedIdx>=0 ? `<div class="ms-progress" style="${progressStyle}"></div>` : '';
+  const progressBar='<div class="frise-arrow"></div><div class="frise-green" id="frise-green-'+p.id+'"></div>';
 
   // checklist HTML
   let clHtml='';
@@ -437,6 +476,21 @@ function renderPage(){
       </div>
 
       <div class="card links-card">
+        <div class="section-title">Risques</div>
+        <div id="risks-list">
+          ${p.risks.length ? p.risks.map((r,i)=>`
+            <div class="risk-item" ondblclick="openRiskModal(${i})">
+              <span style="font-size:10px;color:var(--text2);font-weight:500;min-width:55px">${esc(r.theme)}</span>
+              <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span>
+              <span class="risk-badge risk-${r.level}">${r.level==='faible'?'Faible':r.level==='modere'?'Modéré':'Fort'}</span>
+              ${r.comment?`<span class="risk-com-icon">💬<span class="risk-tooltip">${esc(r.comment)}</span></span>`:'<span style="width:19px"></span>'}
+              <button style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 2px;border-radius:3px" onclick="deleteRisk(${i},event)" title="Supprimer">✕</button>
+            </div>`).join('')
+          : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun risque</span>'}
+        </div>
+        <button class="btn-add-link" onclick="openRiskModal()">+ Ajouter un risque</button>
+      </div>
+      <div class="card links-card">
         <div class="section-title">Liens</div>
         <div class="links-list" id="links-list">
           ${p.links.length ? p.links.map((l,i)=>`
@@ -450,7 +504,7 @@ function renderPage(){
       </div>
       <div class="card timeline-card">
         <div class="section-title">Frise chronologique</div>
-        <div class="milestones">${progressBar}${msHtml}</div>
+        <div class="milestones" id="frise-ms-${p.id}">${progressBar}${msHtml}</div>
         ${clHtml}
       </div>
     </div>
@@ -472,13 +526,14 @@ function renderPage(){
             <th class="col-state">État</th>
             <th class="col-prio">Priorité</th>
             <th class="col-com">Commentaire</th>
-            <th class="col-act">Actions</th>
+            <th class="col-act"></th>
           </tr></thead>
           <tbody>${taskRows}</tbody>
         </table>
       </div>
     </div>
   </div>`;
+  setTimeout(updateGreenLine,30);
 }
 
 function openDateInput(mid, el){
@@ -532,9 +587,12 @@ function taskRow(t,archived){
     </td>
     <td><div class="act-btns">
       ${t.state==='fi'?`<button class="abtn abtn-arc" onclick="archTask('${t.id}')">Archiver</button>`:''}
-      <button class="abtn abtn-del" onclick="delTask('${t.id}')">Supprimer</button>
+      <button class="abtn-x" onclick="delTask('${t.id}')" title="Supprimer">✕</button>
     </div></td>
-  </tr>`;
+  </tr>
+  ${(t.types||[]).includes('Études')?`<tr id="study-${t.id}" class="${rowCls(t)}">
+    <td colspan="7" class="study-row">${renderStudyBar(t)}</td>
+  </tr>`:''}`;
 }
 
 function editTaskDate(id, td){
@@ -596,6 +654,48 @@ function importData(e){
   };
   reader.readAsText(file);
   e.target.value=''; // reset input
+}
+// ── RISKS ──
+const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
+let _riskEditIdx=null;
+function openRiskModal(idx){
+  _riskEditIdx=(idx!==undefined)?idx:null;
+  const p=proj();
+  document.getElementById('risk-modal-title').textContent=_riskEditIdx!==null?'Modifier le risque':'Ajouter un risque';
+  if(_riskEditIdx!==null){
+    const r=p.risks[_riskEditIdx];
+    document.getElementById('risk-theme-inp').value=r.theme||'Turbines';
+    document.getElementById('risk-name-inp').value=r.name||'';
+    document.getElementById('risk-level-inp').value=r.level||'faible';
+    document.getElementById('risk-com-inp').value=r.comment||'';
+  } else {
+    document.getElementById('risk-theme-inp').value='Turbines';
+    document.getElementById('risk-name-inp').value='';
+    document.getElementById('risk-level-inp').value='faible';
+    document.getElementById('risk-com-inp').value='';
+  }
+  document.getElementById('risk-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('risk-name-inp').focus(),50);
+}
+function closeRiskModal(){document.getElementById('risk-modal-bg').classList.remove('open');_riskEditIdx=null;}
+function closeRiskModalIfOutside(e){if(e.target===document.getElementById('risk-modal-bg'))closeRiskModal();}
+function saveRisk(){
+  const name=document.getElementById('risk-name-inp').value.trim();
+  if(!name)return;
+  const p=proj();
+  const r={
+    theme:document.getElementById('risk-theme-inp').value,
+    name,
+    level:document.getElementById('risk-level-inp').value,
+    comment:document.getElementById('risk-com-inp').value.trim()
+  };
+  if(_riskEditIdx!==null){p.risks[_riskEditIdx]=r;}
+  else{p.risks.push(r);}
+  save();closeRiskModal();renderPage();
+}
+function deleteRisk(idx,e){
+  e.stopPropagation();
+  const p=proj();p.risks.splice(idx,1);save();renderPage();
 }
 let _linkEditIdx=null;
 function openLinkModal(idx){
@@ -666,9 +766,54 @@ function fmt2(cmd,val){
   document.getElementById('com-editor').focus();
   document.execCommand(cmd,false,val||null);
 }
-function addTask(){const p=proj();p.tasks.unshift({id:'t'+Date.now(),types:[],name:'',date:'',state:'ac',prio:false,comment:''});save();renderPage()}
+function renderStudyBar(t){
+  if(!t.study) t.study={done:{},skipped:{}};
+  if(!t.study.done) t.study.done={};
+  if(!t.study.skipped) t.study.skipped={};
+
+  let html='';
+  STUDY_JALONS.forEach((j,i)=>{
+    const isDisabled=j.skippable&&t.study.skipped[j.id];
+    const isDone=!isDisabled&&t.study.done[j.id];
+    const cls='study-badge '+(isDisabled?'sj-disabled':isDone?'sj-passed':'sj-todo');
+    const clickFn=isDisabled?'':` onclick="toggleStudyDone('${t.id}','${j.id}')"`;
+    const label=isDone?'✓ '+j.label:j.label;
+    const toggleHtml=j.skippable
+      ?`<div class="study-toggle" onclick="toggleStudySkip('${t.id}','${j.id}')">${isDisabled?'réactiver':'ignorer'}</div>`
+      :'<div style="height:13px"></div>';
+    html+=`<div class="study-jalon"><div class="${cls}"${clickFn}>${label}</div>${toggleHtml}</div>`;
+    if(i<STUDY_JALONS.length-1) html+=`<span class="study-sep">›</span>`;
+  });
+
+  return`<div class="study-jalons">${html}</div>`;
+}
+
+function toggleStudyDone(tid,jid){
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);if(!t)return;
+  if(!t.study)t.study={done:{},skipped:{}};
+  if(!t.study.done)t.study.done={};
+  t.study.done[jid]=!t.study.done[jid];
+  save();
+  const row=document.getElementById('study-'+tid);
+  if(row)row.querySelector('.study-row').innerHTML=renderStudyBar(t);
+}
+
+function toggleStudySkip(tid,jid){
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);if(!t)return;
+  if(!t.study)t.study={done:{},skipped:{}};
+  if(!t.study.skipped)t.study.skipped={};
+  t.study.skipped[jid]=!t.study.skipped[jid];
+  save();
+  const row=document.getElementById('study-'+tid);
+  if(row)row.querySelector('.study-row').innerHTML=renderStudyBar(t);
+}
+
+function addTask(){const p=proj();p.tasks.unshift({id:'t'+Date.now(),types:[],name:'',date:'',state:'ac',prio:false,comment:'',commentHtml:'',study:{current:null,skipped:{}}});save();renderPage()}
 function upTask(id,f,v){const p=proj();const t=p.tasks.find(x=>x.id===id);if(t){t[f]=v;save();}if(f==='state'||f==='prio')renderPage();}
-function delTask(id){const p=proj();p.tasks=p.tasks.filter(x=>x.id!==id);save();renderPage()}
+let _delTaskId=null;
+function delTask(id){_delTaskId=id;document.getElementById('modal-confirm').classList.add('open')}
+function confirmDelete(){if(!_delTaskId)return;const p=proj();p.tasks=p.tasks.filter(x=>x.id!==_delTaskId);save();_delTaskId=null;closeConfirm();renderPage()}
+function closeConfirm(){document.getElementById('modal-confirm').classList.remove('open');_delTaskId=null}
 function archTask(id){const p=proj();const i=p.tasks.findIndex(x=>x.id===id);if(i<0)return;p.archivedTasks.unshift(p.tasks.splice(i,1)[0]);save();renderPage()}
 function restoreTask(id){const p=proj();const i=p.archivedTasks.findIndex(x=>x.id===id);if(i<0)return;p.tasks.unshift(p.archivedTasks.splice(i,1)[0]);save();openArc()}
 
@@ -689,8 +834,8 @@ function togType(tid,tp,checked){
   const p=proj();const t=p.tasks.find(x=>x.id===tid);if(!t)return;
   if(checked){if(!t.types.includes(tp))t.types.push(tp);}else{t.types=t.types.filter(x=>x!==tp);}
   save();
-  const trig=document.querySelector(`#tr-${tid} .type-trigger`);
-  if(trig)trig.innerHTML=t.types.map(tp=>`<span class="type-pill">${tp}</span>`).join('')||'<span style="color:var(--text3);font-size:10px">Choisir…</span>';
+  // re-render full row to show/hide study bar
+  renderPage();
 }
 function addType(tid){
   const inp=document.getElementById('nti');if(!inp||!inp.value.trim())return;
@@ -703,7 +848,7 @@ function openArc(){
   const p=proj();
   document.getElementById('arc-proj-name').textContent=p.name;
   document.getElementById('arc-body').innerHTML=p.archivedTasks.length
-    ?`<table class="tasks" style="width:100%"><thead><tr><th class="col-type">Type</th><th class="col-name">Nom</th><th class="col-date">Échéance</th><th class="col-state">État</th><th class="col-prio">Priorité</th><th class="col-com">Commentaire</th><th class="col-act">Actions</th></tr></thead><tbody>${p.archivedTasks.map(t=>taskRow(t,true)).join('')}</tbody></table>`
+    ?`<table class="tasks" style="width:100%"><thead><tr><th class="col-type">Type</th><th class="col-name">Nom</th><th class="col-date">Échéance</th><th class="col-state">État</th><th class="col-prio">Priorité</th><th class="col-com">Commentaire</th><th class="col-act"></th></tr></thead><tbody>${p.archivedTasks.map(t=>taskRow(t,true)).join('')}</tbody></table>`
     :'<div class="arc-empty">Aucune tâche archivée</div>';
   document.getElementById('arc-overlay').classList.add('open');
 }
@@ -729,6 +874,20 @@ function addProject(){
 function closeModal(){document.getElementById('modal-proj').classList.remove('open');document.getElementById('new-proj-name').value=''}
 document.getElementById('new-proj-name').addEventListener('keydown',e=>{if(e.key==='Enter')addProject()});
 
+function updateGreenLine(){
+  const p=proj();
+  const track=document.getElementById('fm-'+p.id);
+  const green=document.getElementById('fg-'+p.id);
+  if(!track||!green) return;
+  const jalons=track.querySelectorAll('.ms');
+  let lastPassedEl=null;
+  jalons.forEach(j=>{ if(j.classList.contains('ms-passed')) lastPassedEl=j; });
+  if(!lastPassedEl){ green.style.width='0'; return; }
+  const trackRect=track.getBoundingClientRect();
+  const elRect=lastPassedEl.getBoundingClientRect();
+  const endX=elRect.left+elRect.width/2-trackRect.left;
+  green.style.width=Math.max(0,endX-20)+'px';
+}
 function render(){renderTabs();renderPage()}
 render();
 
@@ -832,7 +991,17 @@ async function uploadToDrive(filename, content, folderId){
   return r.json();
 }
 </script>
-<div class="link-modal-bg" id="link-modal-bg" onclick="closeLinkModalIfOutside(event)">
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer la tâche ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirm()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+<div class="link-modal-bg"  id="link-modal-bg" onclick="closeLinkModalIfOutside(event)">
   <div class="link-modal" id="link-modal">
     <h3 id="link-modal-title">Ajouter un lien</h3>
     <div class="lm-field"><label>Nom affiché</label><input type="text" id="link-name-inp" placeholder="ex: Dossier Lascombes…"></div>
@@ -868,6 +1037,32 @@ async function uploadToDrive(filename, content, folderId){
     <div class="com-footer">
       <button class="com-btn-cancel" onclick="closeCom()">Annuler</button>
       <button class="com-btn-save" onclick="saveCom()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="link-modal-bg" id="risk-modal-bg" onclick="closeRiskModalIfOutside(event)">
+  <div class="link-modal" style="width:360px">
+    <h3 id="risk-modal-title">Ajouter un risque</h3>
+    <div class="lm-field"><label>Thème</label>
+      <select id="risk-theme-inp" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;width:100%">
+        <option>Turbines</option><option>Accès</option><option>Intrasite</option>
+        <option>Planning</option><option>Budget</option><option>Technique</option>
+      </select>
+    </div>
+    <div class="lm-field"><label>Nom</label><input type="text" id="risk-name-inp" placeholder="Description courte du risque…"></div>
+    <div class="lm-field"><label>Niveau</label>
+      <select id="risk-level-inp" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;width:100%">
+        <option value="faible">🟡 Faible</option>
+        <option value="modere">🟠 Modéré</option>
+        <option value="fort">🔴 Fort</option>
+      </select>
+    </div>
+    <div class="lm-field"><label>Commentaire (optionnel)</label>
+      <textarea id="risk-com-inp" rows="3" placeholder="Détails, actions à mener…" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;width:100%;resize:none;line-height:1.5"></textarea>
+    </div>
+    <div class="link-modal-btns">
+      <button onclick="closeRiskModal()">Annuler</button>
+      <button class="primary" onclick="saveRisk()">Enregistrer</button>
     </div>
   </div>
 </div>
