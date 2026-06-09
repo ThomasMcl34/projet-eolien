@@ -175,7 +175,9 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .abtn{border:none;cursor:pointer;font-size:10.5px;padding:3px 8px;border-radius:5px;font-weight:500;font-family:inherit;white-space:nowrap}
 .abtn-del{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
 .abtn-del:hover{background:#F5C8C8}
-.abtn-x{width:26px;height:26px;border-radius:5px;background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8;cursor:pointer;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:.12s;flex-shrink:0}
+.abtn-link{border:none;background:none;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;color:var(--text3);transition:.12s}
+.abtn-link:hover{background:var(--blue-light);color:var(--blue)}
+.abtn-x{width:20px;height:20px;border-radius:4px;background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8;cursor:pointer;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:.12s;flex-shrink:0}
 .abtn-x:hover{background:#A32D2D;color:#fff;border-color:#A32D2D}
 .abtn-arc{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2}
 .abtn-arc:hover{background:#BEE8C8}
@@ -195,12 +197,27 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .add-type-row button{padding:2px 9px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:12px}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+/* ICP */
+.icp-item{padding:5px 8px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:500;color:var(--blue);flex-shrink:0}
+.icp-item:hover{background:var(--blue-light);border-color:var(--blue-mid)}
+.icp-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:350;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.icp-overlay.open{display:flex}
+.icp-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:600px;max-width:95%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15)}
+.icp-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
+.icp-panel-header h3{font-size:13px;font-weight:700}
+.icp-close{border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:2px 8px;border-radius:6px}
+.icp-close:hover{background:var(--surface2)}
+.icp-themes{display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1}
+.icp-theme-row{display:flex;align-items:flex-start;gap:8px}
+.icp-theme-label{width:60px;font-size:10.5px;font-weight:700;color:var(--accent);text-transform:uppercase;padding-top:5px;flex-shrink:0}
+.icp-theme-input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;resize:vertical;min-height:32px}
+.icp-theme-input:focus{border-color:var(--blue-mid);background:#fff}
 /* Risks */
 .risk-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
 .risk-faible{background:#FFFDE8;color:#8A6A00;border:1px solid #F5D800}
 .risk-modere{background:#FFF3E0;color:#8A4500;border:1px solid #FF9800}
 .risk-fort{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
-.risk-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative}
+.risk-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative;flex-shrink:0}
 .risk-item:hover{border-color:var(--border2);background:#f0f4fa}
 .risk-com-icon{font-size:13px;color:var(--text3);cursor:pointer;flex-shrink:0;position:relative}
 .risk-com-icon:hover{color:var(--blue)}
@@ -219,8 +236,8 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .link-modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
 .link-modal-btns .primary:hover{background:var(--blue)}
 /* links card */
-.links-card{flex-shrink:0;display:flex;flex-direction:column;gap:6px}
-.links-list{display:flex;flex-direction:column;gap:4px}
+.links-card{flex-shrink:0;display:flex;flex-direction:column;gap:6px;max-height:160px}
+
 .link-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border)}
 .link-item:hover{border-color:var(--border2);background:#f0f4fa}
 .link-item a{flex:1;font-size:11.5px;color:var(--blue);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
@@ -230,7 +247,10 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .link-del-btn{border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:2px 5px;border-radius:4px;flex-shrink:0;opacity:0}
 .link-item:hover .link-del-btn{opacity:1}
 .link-del-btn:hover{background:#fdeaea;color:var(--red)}
-.btn-add-link{font-size:10.5px;padding:3px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;align-self:flex-start;margin-top:2px}
+.card-scroll-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:0}
+.card-scroll-list::-webkit-scrollbar{width:3px}
+.card-scroll-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.btn-add-link{font-size:10.5px;padding:3px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;align-self:flex-start;margin-top:2px;flex-shrink:0}
 .btn-add-link:hover{background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)}
 .modal-bg.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;width:320px;box-shadow:0 8px 32px rgba(20,40,100,.14)}
@@ -314,6 +334,7 @@ const DCL={
   toc:[]
 };
 const STUDY_JALONS=[
+  {id:'plans',label:'Plans',skippable:true},
   {id:'consultation',label:'Consultation',skippable:false},
   {id:'devis',label:'Devis',skippable:false},
   {id:'contrat',label:'Contrat',skippable:true},
@@ -323,7 +344,7 @@ const STUDY_JALONS=[
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[]};
+  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -346,6 +367,7 @@ S.projects.forEach(p=>{
   if(p.location===undefined)p.location='';
   if(!p.links)p.links=[];
   if(!p.risks)p.risks=[];
+  if(!p.icps)p.icps=[];
 });
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
@@ -477,7 +499,7 @@ function renderPage(){
 
       <div class="card links-card">
         <div class="section-title">Risques</div>
-        <div id="risks-list">
+        <div class="card-scroll-list" id="risks-list">
           ${p.risks.length ? p.risks.map((r,i)=>`
             <div class="risk-item" ondblclick="openRiskModal(${i})">
               <span style="font-size:10px;color:var(--text2);font-weight:500;min-width:55px">${esc(r.theme)}</span>
@@ -491,8 +513,17 @@ function renderPage(){
         <button class="btn-add-link" onclick="openRiskModal()">+ Ajouter un risque</button>
       </div>
       <div class="card links-card">
+        <div class="section-title">Points ICP</div>
+        <div class="card-scroll-list" id="icps-list">
+          ${p.icps.length
+            ? p.icps.map((icp,i)=>`<div class="icp-item" onclick="openIcpPanel(${i})">Point ICP du ${icp.date}</div>`).join('')
+            : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun point ICP</span>'}
+        </div>
+        <button class="btn-add-link" onclick="openNewIcpPanel()" style="margin-top:6px">+ Ajouter un point ICP</button>
+      </div>
+      <div class="card links-card">
         <div class="section-title">Liens</div>
-        <div class="links-list" id="links-list">
+        <div class="card-scroll-list" id="links-list">
           ${p.links.length ? p.links.map((l,i)=>`
             <div class="link-item">
               <a href="${esc(l.url)}" target="_blank" title="${esc(l.url)}">${esc(l.name)}</a>
@@ -587,6 +618,11 @@ function taskRow(t,archived){
     </td>
     <td><div class="act-btns">
       ${t.state==='fi'?`<button class="abtn abtn-arc" onclick="archTask('${t.id}')">Archiver</button>`:''}
+      ${t.taskLink
+        ?`<a href="${esc(t.taskLink.url)}" target="_blank" style="font-size:10.5px;color:var(--blue);font-weight:500;text-decoration:none;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block" title="${esc(t.taskLink.url)}">${esc(t.taskLink.name)}</a>
+         <button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Modifier le lien" style="font-size:10px;padding:1px 3px">✏</button>`
+        :`<button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Ajouter un lien" style="font-size:10px;color:var(--text3)">+🔗</button>`
+      }
       <button class="abtn-x" onclick="delTask('${t.id}')" title="Supprimer">✕</button>
     </div></td>
   </tr>
@@ -655,8 +691,77 @@ function importData(e){
   reader.readAsText(file);
   e.target.value=''; // reset input
 }
+
+// ── ICP ──
+const ICP_THEMES=['proc','racco','elec','cons','cipe','scada'];
+let _icpEditIdx=null;
+function openNewIcpPanel(){
+  _icpEditIdx=null;
+  const today=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const dateStr=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+  document.getElementById('icp-date-inp').value=dateStr;
+  document.getElementById('icp-date-label').textContent='Nouveau';
+  document.getElementById('icp-del-btn').style.display='none';
+  ICP_THEMES.forEach(t=>{ document.getElementById('icp-'+t).value=''; });
+  document.getElementById('icp-overlay').classList.add('open');
+}
+function openIcpPanel(idx){
+  _icpEditIdx=idx;
+  const p=proj();const icp=p.icps[idx];
+  document.getElementById('icp-date-inp').value=icp.rawDate||'';
+  document.getElementById('icp-date-label').textContent=icp.date||'';
+  document.getElementById('icp-del-btn').style.display='';
+  ICP_THEMES.forEach(t=>{ document.getElementById('icp-'+t).value=icp[t]||''; });
+  document.getElementById('icp-overlay').classList.add('open');
+}
+function closeIcpPanel(){document.getElementById('icp-overlay').classList.remove('open');_icpEditIdx=null;}
+function saveIcp(){
+  const rawDate=document.getElementById('icp-date-inp').value;
+  if(!rawDate)return;
+  const [y,m,d]=rawDate.split('-');
+  const date=d+'/'+m+'/'+y;
+  const p=proj();
+  const icp={date,rawDate};
+  ICP_THEMES.forEach(t=>{ icp[t]=document.getElementById('icp-'+t).value.trim(); });
+  if(_icpEditIdx!==null){p.icps[_icpEditIdx]=icp;}
+  else{p.icps.unshift(icp);}
+  save();closeIcpPanel();renderPage();
+}
+function deleteIcp(){
+  if(_icpEditIdx===null)return;
+  const p=proj();p.icps.splice(_icpEditIdx,1);
+  save();closeIcpPanel();renderPage();
+}
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
+// Task link
+let _taskLinkId=null;
+function openTaskLinkModal(tid){
+  _taskLinkId=tid;
+  const p=proj();const t=p.tasks.find(x=>x.id===tid);
+  document.getElementById('tl-name-inp').value=t&&t.taskLink?t.taskLink.name:'';
+  document.getElementById('tl-url-inp').value=t&&t.taskLink?t.taskLink.url:'';
+  document.getElementById('task-link-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('tl-name-inp').focus(),50);
+}
+function closeTaskLinkModal(){document.getElementById('task-link-modal-bg').classList.remove('open');_taskLinkId=null;}
+function closeTaskLinkModalIfOutside(e){if(e.target===document.getElementById('task-link-modal-bg'))closeTaskLinkModal();}
+function saveTaskLink(){
+  const name=document.getElementById('tl-name-inp').value.trim();
+  const url=document.getElementById('tl-url-inp').value.trim();
+  if(!name||!url)return;
+  const p=proj();const t=p.tasks.find(x=>x.id===_taskLinkId);
+  if(!t)return;
+  let finalUrl=url;if(!/^https?:\/\//i.test(finalUrl))finalUrl='https://'+finalUrl;
+  t.taskLink={name,url:finalUrl};
+  save();closeTaskLinkModal();renderPage();
+}
+function clearTaskLink(){
+  const p=proj();const t=p.tasks.find(x=>x.id===_taskLinkId);
+  if(t)t.taskLink=null;
+  save();closeTaskLinkModal();renderPage();
+}
 let _riskEditIdx=null;
 function openRiskModal(idx){
   _riskEditIdx=(idx!==undefined)?idx:null;
@@ -808,7 +913,7 @@ function toggleStudySkip(tid,jid){
   if(row)row.querySelector('.study-row').innerHTML=renderStudyBar(t);
 }
 
-function addTask(){const p=proj();p.tasks.unshift({id:'t'+Date.now(),types:[],name:'',date:'',state:'ac',prio:false,comment:'',commentHtml:'',study:{current:null,skipped:{}}});save();renderPage()}
+function addTask(){const p=proj();p.tasks.unshift({id:'t'+Date.now(),types:[],name:'',date:'',state:'ac',prio:false,comment:'',commentHtml:'',study:{current:null,skipped:{}},taskLink:null});save();renderPage()}
 function upTask(id,f,v){const p=proj();const t=p.tasks.find(x=>x.id===id);if(t){t[f]=v;save();}if(f==='state'||f==='prio')renderPage();}
 let _delTaskId=null;
 function delTask(id){_delTaskId=id;document.getElementById('modal-confirm').classList.add('open')}
@@ -1063,6 +1168,45 @@ async function uploadToDrive(filename, content, folderId){
     <div class="link-modal-btns">
       <button onclick="closeRiskModal()">Annuler</button>
       <button class="primary" onclick="saveRisk()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="link-modal-bg" id="task-link-modal-bg" onclick="closeTaskLinkModalIfOutside(event)">
+  <div class="link-modal" style="width:340px">
+    <h3>Lien de la tâche</h3>
+    <div class="lm-field"><label>Nom affiché</label><input type="text" id="tl-name-inp" placeholder="ex: Dossier technique…"></div>
+    <div class="lm-field"><label>URL</label><input type="text" id="tl-url-inp" placeholder="https://…"></div>
+    <div class="link-modal-btns">
+      <button onclick="clearTaskLink()">Effacer</button>
+      <button onclick="closeTaskLinkModal()">Annuler</button>
+      <button class="primary" onclick="saveTaskLink()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="icp-overlay" id="icp-overlay">
+  <div class="icp-panel">
+    <div class="icp-panel-header">
+      <h3>Point ICP — <span id="icp-date-label"></span></h3>
+      <button class="icp-close" onclick="closeIcpPanel()">×</button>
+    </div>
+    <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <label style="font-size:10px;color:var(--text2);font-weight:500">Date</label>
+      <input type="date" id="icp-date-inp" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none">
+    </div>
+    <div class="icp-themes" id="icp-themes">
+      <div class="icp-theme-row"><span class="icp-theme-label">PROC</span><textarea class="icp-theme-input" id="icp-proc" placeholder="Notes…"></textarea></div>
+      <div class="icp-theme-row"><span class="icp-theme-label">RACCO</span><textarea class="icp-theme-input" id="icp-racco" placeholder="Notes…"></textarea></div>
+      <div class="icp-theme-row"><span class="icp-theme-label">ELEC</span><textarea class="icp-theme-input" id="icp-elec" placeholder="Notes…"></textarea></div>
+      <div class="icp-theme-row"><span class="icp-theme-label">CONS</span><textarea class="icp-theme-input" id="icp-cons" placeholder="Notes…"></textarea></div>
+      <div class="icp-theme-row"><span class="icp-theme-label">CIPE</span><textarea class="icp-theme-input" id="icp-cipe" placeholder="Notes…"></textarea></div>
+      <div class="icp-theme-row"><span class="icp-theme-label">SCADA</span><textarea class="icp-theme-input" id="icp-scada" placeholder="Notes…"></textarea></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px;flex-shrink:0">
+      <button class="abtn abtn-del" id="icp-del-btn" onclick="deleteIcp()" style="font-size:11px">Supprimer ce point</button>
+      <div style="display:flex;gap:8px">
+        <button class="modal-btns" onclick="closeIcpPanel()" style="padding:6px 14px;border:1px solid var(--border);border-radius:7px;background:transparent;cursor:pointer;font-size:12px">Annuler</button>
+        <button class="primary modal-btns" onclick="saveIcp()" style="padding:6px 14px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600">Enregistrer</button>
+      </div>
     </div>
   </div>
 </div>
