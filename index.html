@@ -34,12 +34,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .page{display:flex;flex-direction:column;gap:8px;padding:8px;flex:1;overflow:hidden;min-height:0}
 
 /* TOP ROW : fiche + frise côte à côte, même hauteur fixe */
-.top-row{display:flex;gap:8px;flex-shrink:0}
+.top-row{display:flex;gap:8px;flex-shrink:0;align-items:flex-start}
 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow)}
 
 /* FICHE */
-.fiche-card{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.fiche-card{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-self:flex-start}
 .section-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
 .field{display:flex;flex-direction:column;gap:2px}
@@ -236,7 +236,7 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .link-modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
 .link-modal-btns .primary:hover{background:var(--blue)}
 /* links card */
-.links-card{flex-shrink:0;display:flex;flex-direction:column;gap:6px;max-height:160px}
+.links-card{display:flex;flex-direction:column;gap:6px;overflow:hidden;align-self:stretch}
 
 .link-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border)}
 .link-item:hover{border-color:var(--border2);background:#f0f4fa}
@@ -247,7 +247,7 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .link-del-btn{border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:2px 5px;border-radius:4px;flex-shrink:0;opacity:0}
 .link-item:hover .link-del-btn{opacity:1}
 .link-del-btn:hover{background:#fdeaea;color:var(--red)}
-.card-scroll-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:0}
+.card-scroll-list{overflow-y:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:4px;padding-right:2px}
 .card-scroll-list::-webkit-scrollbar{width:3px}
 .card-scroll-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .btn-add-link{font-size:10.5px;padding:3px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;align-self:flex-start;margin-top:2px;flex-shrink:0}
@@ -344,7 +344,7 @@ const STUDY_JALONS=[
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -495,6 +495,9 @@ function renderPage(){
         <div class="field"><label>Localisation</label>
           <textarea rows="2" placeholder="Commune, département, région…" oninput="uf('location',this.value)">${esc(p.location)}</textarea>
         </div>
+        <div class="field"><label>Type de machine visé</label>
+          <input type="text" value="${esc(p.machineType||'')}" placeholder="ex: Vestas V150, SWT-4.0…" oninput="uf('machineType',this.value)">
+        </div>
       </div>
 
       <div class="card links-card">
@@ -564,7 +567,7 @@ function renderPage(){
       </div>
     </div>
   </div>`;
-  setTimeout(updateGreenLine,30);
+  setTimeout(()=>{syncTopRowHeights();updateGreenLine();},30);
 }
 
 function openDateInput(mid, el){
@@ -979,6 +982,16 @@ function addProject(){
 function closeModal(){document.getElementById('modal-proj').classList.remove('open');document.getElementById('new-proj-name').value=''}
 document.getElementById('new-proj-name').addEventListener('keydown',e=>{if(e.key==='Enter')addProject()});
 
+function syncTopRowHeights(){
+  const fiche = document.querySelector('.fiche-card');
+  if(!fiche) return;
+  const h = fiche.offsetHeight;
+  document.querySelectorAll('.links-card').forEach(el=>{
+    el.style.height = h + 'px';
+  });
+  const tl = document.querySelector('.timeline-card');
+  if(tl) tl.style.height = h + 'px';
+}
 function updateGreenLine(){
   const p=proj();
   const track=document.getElementById('fm-'+p.id);
