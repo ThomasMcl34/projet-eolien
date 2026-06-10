@@ -118,7 +118,7 @@ table.tasks td{padding:6px 8px;border-bottom:2px solid var(--border2);vertical-a
 table.tasks tr:last-child td{border-bottom:none}
 table.tasks tr:hover td{filter:brightness(.97)}
 table.tasks tr.row-ac:not(:last-child) td,table.tasks tr.row-ec:not(:last-child) td,table.tasks tr.row-fi:not(:last-child) td,table.tasks tr.row-prio:not(:last-child) td{border-bottom:2px solid var(--border2)}
-.col-type{width:95px}.col-name{width:auto;min-width:80px}.col-date{width:96px}.col-state{width:108px}.col-prio{width:72px}.col-com{width:auto;min-width:120px}.col-act{width:90px}
+.col-type{width:95px}.col-name{width:180px;max-width:180px}.col-date{width:90px}.col-state{width:108px}.col-prio{width:72px}.col-com{width:180px}.col-act{width:130px}
 
 /* Row colors handled by JS via type color */
 tr.row-fi td{opacity:.6}
@@ -624,7 +624,7 @@ function taskRow(t,archived){
         <div class="type-wrap"><div class="type-trigger" onclick="openDD('${t.id}',this)">${pills||'<span style="color:var(--text3);font-size:10px">Choisir…</span>'}</div></div>
       </div>
     </td>
-    <td><input type="text" value="${esc(t.name)}" placeholder="Nom de la tâche" onchange="upTask('${t.id}','name',this.value)"></td>
+    <td style="max-width:180px;overflow:hidden"><input type="text" value="${esc(t.name)}" placeholder="Nom de la tâche" onchange="upTask('${t.id}','name',this.value)" style="width:100%"></td>
     <td style="padding:3px 6px;white-space:nowrap">
       <span onclick="editTaskDate('${t.id}',this)" style="display:inline-block;font-size:11px;padding:3px 8px;background:#fff;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:${t.date?'var(--text)':'var(--text3)'};white-space:nowrap">${t.date?fmt(t.date):'+ date'}</span>
     </td>
