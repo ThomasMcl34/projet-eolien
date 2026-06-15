@@ -286,11 +286,97 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .arc-body{flex:1;overflow-y:auto}
 .arc-empty{color:var(--text3);font-size:12px;text-align:center;padding:28px}
 .empty-tasks{text-align:center;color:var(--text3);font-size:11.5px;padding:22px}
+
+/* ── PRESTAS ── */
+.main-tabs{display:flex;gap:0;padding:0 10px;background:linear-gradient(180deg,#dce4f0,#cdd8ea);border-bottom:1px solid var(--border);flex-shrink:0}
+.main-tab{padding:8px 20px;font-size:12px;font-weight:600;color:#4a5570;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
+.main-tab:hover{color:var(--text)}
+.main-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.sub-tabs{display:flex;align-items:center;gap:2px;padding:4px 10px 0;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.sub-tabs::-webkit-scrollbar{height:0}
+
+/* Prestas page */
+.prestas-page{display:flex;flex-direction:column;gap:10px;padding:10px;flex:1;overflow:hidden;min-height:0}
+.prestas-filters{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.prestas-filters select,.prestas-filters input{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:11.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit}
+.prestas-filters select:focus,.prestas-filters input:focus{border-color:var(--blue-mid)}
+.filter-label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.btn-add-presta{font-size:11px;padding:4px 12px;border:1px solid var(--blue);border-radius:6px;background:var(--blue-mid);color:#fff;cursor:pointer;font-weight:500;margin-left:auto}
+.btn-add-presta:hover{background:var(--blue)}
+.prestas-table-wrap{flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:8px;min-height:0}
+.prestas-table-wrap::-webkit-scrollbar{width:3px}
+.prestas-table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+table.prestas{width:100%;border-collapse:collapse;table-layout:fixed}
+table.prestas th{font-size:10px;font-weight:700;color:var(--text2);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2);z-index:1;text-transform:uppercase;letter-spacing:.05em}
+table.prestas td{padding:7px 10px;border-bottom:2px solid var(--border2);vertical-align:middle;font-size:12px}
+table.prestas tr:last-child td{border-bottom:none}
+table.prestas tr:hover td{filter:brightness(.97);cursor:pointer}
+.pcol-name{width:180px}.pcol-contact{width:160px}.pcol-type{width:110px}.pcol-missions{width:80px}.pcol-com{width:auto}.pcol-act{width:36px;text-align:right}
+
+/* Presta type colors */
+.presta-pill{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin:1px}
+
+/* Fiche presta overlay */
+.presta-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:400;align-items:flex-start;justify-content:center;padding-top:40px;backdrop-filter:blur(2px)}
+.presta-overlay.open{display:flex}
+.presta-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:820px;max-width:96%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.presta-panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.presta-panel-header h3{font-size:15px;font-weight:700;color:var(--text)}
+.presta-panel-body{display:flex;flex-direction:column;gap:0;flex:1;overflow-y:auto;padding:16px 20px}
+.presta-panel-body::-webkit-scrollbar{width:3px}
+.presta-panel-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.presta-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pf{display:flex;flex-direction:column;gap:3px}
+.pf label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.pf input,.pf select,.pf textarea{padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit}
+.pf input:focus,.pf select:focus,.pf textarea:focus{border-color:var(--blue-mid);background:#fff}
+.pf textarea{resize:vertical;min-height:52px;line-height:1.5}
+.pf-full{grid-column:1/-1}
+
+/* Contacts section */
+.contacts-section{margin-bottom:14px}
+.contacts-section h4{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.contacts-section h4::after{content:'';flex:1;height:1px;background:var(--border)}
+.contact-row{display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.contact-row:last-of-type{border-bottom:none}
+.contact-row input{padding:4px 7px;border:1px solid var(--border);border-radius:5px;font-size:11.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;width:100%}
+.contact-row input:focus{border-color:var(--blue-mid);background:#fff}
+.btn-del-contact{border:none;background:#FDEAEA;color:#A32D2D;cursor:pointer;border-radius:4px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.btn-del-contact:hover{background:#A32D2D;color:#fff}
+.btn-add-contact{font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-top:6px}
+.btn-add-contact:hover{background:var(--blue-light);color:var(--blue)}
+
+/* Missions section */
+.missions-section h4{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.missions-section h4::after{content:'';flex:1;height:1px;background:var(--border)}
+table.missions{width:100%;border-collapse:collapse;table-layout:fixed}
+table.missions th{font-size:10px;font-weight:700;color:var(--text2);padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;background:var(--surface2);text-transform:uppercase;letter-spacing:.05em}
+table.missions td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:11.5px}
+table.missions tr:last-child td{border-bottom:none}
+.mcol-proj{width:120px}.mcol-type{width:130px}.mcol-prix{width:90px}.mcol-delai{width:100px}.mcol-lien{width:110px}.mcol-com{width:auto}.mcol-act{width:30px}
+.btn-add-mission{font-size:10.5px;padding:4px 10px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-top:8px}
+.btn-add-mission:hover{background:var(--blue-light);color:var(--blue)}
+.badge-delai-ok{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-delai-ko{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.sel-delai{padding:3px 20px 3px 7px;border:1px solid var(--border);border-radius:5px;font-size:10.5px;outline:none;cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none}
+.sel-delai.ok{background:#2E7D32;color:#fff;font-weight:600}
+.sel-delai.ko{background:#E53935;color:#fff;font-weight:600}
+
+/* Presta add/edit modal */
+.presta-modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.presta-modal-bg.open{display:flex}
+.presta-modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;width:420px;max-width:95%;box-shadow:0 8px 32px rgba(20,40,100,.15);max-height:88vh;overflow-y:auto}
+.presta-modal h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.presta-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.presta-modal-btns button{padding:6px 16px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
+.presta-modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
+.presta-modal-btns .primary:hover{background:var(--blue)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-<div class="tabs-bar" id="tabs-bar"></div>
+<div class="main-tabs" id="main-tabs-bar"></div>
+<div class="sub-tabs" id="tabs-bar"></div>
 <div id="page-container" style="flex:1;overflow:hidden;display:flex;flex-direction:column"></div>
 
 <div class="modal-bg" id="modal-proj">
@@ -372,6 +458,22 @@ S.projects.forEach(p=>{
   if(!p.risks)p.risks=[];
   if(!p.icps)p.icps=[];
 });
+
+// ── PRESTAS DATA ──
+const PRESTA_TYPES_DEFAULT=['Géomètre','Géotechnicien','Démanteleur','Travaux forestiers','Design fondation'];
+const MISSION_TYPES_DEFAULT=['Hydro','Arpentage','Piquetage machines','Relevé topo','G2AVP','G2PRO','G4','Défrichement','Elagage','Débroussaillement','Design Fondation'];
+const PRESTA_TYPE_COLORS={'Géomètre':'#E91E8C','Géotechnicien':'#FF6B00','Démanteleur':'#7D5A3C','Travaux forestiers':'#2E7D32','Design fondation':'#7B2FBE'};
+
+if(!S.prestas) S.prestas=[];
+if(!S.prestaTypes) S.prestaTypes=[...PRESTA_TYPES_DEFAULT];
+if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
+if(!S.mainTab) S.mainTab='projets';
+if(!S.filterPrestaType) S.filterPrestaType='';
+if(!S.filterMissionType) S.filterMissionType='';
+if(!S.filterProject) S.filterProject='';
+
+function getPrestaColor(type){ return PRESTA_TYPE_COLORS[type]||'#888'; }
+
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
 const save=()=>localStorage.setItem('ew_v9',JSON.stringify(S));
@@ -382,6 +484,29 @@ const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&q
 const rowCls=t=>t.state==='fi'?'row-fi':'';
 
 function renderTabs(){
+  // Main tabs
+  const mainBar=document.getElementById('main-tabs-bar');
+  if(mainBar){
+    mainBar.innerHTML='';
+    ['projets','prestas'].forEach(tab=>{
+      const t=document.createElement('div');
+      t.className='main-tab'+(S.mainTab===tab?' active':'');
+      t.textContent=tab==='projets'?'Projets':'Prestas';
+      t.onclick=()=>{S.mainTab=tab;save();render()};
+      mainBar.appendChild(t);
+    });
+    // Export/Import/Drive buttons
+    const tools=document.createElement('div');
+    tools.style.cssText='margin-left:auto;display:flex;gap:4px;align-items:center;padding:4px 0';
+    tools.innerHTML=`
+      <button onclick="exportData()" style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer">⬇ Exporter</button>
+      <label style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer">⬆ Importer<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+      <button id="drive-btn" onclick="driveAuth()" style="font-size:10px;padding:3px 9px;border:1px solid #c3d9f5;border-radius:5px;background:rgba(227,237,250,.8);color:#1A5FAD;cursor:pointer;font-weight:500">☁ Drive</button>
+    `;
+    mainBar.appendChild(tools);
+  }
+  if(S.mainTab!=='projets') return;
+  // Sub tabs (project tabs)
   const bar=document.getElementById('tabs-bar');bar.innerHTML='';
   S.projects.forEach(p=>{
     const t=document.createElement('div');
@@ -714,6 +839,322 @@ function importData(e){
   e.target.value=''; // reset input
 }
 
+
+// ── PRESTAS RENDERING ──
+let _prestaEditId=null;
+let _prestaViewId=null;
+
+function renderPrestas(){
+  const pc=document.getElementById('page-container');
+
+  const types=[...new Set(S.prestas.map(p=>p.type).filter(Boolean))];
+  const missions=[...new Set(S.prestas.flatMap(p=>(p.missions||[]).map(m=>m.type)).filter(Boolean))];
+  const projects=S.projects.map(p=>p.name);
+
+  // Mode : missions détaillées si filtre projet ou mission actif
+  const missionMode = !!(S.filterMissionType || S.filterProject);
+
+  let tableContent='';
+  if(missionMode){
+    // Collect all matching missions across all prestas
+    const missionRows=[];
+    S.prestas.forEach(p=>{
+      if(S.filterPrestaType&&p.type!==S.filterPrestaType) return;
+      (p.missions||[]).forEach(m=>{
+        if(S.filterMissionType&&m.type!==S.filterMissionType) return;
+        if(S.filterProject&&m.project!==S.filterProject) return;
+        const col=getPrestaColor(p.type);
+        const bg=col+'18';
+        const delaiHtml=m.delai==='ok'?'<span class="badge-delai-ok">Respecté</span>':m.delai==='ko'?'<span class="badge-delai-ko">Non respecté</span>':'—';
+        const prixHtml=m.prix?m.prix+' € HT':'—';
+        const lienHtml=m.link?`<a href="${esc(m.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500">${esc(m.link.name)}</a>`:'—';
+        missionRows.push(`<tr style="background:${bg}" onclick="openPrestaView('${p.id}')">
+          <td style="padding:0;width:5px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:${col};border-radius:3px 0 0 3px"></div></td>
+          <td style="font-weight:600;padding:7px 10px;cursor:pointer">${esc(p.name)}</td>
+          <td style="padding:7px 10px">${m.type||'—'}</td>
+          <td style="padding:7px 10px">${m.project||'—'}</td>
+          <td style="padding:7px 10px">${prixHtml}</td>
+          <td style="padding:7px 10px">${delaiHtml}</td>
+          <td style="padding:7px 10px">${lienHtml}</td>
+          <td style="padding:7px 10px;font-size:11px;color:var(--text2)">${esc(m.comment||'')}</td>
+        </tr>`);
+      });
+    });
+    tableContent=`<table class="prestas">
+      <thead><tr>
+        <th style="width:5px;padding:0"></th>
+        <th style="width:160px">Presta</th>
+        <th style="width:130px">Type mission</th>
+        <th style="width:130px">Projet</th>
+        <th style="width:90px">Prix HT</th>
+        <th style="width:100px">Délai</th>
+        <th style="width:110px">Lien</th>
+        <th>Commentaire</th>
+      </tr></thead>
+      <tbody>${missionRows.join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:22px;font-size:12px">Aucune mission trouvée</td></tr>'}</tbody>
+    </table>`;
+  } else {
+    const filtered=S.prestas.filter(p=>!S.filterPrestaType||p.type===S.filterPrestaType);
+    const rows=filtered.map(p=>{
+      const col=getPrestaColor(p.type);
+      const bg=col+'18';
+      const nbM=(p.missions||[]).length;
+      const mainContact=(p.contacts||[])[0];
+      const contactStr=mainContact?`<div style="display:flex;flex-direction:column;gap:1px">
+        <span style="font-weight:600;font-size:11.5px">${esc(mainContact.name)}</span>
+        ${mainContact.phone?`<span style="font-size:10.5px;color:var(--text2)">${esc(mainContact.phone)}</span>`:''}
+        ${mainContact.email?`<span style="font-size:10.5px;color:var(--blue)">${esc(mainContact.email)}</span>`:''}
+      </div>`:'—';
+      const pill=p.type?`<span class="presta-pill" style="background:${col}22;border:1px solid ${col}66;color:${col}">${p.type}</span>`:'—';
+      return`<tr style="background:${bg}" onclick="openPrestaView('${p.id}')">
+        <td style="padding:0;width:5px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:${col};border-radius:3px 0 0 3px"></div></td>
+        <td style="font-weight:600;padding:7px 10px">${esc(p.name)}</td>
+        <td style="padding:7px 10px;font-size:11px">${contactStr}</td>
+        <td style="padding:7px 10px">${pill}</td>
+        <td style="padding:7px 10px;text-align:center"><span style="font-size:11px;color:var(--text2)">${nbM} mission${nbM>1?'s':''}</span></td>
+        <td style="padding:7px 10px;font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.comment||'')}</td>
+        <td style="padding:7px 6px;text-align:right" onclick="event.stopPropagation()">
+          <button class="abtn-x" onclick="deletePresta('${p.id}')" title="Supprimer">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+    tableContent=`<table class="prestas">
+      <thead><tr>
+        <th style="width:5px;padding:0"></th>
+        <th class="pcol-name">Nom</th>
+        <th class="pcol-contact">Contact principal</th>
+        <th class="pcol-type">Type</th>
+        <th class="pcol-missions">Missions</th>
+        <th class="pcol-com">Commentaire</th>
+        <th class="pcol-act"></th>
+      </tr></thead>
+      <tbody>${rows||'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:22px;font-size:12px">Aucun prestataire — cliquez sur « + Ajouter un presta »</td></tr>'}</tbody>
+    </table>`;
+  }
+
+  pc.innerHTML=`<div class="prestas-page">
+    <div class="prestas-filters">
+      <span class="filter-label">Filtrer :</span>
+      <select onchange="S.filterPrestaType=this.value;save();renderPrestas()">
+        <option value="">Tous types presta</option>
+        ${S.prestaTypes.map(t=>`<option value="${t}" ${S.filterPrestaType===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <select onchange="S.filterMissionType=this.value;save();renderPrestas()">
+        <option value="">Tous types mission</option>
+        ${S.missionTypes.map(t=>`<option value="${t}" ${S.filterMissionType===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <select onchange="S.filterProject=this.value;save();renderPrestas()">
+        <option value="">Tous projets</option>
+        ${projects.map(n=>`<option value="${n}" ${S.filterProject===n?'selected':''}>${n}</option>`).join('')}
+      </select>
+      ${missionMode?`<button style="font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:var(--surface2);color:var(--text2);cursor:pointer" onclick="S.filterMissionType='';S.filterProject='';save();renderPrestas()">✕ Réinitialiser</button>`:''}
+      <button class="btn-add-presta" onclick="openPrestaModal()">+ Ajouter un presta</button>
+    </div>
+    <div style="font-size:10.5px;color:var(--text2);padding:2px 0;flex-shrink:0">
+      ${missionMode?'<b>Vue missions</b> — cliquez sur une ligne pour ouvrir la fiche presta':'<b>Vue prestas</b>'}
+    </div>
+    <div class="prestas-table-wrap">${tableContent}</div>
+  </div>`;
+}
+
+function openPrestaModal(id){
+  _prestaEditId=id||null;
+  const p=id?S.prestas.find(x=>x.id===id):null;
+  document.getElementById('pm-name').value=p?p.name:'';
+  document.getElementById('pm-type').value=p?p.type:'';
+  document.getElementById('pm-link-name').value=p&&p.link?p.link.name:'';
+  document.getElementById('pm-link-url').value=p&&p.link?p.link.url:'';
+  document.getElementById('pm-comment').value=p?p.comment||'':'';
+  document.getElementById('presta-modal-title').textContent=p?'Modifier le presta':'Nouveau presta';
+  _pmContacts=p?JSON.parse(JSON.stringify(p.contacts||[])):[{name:'',phone:'',email:''}];renderContactsForm(_pmContacts);
+  // populate type select
+const pmType=document.getElementById('pm-type');
+pmType.innerHTML='<option value="">— Choisir —</option>'+S.prestaTypes.map(t=>`<option value="${t}">${t}</option>`).join('')+'<option value="__new__">+ Ajouter un type…</option>';
+pmType.value=p?p.type||'':'';
+pmType.onchange=function(){if(this.value==='__new__'){const nv=prompt('Nouveau type de presta :');if(nv&&!S.prestaTypes.includes(nv)){S.prestaTypes.push(nv);PRESTA_TYPE_COLORS[nv]='#'+Math.floor(Math.random()*0xaaaaaa+0x444444).toString(16);}this.value=nv||'';openPrestaModal(_prestaEditId);}};
+document.getElementById('presta-modal-bg').classList.add('open');
+}
+function closePrestaModal(){document.getElementById('presta-modal-bg').classList.remove('open');_prestaEditId=null;}
+
+function renderContactsForm(contacts){
+  const cont=document.getElementById('pm-contacts');
+  cont.innerHTML=contacts.map((c,i)=>`
+    <div class="contact-row" id="cr-${i}">
+      <input type="text" placeholder="Nom *" value="${esc(c.name)}" oninput="updateContactField(${i},'name',this.value)">
+      <input type="text" placeholder="Téléphone" value="${esc(c.phone||'')}" oninput="updateContactField(${i},'phone',this.value)">
+      <input type="text" placeholder="Email" value="${esc(c.email||'')}" oninput="updateContactField(${i},'email',this.value)">
+      <button class="btn-del-contact" onclick="removeContact(${i})">✕</button>
+    </div>`).join('');
+}
+let _pmContacts=[];
+function updateContactField(i,field,val){_pmContacts[i][field]=val;}
+function removeContact(i){_pmContacts.splice(i,1);renderContactsForm(_pmContacts);}
+function addContact(){_pmContacts.push({name:'',phone:'',email:''});renderContactsForm(_pmContacts);}
+
+function savePresta(){
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name)return;
+  const type=document.getElementById('pm-type').value;
+  const linkName=document.getElementById('pm-link-name').value.trim();
+  const linkUrl=document.getElementById('pm-link-url').value.trim();
+  const comment=document.getElementById('pm-comment').value.trim();
+  const link=linkName&&linkUrl?{name:linkName,url:(/^https?:\/\//i.test(linkUrl)?linkUrl:'https://'+linkUrl)}:null;
+  const contacts=_pmContacts.filter(c=>c.name.trim());
+  if(_prestaEditId){
+    const p=S.prestas.find(x=>x.id===_prestaEditId);
+    if(p){Object.assign(p,{name,type,link,comment,contacts});}
+  } else {
+    S.prestas.push({id:'pr'+Date.now(),name,type,link,comment,contacts,missions:[]});
+  }
+  save();closePrestaModal();renderPrestas();
+}
+
+function deletePresta(id){
+  _delPrestaId=id;
+  document.getElementById('modal-confirm-presta').classList.add('open');
+}
+let _delPrestaId=null;
+function confirmDeletePresta(){
+  S.prestas=S.prestas.filter(x=>x.id!==_delPrestaId);
+  _delPrestaId=null;
+  document.getElementById('modal-confirm-presta').classList.remove('open');
+  save();renderPrestas();
+}
+function closeConfirmPresta(){document.getElementById('modal-confirm-presta').classList.remove('open');_delPrestaId=null;}
+
+// ── PRESTA VIEW (fiche) ──
+function openPrestaView(id){
+  _prestaViewId=id;
+  renderPrestaView();
+  document.getElementById('presta-overlay').classList.add('open');
+}
+function closePrestaView(){document.getElementById('presta-overlay').classList.remove('open');_prestaViewId=null;}
+
+function renderPrestaView(){
+  const p=S.prestas.find(x=>x.id===_prestaViewId);
+  if(!p)return;
+  const col=getPrestaColor(p.type);
+  document.getElementById('presta-view-name').textContent=p.name;
+
+  // Contacts
+  const contactsHtml=(p.contacts||[]).map(c=>`
+    <div style="padding:7px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <span style="font-weight:700;font-size:13px;min-width:120px">${esc(c.name)}</span>
+      ${c.phone?`<span style="font-size:12px;color:var(--text2)">📞 <b>${esc(c.phone)}</b></span>`:''}
+      ${c.email?`<span style="font-size:12px;color:var(--blue)">✉ <b>${esc(c.email)}</b></span>`:''}
+    </div>`).join('')||'<span style="font-size:11px;color:var(--text3)">Aucun contact</span>';
+
+  // Info
+  const infoHtml=`
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      ${p.type?`<span class="presta-pill" style="background:${col}22;border:1px solid ${col}66;color:${col}">${p.type}</span>`:''}
+      ${p.link?`<a href="${esc(p.link.url)}" target="_blank" style="font-size:11.5px;color:var(--blue);font-weight:500">${esc(p.link.name)}</a>`:''}
+      <button style="font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2)" onclick="openPrestaModal('${p.id}')">✏ Modifier</button>
+    </div>
+    ${p.comment?`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">${esc(p.comment)}</p>`:''}
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:flex;align-items:center;gap:6px">Contacts<span style="flex:1;height:1px;background:var(--border);display:block"></span></div>
+      ${contactsHtml}
+    </div>`;
+  document.getElementById('presta-view-info').innerHTML=infoHtml;
+
+  // Missions
+  const missRows=(p.missions||[]).map((m,i)=>{
+    const delaiCls=m.delai==='ok'?'sel-delai ok':'sel-delai ko';
+    return`<tr>
+      <td><select style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'project',this.value)">
+        <option value="">— Projet —</option>
+        ${S.projects.map(pr=>`<option value="${pr.name}" ${m.project===pr.name?'selected':''}>${pr.name}</option>`).join('')}
+      </select></td>
+      <td><div style="position:relative;display:flex;align-items:center">
+        <select style="width:100%;padding:2px 18px 2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2);appearance:none" onchange="updateMission('${p.id}',${i},'type',this.value)">
+          <option value="">— Type —</option>
+          ${S.missionTypes.map(t=>`<option value="${t}" ${m.type===t?'selected':''}>${t}</option>`).join('')}
+          <option value="__new__">+ Ajouter…</option>
+        </select>
+        <span style="position:absolute;right:4px;pointer-events:none;font-size:9px;color:var(--text3)">▾</span>
+      </div></td>
+      <td><input type="number" placeholder="HT €" value="${m.prix||''}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'prix',this.value)"></td>
+      <td><div style="position:relative;display:flex;align-items:center">
+        <select class="${delaiCls}" onchange="updateMissionDelai('${p.id}',${i},this.value,this)">
+          <option value="">—</option>
+          <option value="ok" ${m.delai==='ok'?'selected':''}>Respecté</option>
+          <option value="ko" ${m.delai==='ko'?'selected':''}>Non respecté</option>
+        </select>
+        <span style="position:absolute;right:4px;pointer-events:none;font-size:9px;color:rgba(255,255,255,.8)">▾</span>
+      </div></td>
+      <td>${m.link?`<a href="${esc(m.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500">${esc(m.link.name)}</a>
+        <button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3)">✏</button>`
+        :`<button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10.5px;color:var(--text2)">+ Lien</button>`}
+      </td>
+      <td><input type="text" placeholder="Commentaire…" value="${esc(m.comment||'')}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'comment',this.value)"></td>
+      <td><button class="abtn-x" onclick="deleteMission('${p.id}',${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('presta-view-missions').innerHTML=`
+    <table class="missions">
+      <thead><tr>
+        <th class="mcol-proj">Projet</th>
+        <th class="mcol-type">Type mission</th>
+        <th class="mcol-prix">Prix HT (€)</th>
+        <th class="mcol-delai">Délai</th>
+        <th class="mcol-lien">Lien</th>
+        <th class="mcol-com">Commentaire</th>
+        <th class="mcol-act"></th>
+      </tr></thead>
+      <tbody>${missRows||'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:14px;font-size:11px">Aucune mission</td></tr>'}</tbody>
+    </table>
+    <button class="btn-add-mission" onclick="addMission('${p.id}')">+ Ajouter une mission</button>`;
+}
+
+function updateMission(pid,idx,field,val){
+  const p=S.prestas.find(x=>x.id===pid);if(!p||!p.missions[idx])return;
+  if(val==='__new__'){
+    const nv=prompt('Nouveau type de mission :');
+    if(nv&&!S.missionTypes.includes(nv)){S.missionTypes.push(nv);save();}
+    return;
+  }
+  p.missions[idx][field]=val;save();
+}
+function updateMissionDelai(pid,idx,val,sel){
+  const p=S.prestas.find(x=>x.id===pid);if(!p||!p.missions[idx])return;
+  p.missions[idx].delai=val;save();
+  sel.className='sel-delai '+(val==='ok'?'ok':val==='ko'?'ko':'');
+}
+function addMission(pid){
+  const p=S.prestas.find(x=>x.id===pid);if(!p)return;
+  if(!p.missions)p.missions=[];
+  p.missions.push({project:'',type:'',prix:'',delai:'',link:null,comment:''});
+  save();renderPrestaView();
+}
+function deleteMission(pid,idx){
+  const p=S.prestas.find(x=>x.id===pid);if(!p)return;
+  p.missions.splice(idx,1);save();renderPrestaView();
+}
+
+let _missionLinkPid=null,_missionLinkIdx=null;
+function editMissionLink(pid,idx){
+  _missionLinkPid=pid;_missionLinkIdx=idx;
+  const p=S.prestas.find(x=>x.id===pid);
+  const m=p&&p.missions[idx];
+  document.getElementById('ml-name').value=m&&m.link?m.link.name:'';
+  document.getElementById('ml-url').value=m&&m.link?m.link.url:'';
+  document.getElementById('mission-link-modal-bg').classList.add('open');
+}
+function saveMissionLink(){
+  const name=document.getElementById('ml-name').value.trim();
+  const url=document.getElementById('ml-url').value.trim();
+  if(!name||!url)return;
+  const p=S.prestas.find(x=>x.id===_missionLinkPid);
+  if(!p||!p.missions[_missionLinkIdx])return;
+  p.missions[_missionLinkIdx].link={name,url:(/^https?:\/\//i.test(url)?url:'https://'+url)};
+  save();
+  document.getElementById('mission-link-modal-bg').classList.remove('open');
+  renderPrestaView();
+}
+function closeMissionLinkModal(){document.getElementById('mission-link-modal-bg').classList.remove('open');}
+
 // ── ICP ──
 const ICP_THEMES=['proc','racco','elec','cons','cipe','scada'];
 let _icpEditIdx=null;
@@ -1025,7 +1466,17 @@ function updateGreenLine(){
   const endX=elRect.left+elRect.width/2-trackRect.left;
   green.style.width=Math.max(0,endX-20)+'px';
 }
-function render(){renderTabs();renderPage()}
+function render(){
+  renderTabs();
+  const subBar=document.getElementById('tabs-bar');
+  if(subBar) subBar.style.display=S.mainTab==='projets'?'flex':'none';
+  if(S.mainTab==='prestas'){
+    document.getElementById('page-container').innerHTML='';
+    renderPrestas();
+  } else {
+    renderPage();
+  }
+}
 render();
 
 // Sauvegarde auto à la fermeture
@@ -1242,5 +1693,82 @@ async function uploadToDrive(filename, content, folderId){
     </div>
   </div>
 </div>
+
+<!-- Presta add/edit modal -->
+<div class="presta-modal-bg" id="presta-modal-bg" onclick="if(event.target===this)closePrestaModal()">
+  <div class="presta-modal">
+    <h3 id="presta-modal-title">Nouveau presta</h3>
+    <div class="presta-info-grid">
+      <div class="pf"><label>Nom *</label><input type="text" id="pm-name" placeholder="Nom de l'entreprise…"></div>
+      <div class="pf"><label>Type</label>
+        <select id="pm-type">
+          <option value="">— Choisir —</option>
+          <option value="__new__">+ Ajouter un type…</option>
+        </select>
+      </div>
+      <div class="pf"><label>Nom du lien</label><input type="text" id="pm-link-name" placeholder="Site web, Drive…"></div>
+      <div class="pf"><label>URL</label><input type="text" id="pm-link-url" placeholder="https://…"></div>
+      <div class="pf pf-full"><label>Commentaire</label><textarea id="pm-comment" placeholder="Notes générales sur ce presta…"></textarea></div>
+    </div>
+    <div class="contacts-section">
+      <h4>Contacts</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;padding:0 0 4px">
+        <span style="font-size:10px;color:var(--text2);font-weight:600">Nom</span>
+        <span style="font-size:10px;color:var(--text2);font-weight:600">Téléphone</span>
+        <span style="font-size:10px;color:var(--text2);font-weight:600">Email</span>
+        <span></span>
+      </div>
+      <div id="pm-contacts"></div>
+      <button class="btn-add-contact" onclick="addContact()">+ Ajouter un contact</button>
+    </div>
+    <div class="presta-modal-btns">
+      <button onclick="closePrestaModal()">Annuler</button>
+      <button class="primary" onclick="savePresta()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Presta view overlay -->
+<div class="presta-overlay" id="presta-overlay">
+  <div class="presta-panel">
+    <div class="presta-panel-header">
+      <h3 id="presta-view-name"></h3>
+      <button style="border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:2px 8px;border-radius:6px" onclick="closePrestaView()">×</button>
+    </div>
+    <div class="presta-panel-body">
+      <div id="presta-view-info"></div>
+      <div class="missions-section">
+        <h4>Missions</h4>
+        <div id="presta-view-missions"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete presta -->
+<div class="modal-bg" id="modal-confirm-presta">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce presta ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Toutes ses missions seront supprimées.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmPresta()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeletePresta()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mission link modal -->
+<div class="link-modal-bg" id="mission-link-modal-bg" style="z-index:600" onclick="if(event.target===this)closeMissionLinkModal()">
+  <div class="link-modal" style="width:340px">
+    <h3>Lien de la mission</h3>
+    <div class="lm-field"><label>Nom affiché</label><input type="text" id="ml-name" placeholder="ex: Devis signé…"></div>
+    <div class="lm-field"><label>URL</label><input type="text" id="ml-url" placeholder="https://…"></div>
+    <div class="link-modal-btns">
+      <button onclick="closeMissionLinkModal()">Annuler</button>
+      <button class="primary" onclick="saveMissionLink()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
