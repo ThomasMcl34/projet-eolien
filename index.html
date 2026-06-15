@@ -311,7 +311,7 @@ table.prestas th{font-size:10px;font-weight:700;color:var(--text2);text-align:le
 table.prestas td{padding:7px 10px;border-bottom:2px solid var(--border2);vertical-align:middle;font-size:12px}
 table.prestas tr:last-child td{border-bottom:none}
 table.prestas tr:hover td{filter:brightness(.97);cursor:pointer}
-.pcol-name{width:180px}.pcol-contact{width:160px}.pcol-type{width:110px}.pcol-missions{width:80px}.pcol-com{width:auto}.pcol-act{width:36px;text-align:right}
+.pcol-name{width:150px}.pcol-contact{width:200px}.pcol-type{width:130px}.pcol-missions{width:72px}.pcol-com{width:160px}.pcol-act{width:36px;text-align:right}
 
 /* Presta type colors */
 .presta-pill{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin:1px}
@@ -909,7 +909,7 @@ function renderPrestas(){
       return`<tr style="background:${bg}" onclick="openPrestaView('${p.id}')">
         <td style="padding:0;width:5px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:${col};border-radius:3px 0 0 3px"></div></td>
         <td style="font-weight:600;padding:7px 10px">${esc(p.name)}</td>
-        <td style="padding:7px 10px;font-size:11px">${contactStr}</td>
+        <td style="padding:7px 10px;font-size:11px;overflow:hidden;max-width:200px">${contactStr}</td>
         <td style="padding:7px 10px">${pill}</td>
         <td style="padding:7px 10px;text-align:center"><span style="font-size:11px;color:var(--text2)">${nbM} mission${nbM>1?'s':''}</span></td>
         <td style="padding:7px 10px;font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.comment||'')}</td>
