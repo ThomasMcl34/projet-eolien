@@ -319,7 +319,7 @@ table.prestas tr:hover td{filter:brightness(.97);cursor:pointer}
 /* Fiche presta overlay */
 .presta-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:400;align-items:flex-start;justify-content:center;padding-top:40px;backdrop-filter:blur(2px)}
 .presta-overlay.open{display:flex}
-.presta-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:820px;max-width:96%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.presta-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:960px;max-width:97%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
 .presta-panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
 .presta-panel-header h3{font-size:15px;font-weight:700;color:var(--text)}
 .presta-panel-body{display:flex;flex-direction:column;gap:0;flex:1;overflow-y:auto;padding:16px 20px}
@@ -353,7 +353,7 @@ table.missions{width:100%;border-collapse:collapse;table-layout:fixed}
 table.missions th{font-size:10px;font-weight:700;color:var(--text2);padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;background:var(--surface2);text-transform:uppercase;letter-spacing:.05em}
 table.missions td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:11.5px}
 table.missions tr:last-child td{border-bottom:none}
-.mcol-proj{width:120px}.mcol-type{width:130px}.mcol-prix{width:90px}.mcol-delai{width:100px}.mcol-lien{width:110px}.mcol-com{width:auto}.mcol-act{width:30px}
+.mcol-proj{width:110px}.mcol-type{width:180px}.mcol-prix{width:80px}.mcol-delai{width:110px}.mcol-lien{width:100px}.mcol-com{width:auto}.mcol-act{width:30px}
 .btn-add-mission{font-size:10.5px;padding:4px 10px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-top:8px}
 .btn-add-mission:hover{background:var(--blue-light);color:var(--blue)}
 .badge-delai-ok{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
@@ -983,6 +983,7 @@ function renderPrestas(){
       </select>
       ${missionMode?`<button style="font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:var(--surface2);color:var(--text2);cursor:pointer" onclick="S.filterMissionType='';S.filterProject='';save();renderPrestas()">✕ Réinitialiser</button>`:''}
       <button class="btn-add-presta" onclick="openPrestaModal()">+ Ajouter un presta</button>
+      <button style="font-size:10.5px;padding:4px 10px;border:1px solid var(--border2);border-radius:6px;background:var(--surface2);color:var(--text2);cursor:pointer" onclick="openManageTypes()">Gérer les types</button>
     </div>
     <div style="font-size:10.5px;color:var(--text2);padding:2px 0;flex-shrink:0">
       ${missionMode?'<b>Vue missions</b> — cliquez sur une ligne pour ouvrir la fiche presta':'<b>Vue prestas</b>'}
@@ -1226,6 +1227,83 @@ function saveMissionLink(){
   renderPrestaView();
 }
 function closeMissionLinkModal(){document.getElementById('mission-link-modal-bg').classList.remove('open');}
+
+
+function openManageTypes(){
+  renderManageTypes();
+  document.getElementById('manage-types-modal').classList.add('open');
+}
+function closeManageTypes(){document.getElementById('manage-types-modal').classList.remove('open');}
+
+function renderManageTypes(){
+  const ptDiv=document.getElementById('manage-presta-types');
+  const mtDiv=document.getElementById('manage-mission-types');
+
+  ptDiv.innerHTML=S.prestaTypes.map((t,i)=>{
+    const col=getPrestaColor(t);
+    const inUse=S.prestas.some(p=>p.type===t);
+    return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">
+      <span style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block"></span>
+      <span style="flex:1;font-size:12px">${t}</span>
+      ${!inUse?`<button class="abtn-x" onclick="deletePrestaType(${i})" title="Supprimer">✕</button>`
+      :`<span style="font-size:9.5px;color:var(--text3)">utilisé</span>`}
+    </div>`;
+  }).join('')||'<span style="font-size:11px;color:var(--text3);display:block;padding:4px 0">Aucun type</span>';
+
+  ptDiv.innerHTML+=`<div style="display:flex;gap:5px;margin-top:8px">
+    <input type="text" id="new-presta-type-inp" placeholder="Nouveau type presta…" style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit">
+    <button onclick="addPrestaTypeFromManage()" style="padding:3px 9px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit">+</button>
+  </div>`;
+
+  mtDiv.innerHTML=S.missionTypes.map((t,i)=>{
+    const inUse=S.prestas.some(p=>(p.missions||[]).some(m=>m.type===t));
+    return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">
+      <span style="flex:1;font-size:12px">${t}</span>
+      ${!inUse?`<button class="abtn-x" onclick="deleteMissionType(${i})" title="Supprimer">✕</button>`
+      :`<span style="font-size:9.5px;color:var(--text3)">utilisé</span>`}
+    </div>`;
+  }).join('')||'<span style="font-size:11px;color:var(--text3);display:block;padding:4px 0">Aucun type</span>';
+
+  mtDiv.innerHTML+=`<div style="display:flex;gap:5px;margin-top:8px">
+    <input type="text" id="new-mission-type-inp" placeholder="Nouveau type mission…" style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit">
+    <button onclick="addMissionTypeFromManage()" style="padding:3px 9px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit">+</button>
+  </div>`;
+
+  // Enter key support
+  setTimeout(()=>{
+    const pi=document.getElementById('new-presta-type-inp');
+    const mi=document.getElementById('new-mission-type-inp');
+    if(pi) pi.onkeydown=e=>{if(e.key==='Enter')addPrestaTypeFromManage();};
+    if(mi) mi.onkeydown=e=>{if(e.key==='Enter')addMissionTypeFromManage();};
+  },10);
+}
+
+function addPrestaTypeFromManage(){
+  const inp=document.getElementById('new-presta-type-inp');
+  const nv=inp?inp.value.trim():'';
+  if(!nv||S.prestaTypes.includes(nv))return;
+  S.prestaTypes.push(nv);
+  getPrestaColor(nv);
+  save();renderManageTypes();
+}
+function addMissionTypeFromManage(){
+  const inp=document.getElementById('new-mission-type-inp');
+  const nv=inp?inp.value.trim():'';
+  if(!nv||S.missionTypes.includes(nv))return;
+  S.missionTypes.push(nv);
+  save();renderManageTypes();
+}
+
+function deletePrestaType(idx){
+  const t=S.prestaTypes[idx];
+  releasePrestaColor(t);
+  S.prestaTypes.splice(idx,1);
+  save();renderManageTypes();
+}
+function deleteMissionType(idx){
+  S.missionTypes.splice(idx,1);
+  save();renderManageTypes();
+}
 
 // ── ICP ──
 const ICP_THEMES=['proc','racco','elec','cons','cipe','scada'];
@@ -1841,5 +1919,24 @@ async function uploadToDrive(filename, content, folderId){
   </div>
 </div>
 
+
+<div class="modal-bg" id="manage-types-modal" onclick="if(event.target===this)closeManageTypes()">
+  <div class="modal" style="width:500px;max-height:80vh;overflow-y:auto">
+    <h3 style="margin-bottom:14px">Gérer les types</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Types presta</div>
+        <div id="manage-presta-types"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Types mission</div>
+        <div id="manage-mission-types"></div>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="primary" onclick="closeManageTypes()">Fermer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
