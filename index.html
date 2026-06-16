@@ -1245,8 +1245,8 @@ function renderManageTypes(){
     return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">
       <span style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0;display:inline-block"></span>
       <span style="flex:1;font-size:12px">${t}</span>
-      ${!inUse?`<button class="abtn-x" onclick="deletePrestaType(${i})" title="Supprimer">✕</button>`
-      :`<span style="font-size:9.5px;color:var(--text3)">utilisé</span>`}
+      ${inUse?`<span style="font-size:9px;color:var(--text3);margin-right:2px">utilisé</span>`:''}
+      <button class="abtn-x" onclick="deletePrestaType(${i},${inUse})" title="Supprimer">✕</button>
     </div>`;
   }).join('')||'<span style="font-size:11px;color:var(--text3);display:block;padding:4px 0">Aucun type</span>';
 
@@ -1256,11 +1256,11 @@ function renderManageTypes(){
   </div>`;
 
   mtDiv.innerHTML=S.missionTypes.map((t,i)=>{
-    const inUse=S.prestas.some(p=>(p.missions||[]).some(m=>m.type===t));
+    const inUse=S.prestas.some(p=>(p.missions||[]).some(m=>m.type===t&&m.type!==''));
     return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">
       <span style="flex:1;font-size:12px">${t}</span>
-      ${!inUse?`<button class="abtn-x" onclick="deleteMissionType(${i})" title="Supprimer">✕</button>`
-      :`<span style="font-size:9.5px;color:var(--text3)">utilisé</span>`}
+      ${inUse?`<span style="font-size:9px;color:var(--text3);margin-right:2px">utilisé</span>`:''}
+      <button class="abtn-x" onclick="deleteMissionType(${i},${inUse})" title="Supprimer">✕</button>
     </div>`;
   }).join('')||'<span style="font-size:11px;color:var(--text3);display:block;padding:4px 0">Aucun type</span>';
 
@@ -1294,15 +1294,37 @@ function addMissionTypeFromManage(){
   save();renderManageTypes();
 }
 
-function deletePrestaType(idx){
-  const t=S.prestaTypes[idx];
-  releasePrestaColor(t);
-  S.prestaTypes.splice(idx,1);
+let _delTypeInfo=null;
+function deletePrestaType(idx,inUse){
+  _delTypeInfo={kind:'presta',idx,inUse};
+  document.getElementById('del-type-msg').textContent=inUse
+    ?'Ce type est utilisé par un ou plusieurs prestas. Êtes-vous sûr de vouloir le supprimer ?'
+    :'Êtes-vous sûr de vouloir supprimer ce type ?';
+  document.getElementById('modal-confirm-type').classList.add('open');
+}
+function deleteMissionType(idx,inUse){
+  _delTypeInfo={kind:'mission',idx,inUse};
+  document.getElementById('del-type-msg').textContent=inUse
+    ?'Ce type est utilisé dans une ou plusieurs missions. Êtes-vous sûr de vouloir le supprimer ?'
+    :'Êtes-vous sûr de vouloir supprimer ce type ?';
+  document.getElementById('modal-confirm-type').classList.add('open');
+}
+function confirmDeleteType(){
+  if(!_delTypeInfo)return;
+  if(_delTypeInfo.kind==='presta'){
+    const t=S.prestaTypes[_delTypeInfo.idx];
+    releasePrestaColor(t);
+    S.prestaTypes.splice(_delTypeInfo.idx,1);
+  } else {
+    S.missionTypes.splice(_delTypeInfo.idx,1);
+  }
+  _delTypeInfo=null;
+  document.getElementById('modal-confirm-type').classList.remove('open');
   save();renderManageTypes();
 }
-function deleteMissionType(idx){
-  S.missionTypes.splice(idx,1);
-  save();renderManageTypes();
+function closeConfirmType(){
+  document.getElementById('modal-confirm-type').classList.remove('open');
+  _delTypeInfo=null;
 }
 
 // ── ICP ──
@@ -1935,6 +1957,16 @@ async function uploadToDrive(filename, content, folderId){
     </div>
     <div class="modal-btns" style="margin-top:14px">
       <button class="primary" onclick="closeManageTypes()">Fermer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-confirm-type">
+  <div class="modal" style="width:320px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce type ?</h3>
+    <p id="del-type-msg" style="font-size:12px;color:var(--text2);margin-bottom:14px"></p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmType()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteType()">Supprimer</button>
     </div>
   </div>
 </div>
