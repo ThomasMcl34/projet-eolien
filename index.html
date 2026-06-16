@@ -1120,7 +1120,7 @@ function renderPrestaView(){
         ${S.projects.map(pr=>`<option value="${pr.name}" ${m.project===pr.name?'selected':''}>${pr.name}</option>`).join('')}
       </select></td>
       <td><div style="position:relative;display:flex;align-items:center">
-        <select style="width:100%;padding:2px 18px 2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2);appearance:none" onchange="updateMission('${p.id}',${i},'type',this.value)">
+        <select data-msel="${p.id}-${i}" style="width:100%;padding:2px 18px 2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2);appearance:none" onchange="updateMission('${p.id}',${i},'type',this.value)">
           <option value="">— Type —</option>
           ${S.missionTypes.map(t=>`<option value="${t}" ${m.type===t?'selected':''}>${t}</option>`).join('')}
           <option value="__new__">+ Ajouter…</option>
@@ -1164,8 +1164,27 @@ function renderPrestaView(){
 function updateMission(pid,idx,field,val){
   const p=S.prestas.find(x=>x.id===pid);if(!p||!p.missions[idx])return;
   if(val==='__new__'){
-    const nv=prompt('Nouveau type de mission :');
-    if(nv&&!S.missionTypes.includes(nv)){S.missionTypes.push(nv);save();}
+    // show inline input next to the select
+    const sel=document.querySelector(`[data-msel="${pid}-${idx}"]`);
+    const wrap=sel?sel.closest('td'):null;
+    if(!wrap)return;
+    sel.value='';
+    const inp=document.createElement('input');
+    inp.type='text';inp.placeholder='Nouveau type…';
+    inp.style.cssText='padding:3px 7px;border:1px solid var(--blue-mid);border-radius:5px;font-size:11px;width:100%;font-family:inherit;outline:none;margin-top:3px;display:block';
+    const btn=document.createElement('button');
+    btn.textContent='OK';
+    btn.style.cssText='margin-top:3px;padding:2px 8px;border:1px solid var(--blue);border-radius:4px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:10px;font-family:inherit';
+    const done=()=>{
+      const nv=inp.value.trim();
+      if(nv&&!S.missionTypes.includes(nv)){S.missionTypes.push(nv);save();}
+      inp.remove();btn.remove();
+      if(nv){const p2=S.prestas.find(x=>x.id===pid);if(p2&&p2.missions[idx])p2.missions[idx].type=nv;save();renderPrestaView();}
+    };
+    btn.onclick=done;
+    inp.onkeydown=e=>{if(e.key==='Enter')done();};
+    wrap.appendChild(inp);wrap.appendChild(btn);
+    inp.focus();
     return;
   }
   p.missions[idx][field]=val;save();
