@@ -460,19 +460,53 @@ S.projects.forEach(p=>{
 });
 
 // ── PRESTAS DATA ──
-const PRESTA_TYPES_DEFAULT=['Géomètre','Géotechnicien','Démanteleur','Travaux forestiers','Design fondation'];
-const MISSION_TYPES_DEFAULT=['Hydro','Arpentage','Piquetage machines','Relevé topo','G2AVP','G2PRO','G4','Défrichement','Elagage','Débroussaillement','Design Fondation'];
-const PRESTA_TYPE_COLORS={'Géomètre':'#E91E8C','Géotechnicien':'#FF6B00','Démanteleur':'#7D5A3C','Travaux forestiers':'#2E7D32','Design fondation':'#7B2FBE'};
+const PRESTA_TYPES_DEFAULT=['Géomètre','Géotechnicien','Démanteleur','Travaux forestiers','Design fondation','Transporteur','Hydrogéologue'];
+const MISSION_TYPES_DEFAULT=['Hydro','Arpentage','Piquetage machines','Relevé topo','G2AVP','G2PRO','G4','Défrichement','Elagage','Débroussaillement','Design Fondation','Road survey'];
+const PRESTA_TYPE_COLORS={'Géomètre':'#E91E8C','Géotechnicien':'#FF6B00','Démanteleur':'#7D5A3C','Travaux forestiers':'#2E7D32','Design fondation':'#7B2FBE','Transporteur':'#00838F','Hydrogéologue':'#1565C0'};
 
 if(!S.prestas) S.prestas=[];
 if(!S.prestaTypes) S.prestaTypes=[...PRESTA_TYPES_DEFAULT];
+if(!S.prestaTypeColors) S.prestaTypeColors={};
+// Seed colors from defaults
+Object.entries(PRESTA_TYPE_COLORS).forEach(([k,v])=>{ if(!S.prestaTypeColors[k]) S.prestaTypeColors[k]=v; });
+// Merge any new default types not yet in saved state
+PRESTA_TYPES_DEFAULT.forEach(t=>{ if(!S.prestaTypes.includes(t)) S.prestaTypes.push(t); });
+MISSION_TYPES_DEFAULT.forEach(t=>{ if(!S.missionTypes.includes(t)) S.missionTypes.push(t); });
 if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
 if(!S.mainTab) S.mainTab='projets';
 if(!S.filterPrestaType) S.filterPrestaType='';
 if(!S.filterMissionType) S.filterMissionType='';
 if(!S.filterProject) S.filterProject='';
 
-function getPrestaColor(type){ return PRESTA_TYPE_COLORS[type]||'#888'; }
+const COLOR_POOL=[
+  '#E91E8C','#FF6B00','#7D5A3C','#2E7D32','#7B2FBE',
+  '#00838F','#1565C0','#C62828','#558B2F','#6A1B9A',
+  '#00695C','#AD1457','#4527A0','#2E7D32','#BF360C',
+  '#37474F','#1B5E20','#880E4F','#0D47A1','#E65100'
+];
+
+function getPrestaColor(type){
+  if(!type) return '#888';
+  if(!S.prestaTypeColors) S.prestaTypeColors={};
+  // init from defaults
+  Object.assign({...PRESTA_TYPE_COLORS}, S.prestaTypeColors);
+  if(S.prestaTypeColors[type]) return S.prestaTypeColors[type];
+  // check defaults
+  if(PRESTA_TYPE_COLORS[type]) return PRESTA_TYPE_COLORS[type];
+  // assign first unused color
+  const used=Object.values(S.prestaTypeColors);
+  const free=COLOR_POOL.find(col=>!used.includes(col))||'#888';
+  S.prestaTypeColors[type]=free;
+  save();
+  return free;
+}
+
+function releasePrestaColor(type){
+  if(S.prestaTypeColors&&S.prestaTypeColors[type]){
+    delete S.prestaTypeColors[type];
+    save();
+  }
+}
 
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
@@ -970,7 +1004,26 @@ function openPrestaModal(id){
 const pmType=document.getElementById('pm-type');
 pmType.innerHTML='<option value="">— Choisir —</option>'+S.prestaTypes.map(t=>`<option value="${t}">${t}</option>`).join('')+'<option value="__new__">+ Ajouter un type…</option>';
 pmType.value=p?p.type||'':'';
-pmType.onchange=function(){if(this.value==='__new__'){const nv=prompt('Nouveau type de presta :');if(nv&&!S.prestaTypes.includes(nv)){S.prestaTypes.push(nv);PRESTA_TYPE_COLORS[nv]='#'+Math.floor(Math.random()*0xaaaaaa+0x444444).toString(16);}this.value=nv||'';openPrestaModal(_prestaEditId);}};
+pmType.onchange=function(){if(this.value==='__new__'){
+  this.value='';
+  const wrap=this.parentElement;
+  const inp=document.createElement('input');
+  inp.type='text';inp.placeholder='Nouveau type…';
+  inp.style.cssText='padding:5px 9px;border:1px solid var(--blue-mid);border-radius:6px;font-size:12px;width:100%;font-family:inherit;outline:none;margin-top:4px';
+  const confirm=document.createElement('button');
+  confirm.textContent='Ajouter';
+  confirm.style.cssText='margin-top:4px;padding:3px 10px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit';
+  confirm.onclick=()=>{
+    const nv=inp.value.trim();
+    if(nv&&!S.prestaTypes.includes(nv)){S.prestaTypes.push(nv);getPrestaColor(nv);save();}
+    inp.remove();confirm.remove();
+    openPrestaModal(_prestaEditId);
+    setTimeout(()=>{document.getElementById('pm-type').value=nv||'';},50);
+  };
+  inp.onkeydown=e=>{if(e.key==='Enter')confirm.click();};
+  wrap.appendChild(inp);wrap.appendChild(confirm);
+  inp.focus();
+}};
 document.getElementById('presta-modal-bg').classList.add('open');
 }
 function closePrestaModal(){document.getElementById('presta-modal-bg').classList.remove('open');_prestaEditId=null;}
@@ -1011,7 +1064,11 @@ function deletePresta(id){
 }
 let _delPrestaId=null;
 function confirmDeletePresta(){
+  const p=S.prestas.find(x=>x.id===_delPrestaId);
+  const type=p?p.type:'';
   S.prestas=S.prestas.filter(x=>x.id!==_delPrestaId);
+  // release color if no other presta uses this type
+  if(type&&!S.prestas.some(x=>x.type===type)) releasePrestaColor(type);
   _delPrestaId=null;
   document.getElementById('modal-confirm-presta').classList.remove('open');
   save();renderPrestas();
