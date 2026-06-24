@@ -212,8 +212,12 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .risk-fort{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
 .risk-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative;flex-shrink:0}
 .risk-item:hover{border-color:var(--border2);background:#f0f4fa}
-.risk-com-icon{font-size:13px;color:var(--text3);cursor:pointer;flex-shrink:0;position:relative}
-.risk-com-icon:hover{color:var(--blue)}
+.risk-com-icon{display:inline-flex;cursor:pointer;flex-shrink:0;position:relative}
+.risk-com-icon svg{width:16px;height:16px;display:block}
+.risk-com-icon:hover{opacity:.8}
+.link-icon{display:inline-flex;cursor:pointer;flex-shrink:0}
+.link-icon svg{width:18px;height:18px;display:block}
+.link-icon:hover{opacity:.8}
 .risk-tooltip{display:none;position:absolute;right:24px;top:-4px;background:var(--text);color:#fff;font-size:10.5px;padding:5px 9px;border-radius:7px;max-width:200px;line-height:1.4;z-index:50;white-space:pre-wrap;pointer-events:none;text-align:left}
 .risk-com-icon:hover .risk-tooltip{display:block}
 .link-modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:250;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
@@ -416,6 +420,7 @@ const STUDY_JALONS=[
   {id:'plans',label:'Plans',skippable:true},
   {id:'consultation',label:'Consultation',skippable:false},
   {id:'devis',label:'Devis',skippable:false},
+  {id:'bdc',label:'BDC',skippable:false},
   {id:'contrat',label:'Contrat',skippable:true},
   {id:'admin',label:'Adm. chantier',skippable:true},
   {id:'livrable',label:'Livrable',skippable:false}
@@ -460,9 +465,9 @@ S.projects.forEach(p=>{
 });
 
 // ── PRESTAS DATA ──
-const PRESTA_TYPES_DEFAULT=['Géomètre','Géotechnicien','Démanteleur','Travaux forestiers','Design fondation','Transporteur','Hydrogéologue'];
+const PRESTA_TYPES_DEFAULT=['Géomètre','Géotechnicien','Démanteleur','Travaux forestiers','Design fondation','Transporteur','Hydrogéologue','Administratif'];
 const MISSION_TYPES_DEFAULT=['Hydro','Arpentage','Piquetage machines','Relevé topo','G2AVP','G2PRO','G4','Défrichement','Elagage','Débroussaillement','Design Fondation','Road survey'];
-const PRESTA_TYPE_COLORS={'Géomètre':'#E91E8C','Géotechnicien':'#FF6B00','Démanteleur':'#7D5A3C','Travaux forestiers':'#2E7D32','Design fondation':'#7B2FBE','Transporteur':'#00838F','Hydrogéologue':'#1565C0'};
+const PRESTA_TYPE_COLORS={'Géomètre':'#E91E8C','Géotechnicien':'#FF6B00','Démanteleur':'#7D5A3C','Travaux forestiers':'#2E7D32','Design fondation':'#7B2FBE','Transporteur':'#00838F','Hydrogéologue':'#1565C0','Administratif':'#558B2F'};
 
 if(!S.prestas) S.prestas=[];
 if(!S.prestaTypes) S.prestaTypes=[...PRESTA_TYPES_DEFAULT];
@@ -508,6 +513,19 @@ function releasePrestaColor(type){
   }
 }
 
+function getPrestaTypeIcon(type){
+  const icons={
+    'Transporteur':`<svg viewBox="0 0 36 36" width="18" height="18"><rect x="2" y="9" width="19" height="13" rx="1" fill="#FBC02D" stroke="#1A1A1A" stroke-width="1.6"/><line x1="2" y1="18" x2="21" y2="18" stroke="#1A1A1A" stroke-width="1.6"/><path d="M21 13h5l4 5v4h-9z" fill="#FBC02D" stroke="#1A1A1A" stroke-width="1.6"/><path d="M23 14.5h3l2.3 3.5h-5.3z" fill="#29B6F6" stroke="#1A1A1A" stroke-width="1.3"/><circle cx="9" cy="23" r="2.6" fill="#90A4AE" stroke="#1A1A1A" stroke-width="1.5"/><circle cx="27" cy="23" r="2.6" fill="#90A4AE" stroke="#1A1A1A" stroke-width="1.5"/></svg>`,
+    'Géomètre':`<svg viewBox="0 0 36 36" width="18" height="18"><path d="M5 31 17 6l12 25z" fill="#FFD66B" stroke="#1A1A1A" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 26h8" stroke="#1A1A1A" stroke-width="1.4"/><line x1="9" y1="13" x2="6.5" y2="13" stroke="#1A1A1A" stroke-width="1.2"/><line x1="11" y1="17" x2="8" y2="17" stroke="#1A1A1A" stroke-width="1.2"/><line x1="13" y1="21" x2="9.5" y2="21" stroke="#1A1A1A" stroke-width="1.2"/><circle cx="27" cy="8" r="2.2" fill="#EF5350" stroke="#1A1A1A" stroke-width="1.4"/><line x1="25.2" y1="9.8" x2="20" y2="25" stroke="#90CAF9" stroke-width="2"/><line x1="28.8" y1="9.8" x2="30" y2="20" stroke="#90CAF9" stroke-width="2"/><line x1="17" y1="20" x2="30" y2="20" stroke="#1A1A1A" stroke-width="1.4"/></svg>`,
+    'Géotechnicien':`<svg viewBox="0 0 36 36" width="18" height="18"><rect x="2" y="14" width="20" height="13" rx="2" fill="#FFE082" stroke="#1A1A1A" stroke-width="1.5"/><rect x="5" y="9" width="8" height="5" rx="1" fill="#FF7043" stroke="#1A1A1A" stroke-width="1.4"/><circle cx="8" cy="29" r="2.3" fill="#90A4AE" stroke="#1A1A1A" stroke-width="1.3"/><circle cx="18" cy="29" r="2.3" fill="#90A4AE" stroke="#1A1A1A" stroke-width="1.3"/><path d="M22 16l5-5 4 1-1 6-3 6-6 3z" fill="#D8E5EC" stroke="#1A1A1A" stroke-width="1.4" stroke-linejoin="round"/><circle cx="30" cy="17" r="1.6" fill="#FFD54F" stroke="#1A1A1A" stroke-width="1"/></svg>`,
+    'Démanteleur':`<svg viewBox="0 0 36 36" width="18" height="18"><line x1="9" y1="31" x2="9" y2="6" stroke="#1A1A1A" stroke-width="1.8"/><path d="M9 6l18 9" stroke="#1A1A1A" stroke-width="1.8" fill="none"/><path d="M9 6 4 14h6z" fill="#90A4AE" stroke="#1A1A1A" stroke-width="1.3"/><line x1="9" y1="31" x2="20" y2="31" stroke="#1A1A1A" stroke-width="1.8"/><line x1="27" y1="15" x2="27" y2="22" stroke="#1A1A1A" stroke-width="1.8"/><path d="M27 22c-2.2 0-3.8 1.7-3.8 4" stroke="#90A4AE" stroke-width="2" fill="none"/><circle cx="27" cy="15" r="1.6" fill="#FBC02D" stroke="#1A1A1A" stroke-width="1"/></svg>`,
+    'Travaux forestiers':`<svg viewBox="0 0 36 36" width="18" height="18"><line x1="2" y1="29" x2="34" y2="29" stroke="#1B5E20" stroke-width="2"/><line x1="8" y1="29" x2="8" y2="20" stroke="#1B5E20" stroke-width="1.6"/><path d="M8 8l5 9H3z" fill="#81C784" stroke="#1A1A1A" stroke-width="1.2"/><line x1="15" y1="29" x2="15" y2="22" stroke="#1B5E20" stroke-width="1.6"/><path d="M15 7l5.5 10h-11z" fill="#43A047" stroke="#1A1A1A" stroke-width="1.2"/><line x1="22" y1="29" x2="22" y2="19" stroke="#1B5E20" stroke-width="1.6"/><path d="M22 5l6 12h-12z" fill="#2E7D32" stroke="#1A1A1A" stroke-width="1.2"/><line x1="29" y1="29" x2="29" y2="22" stroke="#1B5E20" stroke-width="1.6"/><path d="M29 12l4.5 8h-9z" fill="#81C784" stroke="#1A1A1A" stroke-width="1.2"/></svg>`,
+    'Administratif':`<svg viewBox="0 0 36 36" width="18" height="18"><circle cx="11" cy="20" r="6" fill="#A5D6A7" stroke="#2E7D32" stroke-width="1.4"/><circle cx="9.3" cy="18.5" r=".9" fill="#2E7D32"/><circle cx="12.7" cy="18.5" r=".9" fill="#2E7D32"/><path d="M5 32c0-4 2.7-6.5 6-6.5s6 2.5 6 6.5" fill="#A5D6A7" stroke="#2E7D32" stroke-width="1.4"/><rect x="18" y="13" width="13" height="9" rx="1" fill="#D7F2C7" stroke="#2E7D32" stroke-width="1.4"/><rect x="22.5" y="22" width="4" height="4" fill="#D7F2C7" stroke="#2E7D32" stroke-width="1.2"/><g stroke="#2E7D32" stroke-width="1.6" fill="none"><circle cx="22" cy="5" r="2.4"/><path d="M22 1.6v.8M22 7.6v.8M18.6 5h.8M24.6 5h.8M19.4 2.4l.6.6M24 7l.6.6M19.4 7.6l.6-.6M24 3l.6-.6"/></g><g stroke="#2E7D32" stroke-width="1.4" fill="none"><circle cx="28" cy="6.5" r="1.8"/><path d="M28 4v.6M28 8.4v.6M25.8 6.5h.6M29.6 6.5h.6"/></g><path d="M27 4h6v3.5l-2.5 2H29l-1 1.2V8h-1z" fill="#D7F2C7" stroke="#2E7D32" stroke-width="1.2"/></svg>`,
+    'Hydrogéologue':`<svg viewBox="0 0 36 36" width="18" height="18"><path d="M18 4c4 6 8 11 8 16a8 8 0 1 1-16 0c0-5 4-10 8-16z" fill="#1E88E5" stroke="#0D47A1" stroke-width="1.2"/><path d="M15 22a4 4 0 0 0 4 4" stroke="#BBDEFB" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="16" cy="26.5" r="1.3" fill="#BBDEFB"/><ellipse cx="18" cy="33" rx="9" ry="1.6" fill="none" stroke="#1E88E5" stroke-width="1.4"/><ellipse cx="18" cy="33" rx="5" ry="1" fill="none" stroke="#1E88E5" stroke-width="1.2"/></svg>`
+  };
+  return icons[type]||'';
+}
+
 if(!S.taskTypes)S.taskTypes=[...BASE_TYPES];
 
 const save=()=>localStorage.setItem('ew_v9',JSON.stringify(S));
@@ -515,6 +533,11 @@ const proj=()=>S.projects.find(p=>p.id===S.activeId);
 const getCL=mid=>{const p=proj();if(!p.checklists[mid])p.checklists[mid]=DCL[mid].map((t,i)=>({id:i,text:t,done:false}));return p.checklists[mid]};
 const fmt=d=>{if(!d)return'';const[y,m,j]=d.split('-');return`${j}/${m}/${y}`};
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+let _linkIconGradCounter=0;
+function linkIconSvg(){
+  const gid='linkGrad'+(_linkIconGradCounter++);
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="url(#${gid})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E91E8C"/><stop offset="100%" stop-color="#FF7A45"/></linearGradient></defs><path d="M10.5 13.5l3-3"></path><path d="M8.5 16.5a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 0 1 5 5l-.5.5"></path><path d="M15.5 7.5a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 0 1-5-5l.5-.5"></path></svg>`;
+}
 const rowCls=t=>t.state==='fi'?'row-fi':'';
 
 function renderTabs(){
@@ -670,7 +693,7 @@ function renderPage(){
               <span style="font-size:10px;color:var(--text2);font-weight:500;min-width:55px">${esc(r.theme)}</span>
               <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span>
               <span class="risk-badge risk-${r.level}">${r.level==='faible'?'Faible':r.level==='modere'?'Modéré':'Fort'}</span>
-              ${r.comment?`<span class="risk-com-icon">💬<span class="risk-tooltip">${esc(r.comment)}</span></span>`:'<span style="width:19px"></span>'}
+              ${r.comment?`<span class="risk-com-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#riskGrad${i})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="riskGrad${i}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E91E8C"/><stop offset="100%" stop-color="#FF7A45"/></linearGradient></defs><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><line x1="7.5" y1="9" x2="15" y2="9" stroke="url(#riskGrad${i})" stroke-width="2"></line><line x1="7.5" y1="12" x2="15" y2="12" stroke="url(#riskGrad${i})" stroke-width="2"></line><line x1="7.5" y1="15" x2="13" y2="15" stroke="url(#riskGrad${i})" stroke-width="2"></line></svg><span class="risk-tooltip">${esc(r.comment)}</span></span>`:'<span style="width:19px"></span>'}
               <button style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 2px;border-radius:3px" onclick="deleteRisk(${i},event)" title="Supprimer">✕</button>
             </div>`).join('')
           : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun risque</span>'}
@@ -692,7 +715,7 @@ function renderPage(){
           ${p.links.length ? p.links.map((l,i)=>`
             <div class="link-item">
               <a href="${esc(l.url)}" target="_blank" title="${esc(l.url)}">${esc(l.name)}</a>
-              <button class="link-edit-btn" onclick="openLinkModal(${i})" title="Modifier">✏️</button>
+              <button class="link-edit-btn link-icon" onclick="openLinkModal(${i})" title="Modifier">${linkIconSvg()}</button>
               <button class="link-del-btn" onclick="deleteLink(${i})" title="Supprimer">✕</button>
             </div>`).join('') : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun lien</span>'}
         </div>
@@ -797,13 +820,13 @@ function taskRow(t,archived){
       <option value="1"${t.prio?' selected':''}>Oui</option>
     </select></div></td>
     <td style="padding:3px 6px">
-      <div onclick="openCom('${t.id}')" title="${esc(t.comment)}" style="font-size:11px;padding:3px 8px;background:#fff;border:1px solid var(--border);border-radius:5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${t.comment?'var(--text)':'var(--text3)'}">${t.comment||'…'}</div>
+      <div onclick="openCom('${t.id}')" title="${esc(t.comment)}" style="font-size:11px;padding:3px 8px;background:#fff;border:1px solid var(--border);border-radius:5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${t.comment?'var(--text)':'var(--text3)'}">${t.commentHtml||t.comment||'…'}</div>
     </td>
     <td><div class="act-btns">
       ${t.state==='fi'?`<button class="abtn abtn-arc" onclick="archTask('${t.id}')">Archiver</button>`:''}
       ${t.taskLink
         ?`<a href="${esc(t.taskLink.url)}" target="_blank" style="font-size:10.5px;color:var(--blue);font-weight:500;text-decoration:none;white-space:nowrap" title="${esc(t.taskLink.url)}">${esc(t.taskLink.name)}</a>
-         <button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Modifier le lien" style="font-size:10px;padding:1px 3px">✏</button>`
+         <button class="abtn-link link-icon" onclick="openTaskLinkModal('${t.id}')" title="Modifier le lien" style="padding:1px 3px">${linkIconSvg()}</button>`
         :`<button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Ajouter un lien" style="font-size:10px;color:var(--text3)">+ Lien</button>`
       }
       <button class="abtn-x" onclick="delTask('${t.id}')" title="Supprimer">✕</button>
@@ -1138,7 +1161,7 @@ function renderPrestaView(){
         <span style="position:absolute;right:4px;pointer-events:none;font-size:9px;color:rgba(255,255,255,.8)">▾</span>
       </div></td>
       <td>${m.link?`<a href="${esc(m.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500">${esc(m.link.name)}</a>
-        <button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3)">✏</button>`
+        <button class="link-icon" onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;vertical-align:middle">${linkIconSvg()}</button>`
         :`<button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10.5px;color:var(--text2)">+ Lien</button>`}
       </td>
       <td><input type="text" placeholder="Commentaire…" value="${esc(m.comment||'')}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'comment',this.value)"></td>
@@ -1502,9 +1525,25 @@ function saveCom(){
   t.comment=ed.innerText;
   save();closeCom();renderPage();
 }
+let _savedSelection=null;
+function saveSelection(){
+  const sel=window.getSelection();
+  if(sel.rangeCount>0) _savedSelection=sel.getRangeAt(0).cloneRange();
+}
+function restoreSelection(){
+  if(_savedSelection){
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_savedSelection);
+  }
+}
 function fmt2(cmd,val){
-  document.getElementById('com-editor').focus();
+  const ed=document.getElementById('com-editor');
+  ed.focus();
+  restoreSelection();
+  document.execCommand('styleWithCSS',false,true);
   document.execCommand(cmd,false,val||null);
+  saveSelection();
 }
 function renderStudyBar(t){
   if(!t.study) t.study={done:{},skipped:{}};
@@ -1761,7 +1800,7 @@ async function uploadToDrive(filename, content, folderId){
     </div>
   </div>
 </div>
-<div class="link-modal-bg"  id="link-modal-bg" onclick="closeLinkModalIfOutside(event)">
+<div class="link-modal-bg"  id="link-modal-bg">
   <div class="link-modal" id="link-modal">
     <h3 id="link-modal-title">Ajouter un lien</h3>
     <div class="lm-field"><label>Nom affiché</label><input type="text" id="link-name-inp" placeholder="ex: Dossier Lascombes…"></div>
@@ -1772,35 +1811,35 @@ async function uploadToDrive(filename, content, folderId){
     </div>
   </div>
 </div>
-<div class="com-overlay"  id="com-overlay" onclick="closeComIfOutside(event)">
+<div class="com-overlay"  id="com-overlay">
   <div class="com-panel" id="com-panel">
     <div class="com-header">
       <span class="com-header-title">Commentaire</span>
       <button class="com-close" onclick="closeCom()">×</button>
     </div>
     <div class="com-toolbar">
-      <button class="com-tb-btn" onclick="fmt2('bold')" title="Gras"><b>G</b></button>
-      <button class="com-tb-btn" onclick="fmt2('italic')" title="Italique"><i>I</i></button>
-      <button class="com-tb-btn" onclick="fmt2('underline')" title="Souligné"><u>S</u></button>
-      <button class="com-tb-btn" onclick="fmt2('strikeThrough')" title="Barré"><s>B</s></button>
+      <button class="com-tb-btn" onmousedown="event.preventDefault();fmt2('bold')" title="Gras"><b>G</b></button>
+      <button class="com-tb-btn" onmousedown="event.preventDefault();fmt2('italic')" title="Italique"><i>I</i></button>
+      <button class="com-tb-btn" onmousedown="event.preventDefault();fmt2('underline')" title="Souligné"><u>S</u></button>
+      <button class="com-tb-btn" onmousedown="event.preventDefault();fmt2('strikeThrough')" title="Barré"><s>B</s></button>
       <div class="com-tb-sep"></div>
       <div class="com-colors">
-        <div class="com-color" style="background:#1C2333" onclick="fmt2('foreColor','#1C2333')" title="Noir"></div>
-        <div class="com-color" style="background:#A32D2D" onclick="fmt2('foreColor','#A32D2D')" title="Rouge"></div>
-        <div class="com-color" style="background:#2D7A3A" onclick="fmt2('foreColor','#2D7A3A')" title="Vert"></div>
-        <div class="com-color" style="background:#1A5FAD" onclick="fmt2('foreColor','#1A5FAD')" title="Bleu"></div>
-        <div class="com-color" style="background:#8A5200" onclick="fmt2('foreColor','#8A5200')" title="Ambre"></div>
-        <div class="com-color" style="background:#9AA3B2" onclick="fmt2('foreColor','#9AA3B2')" title="Gris"></div>
+        <div class="com-color" style="background:#1C2333" onmousedown="event.preventDefault();fmt2('foreColor','#1C2333')" title="Noir"></div>
+        <div class="com-color" style="background:#A32D2D" onmousedown="event.preventDefault();fmt2('foreColor','#A32D2D')" title="Rouge"></div>
+        <div class="com-color" style="background:#2D7A3A" onmousedown="event.preventDefault();fmt2('foreColor','#2D7A3A')" title="Vert"></div>
+        <div class="com-color" style="background:#1A5FAD" onmousedown="event.preventDefault();fmt2('foreColor','#1A5FAD')" title="Bleu"></div>
+        <div class="com-color" style="background:#8A5200" onmousedown="event.preventDefault();fmt2('foreColor','#8A5200')" title="Ambre"></div>
+        <div class="com-color" style="background:#9AA3B2" onmousedown="event.preventDefault();fmt2('foreColor','#9AA3B2')" title="Gris"></div>
       </div>
     </div>
-    <div class="com-editor" id="com-editor" contenteditable="true"></div>
+    <div class="com-editor" id="com-editor" contenteditable="true" onmouseup="saveSelection()" onkeyup="saveSelection()"></div>
     <div class="com-footer">
       <button class="com-btn-cancel" onclick="closeCom()">Annuler</button>
       <button class="com-btn-save" onclick="saveCom()">Enregistrer</button>
     </div>
   </div>
 </div>
-<div class="link-modal-bg" id="risk-modal-bg" onclick="closeRiskModalIfOutside(event)">
+<div class="link-modal-bg" id="risk-modal-bg">
   <div class="link-modal" style="width:360px">
     <h3 id="risk-modal-title">Ajouter un risque</h3>
     <div class="lm-field"><label>Thème</label>
@@ -1826,7 +1865,7 @@ async function uploadToDrive(filename, content, folderId){
     </div>
   </div>
 </div>
-<div class="link-modal-bg" id="task-link-modal-bg" onclick="closeTaskLinkModalIfOutside(event)">
+<div class="link-modal-bg" id="task-link-modal-bg">
   <div class="link-modal" style="width:340px">
     <h3>Lien de la tâche</h3>
     <div class="lm-field"><label>Nom affiché</label><input type="text" id="tl-name-inp" placeholder="ex: Dossier technique…"></div>
@@ -1867,7 +1906,7 @@ async function uploadToDrive(filename, content, folderId){
 </div>
 
 <!-- Presta add/edit modal -->
-<div class="presta-modal-bg" id="presta-modal-bg" onclick="if(event.target===this)closePrestaModal()">
+<div class="presta-modal-bg" id="presta-modal-bg">
   <div class="presta-modal">
     <h3 id="presta-modal-title">Nouveau presta</h3>
     <div class="presta-info-grid">
@@ -1929,7 +1968,7 @@ async function uploadToDrive(filename, content, folderId){
 </div>
 
 <!-- Mission link modal -->
-<div class="link-modal-bg" id="mission-link-modal-bg" style="z-index:600" onclick="if(event.target===this)closeMissionLinkModal()">
+<div class="link-modal-bg" id="mission-link-modal-bg" style="z-index:600">
   <div class="link-modal" style="width:340px">
     <h3>Lien de la mission</h3>
     <div class="lm-field"><label>Nom affiché</label><input type="text" id="ml-name" placeholder="ex: Devis signé…"></div>
@@ -1942,7 +1981,7 @@ async function uploadToDrive(filename, content, folderId){
 </div>
 
 
-<div class="modal-bg" id="manage-types-modal" onclick="if(event.target===this)closeManageTypes()">
+<div class="modal-bg" id="manage-types-modal">
   <div class="modal" style="width:500px;max-height:80vh;overflow-y:auto">
     <h3 style="margin-bottom:14px">Gérer les types</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -1970,5 +2009,43 @@ async function uploadToDrive(filename, content, folderId){
     </div>
   </div>
 </div>
+<script>
+// ── GLOBAL ENTER/ESCAPE HANDLER FOR MODALS ──
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter' && e.key!=='Escape') return;
+
+  // Map of overlay id -> {save: fn, close: fn}
+  const modalMap = [
+    {id:'link-modal-bg', save:saveLink, close:closeLinkModal},
+    {id:'risk-modal-bg', save:saveRisk, close:closeRiskModal},
+    {id:'task-link-modal-bg', save:saveTaskLink, close:closeTaskLinkModal},
+    {id:'com-overlay', save:saveCom, close:closeCom},
+    {id:'modal-proj', save:addProject, close:()=>closeModal('modal-proj')},
+    {id:'arc-overlay', save:null, close:closeArc},
+    {id:'icp-overlay', save:saveIcp, close:closeIcpPanel},
+    {id:'presta-modal-bg', save:savePresta, close:closePrestaModal},
+    {id:'presta-overlay', save:null, close:closePrestaView},
+    {id:'mission-link-modal-bg', save:saveMissionLink, close:closeMissionLinkModal},
+    {id:'manage-types-modal', save:null, close:closeManageTypes},
+    {id:'modal-confirm', save:null, close:closeConfirm},
+    {id:'modal-confirm-presta', save:null, close:closeConfirmPresta},
+    {id:'modal-confirm-type', save:null, close:closeConfirmType}
+  ];
+
+  for(const m of modalMap){
+    const el=document.getElementById(m.id);
+    if(el && el.classList.contains('open')){
+      // Don't trigger Enter-save if focus is in a textarea (allow newlines)
+      const tag=document.activeElement?document.activeElement.tagName:'';
+      if(e.key==='Enter' && tag==='TEXTAREA') return;
+      e.preventDefault();
+      if(e.key==='Enter' && m.save){ m.save(); }
+      else if(e.key==='Escape'){ m.close(); }
+      else if(e.key==='Enter' && !m.save){ m.close(); }
+      return; // only handle the topmost/first matching open modal
+    }
+  }
+});
+</script>
 </body>
 </html>
