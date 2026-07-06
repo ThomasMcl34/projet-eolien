@@ -748,13 +748,13 @@ function renderPage(){
         <button class="btn-add-link" onclick="openLinkModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> Ajouter</button>
       </div>
       <div style="display:flex;gap:8px;flex:1;overflow:hidden;min-height:0">
-        <div class="card" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+        <div class="card cal-card" id="cal-${p.id}">
+          ${renderCalendar(p)}
+        </div>
+        <div class="card" style="flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden;min-width:0">
           <div class="section-title">Frise chronologique</div>
           <div class="milestones" id="frise-ms-${p.id}">${progressBar}${msHtml}</div>
           ${clHtml}
-        </div>
-        <div class="card cal-card" id="cal-${p.id}">
-          ${renderCalendar(p)}
         </div>
       </div>
     </div>
