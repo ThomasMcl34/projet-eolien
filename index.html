@@ -375,6 +375,32 @@ table.missions tr:last-child td{border-bottom:none}
 .presta-modal-btns button{padding:6px 16px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
 .presta-modal-btns .primary{background:var(--blue-mid);color:#fff;border-color:var(--blue);font-weight:600}
 .presta-modal-btns .primary:hover{background:var(--blue)}
+
+/* ── CALENDAR ── */
+.cal-card{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0}
+.cal-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cal-nav{border:none;background:none;cursor:pointer;font-size:15px;color:var(--text2);padding:0 4px;border-radius:4px;line-height:1}
+.cal-nav:hover{background:var(--surface2);color:var(--text)}
+.cal-month-label{font-size:11px;font-weight:700;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;flex-shrink:0}
+.cal-dow{font-size:8px;font-weight:700;color:var(--text3);text-align:center;padding:2px 0;text-transform:uppercase}
+.cal-day{border-radius:3px;height:36px;font-size:8.5px;background:transparent;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2px}
+.cal-day.today .cal-day-num{background:var(--blue-mid);color:#fff;border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.cal-day.other-month .cal-day-num{color:var(--text3)}
+.cal-day-num{font-size:8.5px;color:var(--text2);width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-milestone{font-size:7px;font-weight:700;color:var(--blue);background:var(--blue-light);border-radius:2px;padding:0 3px;white-space:nowrap;overflow:hidden;max-width:90%;line-height:1.5;margin-top:1px;text-align:center}
+.cal-rdv-dot{width:7px;height:7px;border-radius:50%;background:#E53935;cursor:pointer;flex-shrink:0;display:block}
+.cal-rdv-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;min-height:0}
+.cal-rdv-list::-webkit-scrollbar{width:3px}
+.cal-rdv-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cal-rdv-item{display:flex;align-items:center;gap:5px;font-size:10px;padding:3px 5px;background:#FFF5F5;border-left:3px solid #E53935;border-radius:3px;flex-shrink:0}
+.cal-rdv-item-date{font-size:9px;color:#E53935;font-weight:700;white-space:nowrap;flex-shrink:0}
+.cal-rdv-item-title{font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px}
+.cal-rdv-item-del{border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3);padding:0 2px;opacity:0;border-radius:3px;flex-shrink:0}
+.cal-rdv-item:hover .cal-rdv-item-del{opacity:1}
+.btn-add-rdv{font-size:10px;padding:3px 9px;border:1px solid #E53935;border-radius:5px;background:#FFF5F5;color:#E53935;cursor:pointer;font-weight:600;flex-shrink:0;align-self:flex-start}
+.btn-add-rdv:hover{background:#FDEAEA}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -438,7 +464,7 @@ function getTypeColor(type){ return TYPE_COLORS[type]||'#888'; }
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -462,6 +488,7 @@ S.projects.forEach(p=>{
   if(!p.links)p.links=[];
   if(!p.risks)p.risks=[];
   if(!p.icps)p.icps=[];
+  if(!p.rdvs)p.rdvs=[];
 });
 
 // ── PRESTAS DATA ──
@@ -479,6 +506,7 @@ PRESTA_TYPES_DEFAULT.forEach(t=>{ if(!S.prestaTypes.includes(t)) S.prestaTypes.p
 MISSION_TYPES_DEFAULT.forEach(t=>{ if(!S.missionTypes.includes(t)) S.missionTypes.push(t); });
 if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
 if(!S.mainTab) S.mainTab='projets';
+if(!S.calMonths) S.calMonths={}; // {projectId: 'YYYY-MM'}
 if(!S.filterPrestaType) S.filterPrestaType='';
 if(!S.filterMissionType) S.filterMissionType='';
 if(!S.filterProject) S.filterProject='';
@@ -533,10 +561,8 @@ const proj=()=>S.projects.find(p=>p.id===S.activeId);
 const getCL=mid=>{const p=proj();if(!p.checklists[mid])p.checklists[mid]=DCL[mid].map((t,i)=>({id:i,text:t,done:false}));return p.checklists[mid]};
 const fmt=d=>{if(!d)return'';const[y,m,j]=d.split('-');return`${j}/${m}/${y}`};
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-let _linkIconGradCounter=0;
 function linkIconSvg(){
-  const gid='linkGrad'+(_linkIconGradCounter++);
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="url(#${gid})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E91E8C"/><stop offset="100%" stop-color="#FF7A45"/></linearGradient></defs><path d="M10.5 13.5l3-3"></path><path d="M8.5 16.5a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 0 1 5 5l-.5.5"></path><path d="M15.5 7.5a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 0 1-5-5l.5-.5"></path></svg>`;
+  return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`;
 }
 const rowCls=t=>t.state==='fi'?'row-fi':'';
 
@@ -693,7 +719,7 @@ function renderPage(){
               <span style="font-size:10px;color:var(--text2);font-weight:500;min-width:55px">${esc(r.theme)}</span>
               <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span>
               <span class="risk-badge risk-${r.level}">${r.level==='faible'?'Faible':r.level==='modere'?'Modéré':'Fort'}</span>
-              ${r.comment?`<span class="risk-com-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#riskGrad${i})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="riskGrad${i}" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E91E8C"/><stop offset="100%" stop-color="#FF7A45"/></linearGradient></defs><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><line x1="7.5" y1="9" x2="15" y2="9" stroke="url(#riskGrad${i})" stroke-width="2"></line><line x1="7.5" y1="12" x2="15" y2="12" stroke="url(#riskGrad${i})" stroke-width="2"></line><line x1="7.5" y1="15" x2="13" y2="15" stroke="url(#riskGrad${i})" stroke-width="2"></line></svg><span class="risk-tooltip">${esc(r.comment)}</span></span>`:'<span style="width:19px"></span>'}
+              ${r.comment?`<span class="risk-com-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="risk-tooltip">${esc(r.comment)}</span></span>`:'<span style="width:19px"></span>'}
               <button style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 2px;border-radius:3px" onclick="deleteRisk(${i},event)" title="Supprimer">✕</button>
             </div>`).join('')
           : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun risque</span>'}
@@ -719,12 +745,17 @@ function renderPage(){
               <button class="link-del-btn" onclick="deleteLink(${i})" title="Supprimer">✕</button>
             </div>`).join('') : '<span style="font-size:10.5px;color:var(--text3);font-style:italic">Aucun lien</span>'}
         </div>
-        <button class="btn-add-link" onclick="openLinkModal()">+ Ajouter un lien</button>
+        <button class="btn-add-link" onclick="openLinkModal()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> Ajouter</button>
       </div>
-      <div class="card timeline-card">
-        <div class="section-title">Frise chronologique</div>
-        <div class="milestones" id="frise-ms-${p.id}">${progressBar}${msHtml}</div>
-        ${clHtml}
+      <div style="display:flex;gap:8px;flex:1;overflow:hidden;min-height:0">
+        <div class="card" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+          <div class="section-title">Frise chronologique</div>
+          <div class="milestones" id="frise-ms-${p.id}">${progressBar}${msHtml}</div>
+          ${clHtml}
+        </div>
+        <div class="card cal-card" id="cal-${p.id}">
+          ${renderCalendar(p)}
+        </div>
       </div>
     </div>
 
@@ -827,7 +858,7 @@ function taskRow(t,archived){
       ${t.taskLink
         ?`<a href="${esc(t.taskLink.url)}" target="_blank" style="font-size:10.5px;color:var(--blue);font-weight:500;text-decoration:none;white-space:nowrap" title="${esc(t.taskLink.url)}">${esc(t.taskLink.name)}</a>
          <button class="abtn-link link-icon" onclick="openTaskLinkModal('${t.id}')" title="Modifier le lien" style="padding:1px 3px">${linkIconSvg()}</button>`
-        :`<button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Ajouter un lien" style="font-size:10px;color:var(--text3)">+ Lien</button>`
+        :`<button class="abtn-link" onclick="openTaskLinkModal('${t.id}')" title="Ajouter un lien" style="font-size:10px;color:var(--text3)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button>`
       }
       <button class="abtn-x" onclick="delTask('${t.id}')" title="Supprimer">✕</button>
     </div></td>
@@ -1126,7 +1157,7 @@ function renderPrestaView(){
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
       ${p.type?`<span class="presta-pill" style="background:${col}22;border:1px solid ${col}66;color:${col}">${p.type}</span>`:''}
 
-      <button style="font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2)" onclick="openPrestaModal('${p.id}')">✏ Modifier</button>
+      <button style="font-size:10.5px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:transparent;cursor:pointer;color:var(--text2)" onclick="openPrestaModal('${p.id}')">Modifier</button>
     </div>
     ${p.comment?`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">${esc(p.comment)}</p>`:''}
     <div style="margin-bottom:14px">
@@ -1162,7 +1193,7 @@ function renderPrestaView(){
       </div></td>
       <td>${m.link?`<a href="${esc(m.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500">${esc(m.link.name)}</a>
         <button class="link-icon" onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;vertical-align:middle">${linkIconSvg()}</button>`
-        :`<button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10.5px;color:var(--text2)">+ Lien</button>`}
+        :`<button onclick="editMissionLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer;font-size:10.5px;color:var(--text2)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button>`}
       </td>
       <td><input type="text" placeholder="Commentaire…" value="${esc(m.comment||'')}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'comment',this.value)"></td>
       <td><button class="abtn-x" onclick="deleteMission('${p.id}',${i})">✕</button></td>
@@ -1224,9 +1255,19 @@ function addMission(pid){
   p.missions.push({project:'',type:'',prix:'',delai:'',link:null,comment:''});
   save();renderPrestaView();
 }
+let _delMissionPid=null,_delMissionIdx=null;
 function deleteMission(pid,idx){
-  const p=S.prestas.find(x=>x.id===pid);if(!p)return;
-  p.missions.splice(idx,1);save();renderPrestaView();
+  _delMissionPid=pid;_delMissionIdx=idx;
+  document.getElementById('modal-confirm-mission').classList.add('open');
+}
+function confirmDeleteMission(){
+  const p=S.prestas.find(x=>x.id===_delMissionPid);
+  if(p)p.missions.splice(_delMissionIdx,1);
+  save();closeConfirmMission();renderPrestaView();
+}
+function closeConfirmMission(){
+  document.getElementById('modal-confirm-mission').classList.remove('open');
+  _delMissionPid=null;_delMissionIdx=null;
 }
 
 let _missionLinkPid=null,_missionLinkIdx=null;
@@ -1391,6 +1432,162 @@ function deleteIcp(){
   const p=proj();p.icps.splice(_icpEditIdx,1);
   save();closeIcpPanel();renderPage();
 }
+
+// ── CALENDAR ──
+const DOW=['Lu','Ma','Me','Je','Ve','Sa','Di'];
+const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MS_SHORT={depot:'Dépôt',pac:'PAC',p4:'P4',rtb:'RTB',ic:'IC',ntp:'NTP',soc:'SOC',toc:'TOC'};
+
+function getCalMonth(pid){
+  if(!S.calMonths) S.calMonths={};
+  if(!S.calMonths[pid]){
+    const now=new Date();
+    S.calMonths[pid]=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  }
+  return S.calMonths[pid];
+}
+
+function navCal(pid,delta){
+  const [y,m]=getCalMonth(pid).split('-').map(Number);
+  const d=new Date(y,m-1+delta,1);
+  S.calMonths[pid]=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  save();
+  const el=document.getElementById('cal-'+pid);
+  const p=S.projects.find(x=>x.id===pid);
+  if(el&&p) el.innerHTML=renderCalendar(p);
+}
+
+function renderCalendar(p){
+  const monthStr=getCalMonth(p.id);
+  const [cy,cm]=monthStr.split('-').map(Number);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const firstDay=new Date(cy,cm-1,1);
+  const lastDay=new Date(cy,cm,0);
+  let startDow=firstDay.getDay(); if(startDow===0)startDow=7; startDow--;
+
+  // milestone map
+  const msMap={};
+  Object.entries(p.dates||{}).forEach(([mid,d])=>{
+    if(!d)return;
+    const [dy,dm,dd]=d.split('-');
+    if(parseInt(dy)===cy&&parseInt(dm)===cm){
+      const k=parseInt(dd);
+      if(!msMap[k])msMap[k]=[];
+      msMap[k].push(MS_SHORT[mid]||mid);
+    }
+  });
+
+  // rdv map
+  const rdvMap={};
+  (p.rdvs||[]).forEach((r,i)=>{
+    if(!r.date)return;
+    const [ry,rm,rd]=r.date.split('-');
+    if(parseInt(ry)===cy&&parseInt(rm)===cm){
+      const k=parseInt(rd);
+      if(!rdvMap[k])rdvMap[k]=[];
+      rdvMap[k].push({...r,idx:i});
+    }
+  });
+
+  const totalCells=Math.ceil((startDow+lastDay.getDate())/7)*7;
+
+  // dow headers
+  let cells=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  for(let i=0;i<totalCells;i++){
+    const dayNum=i-startDow+1;
+    const inMonth=dayNum>=1&&dayNum<=lastDay.getDate();
+    const date=new Date(cy,cm-1,dayNum);
+    const isToday=inMonth&&date.getTime()===today.getTime();
+    let cls='cal-day'+(isToday?' today':'')+(inMonth?'':' other-month');
+    const dispNum=inMonth?dayNum:date.getDate();
+    let inner=`<div class="cal-day-num">${dispNum}</div>`;
+    if(inMonth&&msMap[dayNum]){
+      // show up to 2 milestones as short labels
+      msMap[dayNum].slice(0,2).forEach(ms=>{ inner+=`<span class="cal-milestone" title="${ms}">${ms.slice(0,4)}</span>`; });
+    }
+    if(inMonth&&rdvMap[dayNum]){
+      // dots only, tooltip on hover
+      let dots='<div style="display:flex;justify-content:center;align-items:center;gap:2px;margin-top:1px">';
+      rdvMap[dayNum].forEach(r=>{ dots+=`<span class="cal-rdv-dot" onclick="event.stopPropagation();openEditRdv('${p.id}',${r.idx})" title="${esc(r.title)}"></span>`; });
+      dots+='</div>';
+      inner+=dots;
+    }
+    cells+=`<div class="${cls}">${inner}</div>`;
+  }
+
+  // rdv list
+  const rdvListHtml=(p.rdvs||[]).length
+    ?(p.rdvs||[]).map((r,i)=>`
+      <div class="cal-rdv-item">
+        <span class="cal-rdv-item-date">${fmt(r.date)||'—'}</span>
+        <span class="cal-rdv-item-title" title="${esc(r.comment||'')}">${esc(r.title)}</span>
+        <button class="cal-rdv-item-del" onclick="event.stopPropagation();openEditRdv('${p.id}',${i})" title="Modifier" style="opacity:0;color:var(--blue)">✏</button>
+        <button class="cal-rdv-item-del" onclick="event.stopPropagation();deleteRdv('${p.id}',${i})" title="Supprimer">✕</button>
+      </div>`).join('')
+    :'<span style="font-size:10px;color:var(--text3);font-style:italic">Aucun rendez-vous</span>';
+
+  return`<div class="section-title" style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:0;display:flex;align-items:center;gap:5px">Calendrier<span style="flex:1;height:1px;background:var(--border);display:block"></span></div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="event.stopPropagation();navCal('${p.id}',-1)">‹</button>
+      <span class="cal-month-label">${MONTHS[cm-1]} ${cy}</span>
+      <button class="cal-nav" onclick="event.stopPropagation();navCal('${p.id}',1)">›</button>
+    </div>
+    <div class="cal-grid">${cells}</div>
+    <button class="btn-add-rdv" onclick="event.stopPropagation();openAddRdv('${p.id}')">+ RDV</button>
+    <div class="cal-rdv-list">${rdvListHtml}</div>`;
+}
+
+// RDV modal
+let _rdvPid=null, _rdvEditIdx=null;
+function openAddRdv(pid){
+  _rdvPid=pid; _rdvEditIdx=null;
+  const today=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('rdv-date').value=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+  document.getElementById('rdv-title').value='';
+  document.getElementById('rdv-comment').value='';
+  document.getElementById('rdv-modal-title').textContent='Nouveau RDV';
+  document.getElementById('rdv-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('rdv-title').focus(),50);
+}
+function openEditRdv(pid,idx){
+  const p=S.projects.find(x=>x.id===pid);if(!p)return;
+  const r=p.rdvs[idx];if(!r)return;
+  _rdvPid=pid; _rdvEditIdx=idx;
+  document.getElementById('rdv-date').value=r.date||'';
+  document.getElementById('rdv-title').value=r.title||'';
+  document.getElementById('rdv-comment').value=r.comment||'';
+  document.getElementById('rdv-modal-title').textContent='Modifier le RDV';
+  document.getElementById('rdv-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('rdv-title').focus(),50);
+}
+function saveRdv(){
+  const date=document.getElementById('rdv-date').value;
+  const title=document.getElementById('rdv-title').value.trim();
+  if(!date||!title)return;
+  const comment=document.getElementById('rdv-comment').value.trim();
+  const p=S.projects.find(x=>x.id===_rdvPid);if(!p)return;
+  if(_rdvEditIdx!==null){p.rdvs[_rdvEditIdx]={date,title,comment};}
+  else{p.rdvs.push({date,title,comment});}
+  p.rdvs.sort((a,b)=>a.date.localeCompare(b.date));
+  save();closeRdvModal();renderPage();
+}
+let _delRdvPid=null,_delRdvIdx=null;
+function deleteRdv(pid,idx){
+  _delRdvPid=pid;_delRdvIdx=idx;
+  document.getElementById('modal-confirm-rdv').classList.add('open');
+}
+function confirmDeleteRdv(){
+  const p=S.projects.find(x=>x.id===_delRdvPid);
+  if(p)p.rdvs.splice(_delRdvIdx,1);
+  save();closeConfirmRdv();renderPage();
+}
+function closeConfirmRdv(){
+  document.getElementById('modal-confirm-rdv').classList.remove('open');
+  _delRdvPid=null;_delRdvIdx=null;
+}
+function closeRdvModal(){document.getElementById('rdv-modal-bg').classList.remove('open');_rdvPid=null;_rdvEditIdx=null;}
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -1456,9 +1653,19 @@ function saveRisk(){
   else{p.risks.push(r);}
   save();closeRiskModal();renderPage();
 }
+let _delRiskIdx=null;
 function deleteRisk(idx,e){
   e.stopPropagation();
-  const p=proj();p.risks.splice(idx,1);save();renderPage();
+  _delRiskIdx=idx;
+  document.getElementById('modal-confirm-risk').classList.add('open');
+}
+function confirmDeleteRisk(){
+  const p=proj();p.risks.splice(_delRiskIdx,1);
+  save();closeConfirmRisk();renderPage();
+}
+function closeConfirmRisk(){
+  document.getElementById('modal-confirm-risk').classList.remove('open');
+  _delRiskIdx=null;
 }
 let _linkEditIdx=null;
 function openLinkModal(idx){
@@ -1497,8 +1704,18 @@ function saveLink(){
   else{p.links.push({name,url:finalUrl});}
   save();closeLinkModal();renderPage();
 }
+let _delLinkIdx=null;
 function deleteLink(idx){
-  const p=proj();p.links.splice(idx,1);save();renderPage();
+  _delLinkIdx=idx;
+  document.getElementById('modal-confirm-link').classList.add('open');
+}
+function confirmDeleteLink(){
+  const p=proj();p.links.splice(_delLinkIdx,1);
+  save();closeConfirmLink();renderPage();
+}
+function closeConfirmLink(){
+  document.getElementById('modal-confirm-link').classList.remove('open');
+  _delLinkIdx=null;
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('link-modal-bg').classList.contains('open'))saveLink();});
 let _comTaskId=null;
@@ -2027,6 +2244,11 @@ document.addEventListener('keydown', function(e){
     {id:'presta-overlay', save:null, close:closePrestaView},
     {id:'mission-link-modal-bg', save:saveMissionLink, close:closeMissionLinkModal},
     {id:'manage-types-modal', save:null, close:closeManageTypes},
+    {id:'rdv-modal-bg', save:saveRdv, close:closeRdvModal},
+    {id:'modal-confirm-rdv', save:null, close:closeConfirmRdv},
+    {id:'modal-confirm-risk', save:null, close:closeConfirmRisk},
+    {id:'modal-confirm-link', save:null, close:closeConfirmLink},
+    {id:'modal-confirm-mission', save:null, close:closeConfirmMission},
     {id:'modal-confirm', save:null, close:closeConfirm},
     {id:'modal-confirm-presta', save:null, close:closeConfirmPresta},
     {id:'modal-confirm-type', save:null, close:closeConfirmType}
@@ -2047,5 +2269,67 @@ document.addEventListener('keydown', function(e){
   }
 });
 </script>
+
+<div class="modal-bg" id="rdv-modal-bg">
+  <div class="modal" style="width:360px">
+    <h3 id="rdv-modal-title" style="margin-bottom:14px">Nouveau RDV</h3>
+    <div class="lm-field" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">
+      <label style="font-size:10px;color:var(--text2);font-weight:500">Date</label>
+      <input type="date" id="rdv-date" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none">
+    </div>
+    <div class="lm-field" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">
+      <label style="font-size:10px;color:var(--text2);font-weight:500">Titre *</label>
+      <input type="text" id="rdv-title" placeholder="Réunion, visite terrain…" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none">
+    </div>
+    <div class="lm-field" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">
+      <label style="font-size:10px;color:var(--text2);font-weight:500">Commentaire</label>
+      <textarea id="rdv-comment" rows="2" placeholder="Notes…" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;resize:none;line-height:1.5"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button onclick="closeRdvModal()">Annuler</button>
+      <button class="primary" onclick="saveRdv()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-confirm-rdv">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce RDV ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmRdv()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteRdv()">Supprimer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-confirm-risk">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce risque ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmRisk()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteRisk()">Supprimer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-confirm-link">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce lien ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmLink()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteLink()">Supprimer</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-confirm-mission" style="z-index:600">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer cette mission ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmMission()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteMission()">Supprimer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
