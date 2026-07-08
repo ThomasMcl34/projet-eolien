@@ -398,7 +398,13 @@ table.missions tr:last-child td{border-bottom:none}
 .cal-rdv-item-title{font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px}
 .cal-rdv-item-del{border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3);padding:0 2px;opacity:0;border-radius:3px;flex-shrink:0}
 .cal-rdv-item:hover .cal-rdv-item-del{opacity:1}
-.btn-add-rdv{font-size:10px;padding:3px 9px;border:1px solid #E53935;border-radius:5px;background:#FFF5F5;color:#E53935;cursor:pointer;font-weight:600;flex-shrink:0;align-self:flex-start}
+.btn-add-rdv{font-size:10px;padding:3px 9px;border:1px solid #E53935;border-radius:5px;background:#FFF5F5;color:#E53935;cursor:pointer;font-weight:600;flex-shrink:0}
+.btn-add-rdv:hover{background:#FDEAEA}
+.btn-arc-rdv{font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:var(--surface2);color:var(--text2);cursor:pointer;font-weight:500;flex-shrink:0}
+.btn-arc-rdv:hover{background:var(--border)}
+.cal-rdv-done{width:7px;height:7px;border-radius:50%;background:#2E7D32;cursor:pointer;flex-shrink:0;display:block}
+.cal-rdv-item-tick{border:none;background:none;cursor:pointer;font-size:12px;color:#2E7D32;padding:0 2px;opacity:0;border-radius:3px;flex-shrink:0;font-weight:700}
+.cal-rdv-item:hover .cal-rdv-item-tick{opacity:1}
 .btn-add-rdv:hover{background:#FDEAEA}
 
 </style>
@@ -464,7 +470,7 @@ function getTypeColor(type){ return TYPE_COLORS[type]||'#888'; }
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -489,6 +495,7 @@ S.projects.forEach(p=>{
   if(!p.risks)p.risks=[];
   if(!p.icps)p.icps=[];
   if(!p.rdvs)p.rdvs=[];
+  if(!p.rdvsArchived)p.rdvsArchived=[];
 });
 
 // ── PRESTAS DATA ──
@@ -1488,6 +1495,16 @@ function renderCalendar(p){
       rdvMap[k].push({...r,idx:i});
     }
   });
+  // also show archived RDVs as green dots
+  (p.rdvsArchived||[]).forEach((r,i)=>{
+    if(!r.date)return;
+    const [ry,rm,rd]=r.date.split('-');
+    if(parseInt(ry)===cy&&parseInt(rm)===cm){
+      const k=parseInt(rd);
+      if(!rdvMap[k])rdvMap[k]=[];
+      rdvMap[k].push({...r,idx:i,archived:true});
+    }
+  });
 
   const totalCells=Math.ceil((startDow+lastDay.getDate())/7)*7;
 
@@ -1507,9 +1524,11 @@ function renderCalendar(p){
       msMap[dayNum].slice(0,2).forEach(ms=>{ inner+=`<span class="cal-milestone" title="${ms}">${ms.slice(0,4)}</span>`; });
     }
     if(inMonth&&rdvMap[dayNum]){
-      // dots only, tooltip on hover
       let dots='<div style="display:flex;justify-content:center;align-items:center;gap:2px;margin-top:1px">';
-      rdvMap[dayNum].forEach(r=>{ dots+=`<span class="cal-rdv-dot" onclick="event.stopPropagation();openEditRdv('${p.id}',${r.idx})" title="${esc(r.title)}"></span>`; });
+      rdvMap[dayNum].forEach(r=>{
+        const cls=r.archived?'cal-rdv-done':'cal-rdv-dot';
+        dots+=`<span class="${cls}" onclick="event.stopPropagation();${r.archived?'':`openEditRdv('${p.id}',${r.idx})`}" title="${esc(r.title)}"></span>`;
+      });
       dots+='</div>';
       inner+=dots;
     }
@@ -1522,6 +1541,7 @@ function renderCalendar(p){
       <div class="cal-rdv-item">
         <span class="cal-rdv-item-date">${fmt(r.date)||'—'}</span>
         <span class="cal-rdv-item-title" title="${esc(r.comment||'')}">${esc(r.title)}</span>
+        <button class="cal-rdv-item-tick" onclick="event.stopPropagation();archiveRdv('${p.id}',${i})" title="Valider">✓</button>
         <button class="cal-rdv-item-del" onclick="event.stopPropagation();openEditRdv('${p.id}',${i})" title="Modifier" style="opacity:0;color:var(--blue)">✏</button>
         <button class="cal-rdv-item-del" onclick="event.stopPropagation();deleteRdv('${p.id}',${i})" title="Supprimer">✕</button>
       </div>`).join('')
@@ -1534,7 +1554,10 @@ function renderCalendar(p){
       <button class="cal-nav" onclick="event.stopPropagation();navCal('${p.id}',1)">›</button>
     </div>
     <div class="cal-grid">${cells}</div>
-    <button class="btn-add-rdv" onclick="event.stopPropagation();openAddRdv('${p.id}')">+ RDV</button>
+    <div style="display:flex;gap:5px;flex-shrink:0">
+      <button class="btn-add-rdv" onclick="event.stopPropagation();openAddRdv('${p.id}')">+ RDV</button>
+      <button class="btn-arc-rdv" onclick="event.stopPropagation();openArchivedRdvs('${p.id}')">📁 Archivés (${(p.rdvsArchived||[]).length})</button>
+    </div>
     <div class="cal-rdv-list">${rdvListHtml}</div>`;
 }
 
@@ -1588,6 +1611,91 @@ function closeConfirmRdv(){
   _delRdvPid=null;_delRdvIdx=null;
 }
 function closeRdvModal(){document.getElementById('rdv-modal-bg').classList.remove('open');_rdvPid=null;_rdvEditIdx=null;}
+
+// ── RDV ARCHIVE ──
+let _archRdvPid=null, _archRdvIdx=null;
+function archiveRdv(pid,idx){
+  _archRdvPid=pid; _archRdvIdx=idx;
+  document.getElementById('modal-confirm-archive-rdv').classList.add('open');
+}
+function confirmArchiveRdv(){
+  const p=S.projects.find(x=>x.id===_archRdvPid);if(!p)return;
+  const r=p.rdvs.splice(_archRdvIdx,1)[0];
+  if(!p.rdvsArchived)p.rdvsArchived=[];
+  p.rdvsArchived.unshift(r);
+  p.rdvsArchived.sort((a,b)=>b.date.localeCompare(a.date));
+  save();closeConfirmArchiveRdv();renderPage();
+}
+function closeConfirmArchiveRdv(){
+  document.getElementById('modal-confirm-archive-rdv').classList.remove('open');
+  _archRdvPid=null;_archRdvIdx=null;
+}
+
+let _arcRdvViewPid=null;
+function openArchivedRdvs(pid){
+  _arcRdvViewPid=pid;
+  renderArchivedRdvs();
+  document.getElementById('archived-rdv-overlay').classList.add('open');
+}
+function closeArchivedRdvs(){document.getElementById('archived-rdv-overlay').classList.remove('open');_arcRdvViewPid=null;}
+
+function renderArchivedRdvs(){
+  const p=S.projects.find(x=>x.id===_arcRdvViewPid);if(!p)return;
+  const body=document.getElementById('archived-rdv-body');
+  const list=p.rdvsArchived||[];
+  if(!list.length){body.innerHTML='<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun RDV archivé</span>';return;}
+  body.innerHTML=list.map((r,i)=>`
+    <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:#2E7D32;font-weight:700;white-space:nowrap">${fmt(r.date)||'—'}</span>
+        <span style="font-size:12px;font-weight:600;flex:1">${esc(r.title)}</span>
+        <button onclick="restoreRdv('${p.id}',${i})" style="font-size:10px;padding:2px 7px;border:1px solid var(--border2);border-radius:4px;background:transparent;cursor:pointer;color:var(--text2)">Restaurer</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="text" value="${esc(r.comment||'')}" placeholder="Commentaire…" onchange="updateArchivedRdv('${p.id}',${i},'comment',this.value)"
+          style="flex:1;padding:3px 7px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit">
+        ${r.link
+          ?`<a href="${esc(r.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500;white-space:nowrap">${esc(r.link.name)}</a>
+            <button onclick="editArchivedRdvLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer">${linkIconSvg()}</button>`
+          :`<button onclick="editArchivedRdvLink('${p.id}',${i})" style="border:none;background:none;cursor:pointer">${linkIconSvg()}</button>`
+        }
+      </div>
+    </div>`).join('');
+}
+
+function updateArchivedRdv(pid,idx,field,val){
+  const p=S.projects.find(x=>x.id===pid);if(!p)return;
+  if(p.rdvsArchived[idx])p.rdvsArchived[idx][field]=val;
+  save();
+}
+function restoreRdv(pid,idx){
+  const p=S.projects.find(x=>x.id===pid);if(!p)return;
+  const r=p.rdvsArchived.splice(idx,1)[0];
+  p.rdvs.push(r);
+  p.rdvs.sort((a,b)=>a.date.localeCompare(b.date));
+  save();renderArchivedRdvs();renderPage();
+}
+
+let _arcRdvLinkPid=null,_arcRdvLinkIdx=null;
+function editArchivedRdvLink(pid,idx){
+  _arcRdvLinkPid=pid;_arcRdvLinkIdx=idx;
+  const p=S.projects.find(x=>x.id===pid);
+  const r=p&&p.rdvsArchived[idx];
+  document.getElementById('arc-rdv-link-name').value=r&&r.link?r.link.name:'';
+  document.getElementById('arc-rdv-link-url').value=r&&r.link?r.link.url:'';
+  document.getElementById('arc-rdv-link-modal').classList.add('open');
+}
+function saveArchivedRdvLink(){
+  const name=document.getElementById('arc-rdv-link-name').value.trim();
+  const url=document.getElementById('arc-rdv-link-url').value.trim();
+  if(!name||!url)return;
+  const p=S.projects.find(x=>x.id===_arcRdvLinkPid);if(!p)return;
+  p.rdvsArchived[_arcRdvLinkIdx].link={name,url:(/^https?:\/\//i.test(url)?url:'https://'+url)};
+  save();
+  document.getElementById('arc-rdv-link-modal').classList.remove('open');
+  renderArchivedRdvs();
+}
+function closeArcRdvLinkModal(){document.getElementById('arc-rdv-link-modal').classList.remove('open');}
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -2246,6 +2354,9 @@ document.addEventListener('keydown', function(e){
     {id:'manage-types-modal', save:null, close:closeManageTypes},
     {id:'rdv-modal-bg', save:saveRdv, close:closeRdvModal},
     {id:'modal-confirm-rdv', save:null, close:closeConfirmRdv},
+    {id:'modal-confirm-archive-rdv', save:null, close:closeConfirmArchiveRdv},
+    {id:'archived-rdv-overlay', save:null, close:closeArchivedRdvs},
+    {id:'arc-rdv-link-modal', save:saveArchivedRdvLink, close:closeArcRdvLinkModal},
     {id:'modal-confirm-risk', save:null, close:closeConfirmRisk},
     {id:'modal-confirm-link', save:null, close:closeConfirmLink},
     {id:'modal-confirm-mission', save:null, close:closeConfirmMission},
@@ -2328,6 +2439,39 @@ document.addEventListener('keydown', function(e){
     <div class="modal-btns">
       <button onclick="closeConfirmMission()">Annuler</button>
       <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteMission()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-confirm-archive-rdv" style="z-index:500">
+  <div class="modal" style="width:300px">
+    <h3 style="font-size:13px;margin-bottom:10px">Valider ce RDV ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Il sera déplacé dans les RDV archivés et apparaîtra en vert sur le calendrier.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmArchiveRdv()">Annuler</button>
+      <button class="primary" style="background:#2E7D32;border-color:#1B5E20" onclick="confirmArchiveRdv()">Valider</button>
+    </div>
+  </div>
+</div>
+
+<div class="arc-overlay" id="archived-rdv-overlay" style="z-index:450">
+  <div class="arc-panel" style="width:520px;max-height:75vh">
+    <div class="arc-hdr">
+      <h3>RDV archivés</h3>
+      <button class="arc-close" onclick="closeArchivedRdvs()">×</button>
+    </div>
+    <div class="arc-body" id="archived-rdv-body"></div>
+  </div>
+</div>
+
+<div class="link-modal-bg" id="arc-rdv-link-modal" style="z-index:500">
+  <div class="link-modal" style="width:340px">
+    <h3>Lien du RDV</h3>
+    <div class="lm-field"><label>Nom affiché</label><input type="text" id="arc-rdv-link-name" placeholder="ex: CR réunion…"></div>
+    <div class="lm-field"><label>URL</label><input type="text" id="arc-rdv-link-url" placeholder="https://…"></div>
+    <div class="link-modal-btns">
+      <button onclick="closeArcRdvLinkModal()">Annuler</button>
+      <button class="primary" onclick="saveArchivedRdvLink()">Enregistrer</button>
     </div>
   </div>
 </div>
