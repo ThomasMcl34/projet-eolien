@@ -407,6 +407,50 @@ table.missions tr:last-child td{border-bottom:none}
 .cal-rdv-item:hover .cal-rdv-item-tick{opacity:1}
 .btn-add-rdv:hover{background:#FDEAEA}
 
+
+/* ── CALCULS ── */
+.calc-menu{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20px;padding:30px}
+.calc-menu-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.calc-menu-grid{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.calc-menu-card{width:200px;padding:20px 16px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:var(--shadow);transition:all .15s}
+.calc-menu-card:hover{border-color:var(--blue-mid);background:var(--blue-light);transform:translateY(-2px)}
+.calc-menu-card-icon{font-size:32px}
+.calc-menu-card-label{font-size:13px;font-weight:700;color:var(--text);text-align:center}
+.calc-menu-card-desc{font-size:10.5px;color:var(--text2);text-align:center;line-height:1.4}
+.calc-back-btn{font-size:11px;padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px}
+.calc-back-btn:hover{background:var(--surface2)}
+.calculs-page{display:flex;gap:12px;padding:10px;flex:1;overflow:hidden;min-height:0}
+.calc-left{width:420px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.calc-right{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-width:0}
+.calc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow);flex-shrink:0}
+.calc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.calc-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.calc-field{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.calc-field label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.calc-field input,.calc-field select{padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit}
+.calc-inline{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calc-btn{font-size:12px;padding:7px 18px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-weight:600;font-family:inherit}
+.calc-btn:hover{background:var(--blue)}
+.calc-btn-sec{font-size:12px;padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.calc-result-row{display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.calc-result-row:last-child{border-bottom:none}
+.calc-result-label{font-size:11.5px;color:var(--text2)}
+.calc-result-val{font-size:14px;font-weight:700;color:var(--text)}
+.calc-result-unit{font-size:10px;color:var(--text3);margin-left:3px}
+.calc-slider-wrap{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.calc-slider-wrap input[type=range]{width:100%;accent-color:var(--blue-mid)}
+.calc-slider-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3)}
+.calc-compare{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;margin-top:6px}
+.calc-compare.ok{background:#D6F0DC;color:#2E7D32;border:1px solid #A8DCB2}
+.calc-compare.warn{background:#FEF3DC;color:#7A4800;border:1px solid #F5CC70}
+.calc-compare.bad{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8}
+.calc-schema{margin:10px 0}
+.calc-saved-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;margin-bottom:6px}
+.calc-saved-item:hover{border-color:var(--blue-mid);background:var(--blue-light)}
+.calc-saved-proj{font-size:10px;color:var(--text3)}
+.calc-saved-name{font-size:12px;font-weight:600}
+.calc-saved-date{font-size:10px;color:var(--text3)}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -513,6 +557,11 @@ PRESTA_TYPES_DEFAULT.forEach(t=>{ if(!S.prestaTypes.includes(t)) S.prestaTypes.p
 MISSION_TYPES_DEFAULT.forEach(t=>{ if(!S.missionTypes.includes(t)) S.missionTypes.push(t); });
 if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
 if(!S.mainTab) S.mainTab='projets';
+if(!S.calculs) S.calculs=[];
+if(!S.calcType) S.calcType=null;
+if(!S.calcRayonInputs) S.calcRayonInputs={valeur:'',secu_route:3,secu_foret:8};
+if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
+if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
 if(!S.calMonths) S.calMonths={}; // {projectId: 'YYYY-MM'}
 if(!S.filterPrestaType) S.filterPrestaType='';
 if(!S.filterMissionType) S.filterMissionType='';
@@ -578,10 +627,10 @@ function renderTabs(){
   const mainBar=document.getElementById('main-tabs-bar');
   if(mainBar){
     mainBar.innerHTML='';
-    ['projets','prestas'].forEach(tab=>{
+    ['projets','prestas','calculs'].forEach(tab=>{
       const t=document.createElement('div');
       t.className='main-tab'+(S.mainTab===tab?' active':'');
-      t.textContent=tab==='projets'?'Projets':'Prestas';
+      t.textContent=tab==='projets'?'Projets':tab==='prestas'?'Prestas':'Calculs';
       t.onclick=()=>{S.mainTab=tab;save();render()};
       mainBar.appendChild(t);
     });
@@ -609,16 +658,7 @@ function renderTabs(){
   a.textContent='+';
   a.onclick=()=>document.getElementById('modal-proj').classList.add('open');
   bar.appendChild(a);
-  // export/import buttons
-  const tools=document.createElement('div');
-  tools.style.cssText='margin-left:auto;display:flex;gap:4px;padding-bottom:2px;flex-shrink:0';
-  tools.innerHTML=`
-    <button onclick="exportData()" style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Exporter toutes les données">⬇ Exporter</button>
-    <label style="font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:rgba(255,255,255,.5);color:#4a5570;cursor:pointer" title="Importer des données">⬆ Importer<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
-    <button id="drive-btn" onclick="driveAuth()" style="font-size:10px;padding:3px 9px;border:1px solid #c3d9f5;border-radius:5px;background:rgba(227,237,250,.8);color:#1A5FAD;cursor:pointer;font-weight:500">☁ Drive</button>
-    
-  `;
-  bar.appendChild(tools);
+
 }
 
 function renderPage(){
@@ -1696,6 +1736,501 @@ function saveArchivedRdvLink(){
   renderArchivedRdvs();
 }
 function closeArcRdvLinkModal(){document.getElementById('arc-rdv-link-modal').classList.remove('open');}
+
+
+// ── CALCULS ──
+const CALC_TYPES=[
+  {id:'volumes_terres', icon:'⛏️', label:'Volume de terres', desc:'Excavation fondations + décapage surface permanente, stockage et comparaison emprise chantier'},
+  {id:'rayon_courbure', icon:'🔄', label:'Rayon de courbure', desc:'Calcul des rayons de virage pour le transport des pales selon le modèle de machine et le type de route'},
+  {id:'talus', icon:'📐', label:'Calcul talus', desc:"Longueur de talus selon l'altitude à rattraper — schémas 1:1 et 2:3"}
+];
+
+let _calcInputs={proj:'',name:'',nbMachines:1,diam:0,hExcav:0,emprPerm:0,epDecap:0,emprChantier:0,epVeg:25};
+let _calcResults=null;
+let _calcEditId=null;
+let _pendingSave=null;
+
+function renderCalcMenu(){
+  const pc=document.getElementById('page-container');
+  const cards=CALC_TYPES.map(t=>`
+    <div class="calc-menu-card" onclick="selectCalcType('${t.id}')">
+      <div class="calc-menu-card-icon">${t.icon}</div>
+      <div class="calc-menu-card-label">${t.label}</div>
+      <div class="calc-menu-card-desc">${t.desc}</div>
+    </div>`).join('');
+  pc.innerHTML=`<div class="calc-menu">
+    <div class="calc-menu-title">Choisir un calcul</div>
+    <div class="calc-menu-grid">${cards}</div>
+  </div>`;
+}
+
+function selectCalcType(type){S.calcType=type;save();renderCalculs();}
+
+function renderCalculs(){
+  if(!S.calcType){renderCalcMenu();return;}
+  if(S.calcType==='rayon_courbure'){renderRayonCalc();return;}
+  if(S.calcType==='talus'){renderTalusCalc();return;}
+
+  // volumes_terres
+  const pc=document.getElementById('page-container');
+  const inp=_calcInputs;
+  const projOptions=S.projects.map(p=>`<option value="${p.id}" ${inp.proj===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
+  const savedHtml=S.calculs.filter(cl=>!cl.type||cl.type==='volumes_terres').length
+    ?S.calculs.filter(cl=>!cl.type||cl.type==='volumes_terres').map((calc,i)=>{
+        const idx=S.calculs.indexOf(calc);
+        return`<div class="calc-saved-item" onclick="loadCalc(${idx})">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+              <span class="calc-saved-name">${esc(calc.name)}</span>
+              <span class="calc-saved-proj">${esc(S.projects.find(p=>p.id===calc.inputs?.proj)?.name||'—')}</span>
+            </div>
+            <span class="calc-saved-date">${calc.date}</span>
+          </div>
+          <button class="abtn-x" onclick="event.stopPropagation();deleteCalc(${idx})">✕</button>
+        </div>`;}).join('')
+    :'<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun calcul sauvegardé</span>';
+
+  pc.innerHTML=`<div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+    <div style="padding:8px 10px 0;flex-shrink:0">
+      <button class="calc-back-btn" onclick="S.calcType=null;save();renderCalcMenu()">‹ Choisir un autre calcul</button>
+    </div>
+    <div class="calculs-page">
+      <div class="calc-left">
+        <div class="calc-card">
+          <div class="calc-title">Volume de terres</div>
+          <div class="calc-field"><label>Projet associé</label>
+            <select onchange="_calcInputs.proj=this.value">
+              <option value="">— Aucun —</option>${projOptions}
+            </select>
+          </div>
+          <div class="calc-field"><label>Nom du calcul</label>
+            <input type="text" value="${esc(inp.name)}" placeholder="ex: Variante A" oninput="_calcInputs.name=this.value">
+          </div>
+          <div class="calc-inline">
+            <div class="calc-field"><label>Nb machines</label>
+              <input type="number" min="1" value="${inp.nbMachines}" oninput="_calcInputs.nbMachines=+this.value||1">
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 6px">Excavation fondations</div>
+          <div class="calc-inline">
+            <div class="calc-field"><label>Diamètre (m)</label>
+              <input type="number" min="0" step="0.1" value="${inp.diam}" oninput="_calcInputs.diam=+this.value||0">
+            </div>
+            <div class="calc-field"><label>Hauteur (m)</label>
+              <input type="number" min="0" step="0.1" value="${inp.hExcav}" oninput="_calcInputs.hExcav=+this.value||0">
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 6px">Décapage surface permanente</div>
+          <div class="calc-inline">
+            <div class="calc-field"><label>Emprise (m²)</label>
+              <input type="number" min="0" value="${inp.emprPerm}" oninput="_calcInputs.emprPerm=+this.value||0">
+            </div>
+            <div class="calc-field"><label>Épaisseur (m)</label>
+              <input type="number" min="0" step="0.01" value="${inp.epDecap}" oninput="_calcInputs.epDecap=+this.value||0">
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 6px">Stockage</div>
+          <div class="calc-field"><label>Emprise chantier disponible (m²)</label>
+            <input type="number" min="0" value="${inp.emprChantier}" oninput="_calcInputs.emprChantier=+this.value||0">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="calc-btn" onclick="runCalc()">Calculer</button>
+            <button class="calc-btn-sec" onclick="resetCalc()">Réinitialiser</button>
+          </div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-title">Calculs sauvegardés</div>
+          ${savedHtml}
+        </div>
+      </div>
+      <div class="calc-right" id="calc-results-panel">
+        ${_calcResults?renderCalcResults():'<div class="calc-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--text3);font-size:12px;font-style:italic">Renseignez les paramètres et cliquez sur « Calculer »</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function runCalc(){
+  const inp=_calcInputs;
+  const pi=Math.PI;
+  const volExcav=pi*Math.pow(inp.diam/2,2)*inp.hExcav*inp.nbMachines;
+  const volDecap=inp.emprPerm*inp.epDecap;
+  const volTotal=volExcav+volDecap;
+  const epVegM=inp.epVeg/100;
+  const volVeg=Math.min(volTotal, inp.emprPerm*epVegM+(pi*Math.pow(inp.diam/2,2)*Math.min(epVegM,inp.hExcav)*inp.nbMachines));
+  const volAutre=volTotal-volVeg;
+  const surfVeg=volVeg/2;
+  const surfAutre=volAutre/2;
+  const surfTotale=surfVeg+surfAutre;
+  const ratio=inp.emprChantier>0?surfTotale/inp.emprChantier:null;
+  _calcResults={inp:{...inp},volExcav,volDecap,volTotal,volVeg,volAutre,surfVeg,surfAutre,surfTotale,ratio};
+  const panel=document.getElementById('calc-results-panel');
+  if(panel) panel.innerHTML=renderCalcResults();
+}
+
+function renderCalcResults(){
+  if(!_calcResults) return '';
+  const r=_calcResults;
+  const f2=(v,d=1)=>v.toFixed(d).replace('.',',');
+  let compareHtml='';
+  if(r.ratio!==null){
+    const pct=Math.round(r.ratio*100);
+    const cls=r.ratio<=0.8?'ok':r.ratio<=1?'warn':'bad';
+    const icon=r.ratio<=0.8?'✓':r.ratio<=1?'⚠':'✗';
+    compareHtml=`<div class="calc-compare ${cls}">${icon} Surface stockage = ${f2(r.surfTotale)} m² vs ${r.inp.emprChantier} m² chantier (${pct}%)</div>`;
+  }
+  const totW=Math.max(20,Math.min(200,Math.round(r.surfTotale)));
+  const vegW=Math.round(totW*(r.volVeg/Math.max(r.volTotal,0.001)));
+  const autW=totW-vegW;
+  const schemaHtml=`<div class="calc-schema">
+    <svg width="${totW+60}" height="70" viewBox="0 0 ${totW+60} 70">
+      <rect x="30" y="5" width="${vegW}" height="40" fill="#8BC34A" stroke="#558B2F" stroke-width="1.5"/>
+      <rect x="${30+vegW}" y="5" width="${autW}" height="40" fill="#A0887A" stroke="#6D4C41" stroke-width="1.5"/>
+      <text x="${30+vegW/2}" y="30" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">Vég.</text>
+      <text x="${30+vegW+autW/2}" y="30" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">Autre</text>
+      <line x1="30" y1="50" x2="${30+totW}" y2="50" stroke="#1A1A1A" stroke-width="1"/>
+      <text x="${30+totW/2}" y="62" text-anchor="middle" font-size="9" fill="var(--text2)">${f2(r.surfTotale)} m²</text>
+      <line x1="28" y1="5" x2="28" y2="45" stroke="#1A1A1A" stroke-width="1"/>
+      <text x="14" y="28" text-anchor="middle" font-size="9" fill="var(--text2)" transform="rotate(-90,14,28)">2,0 m</text>
+    </svg>
+    <div style="display:flex;gap:12px;font-size:10px">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#8BC34A;border-radius:2px;display:inline-block"></span>Terre vég. ${f2(r.surfVeg)} m²</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:#A0887A;border-radius:2px;display:inline-block"></span>Terre autre ${f2(r.surfAutre)} m²</span>
+    </div>
+  </div>`;
+  return`<div class="calc-card">
+    <div class="calc-title">Résultats</div>
+    <div class="calc-result-row"><span class="calc-result-label">Volume excavation fondations</span><span><span class="calc-result-val">${f2(r.volExcav)}</span><span class="calc-result-unit">m³</span></span></div>
+    <div class="calc-result-row"><span class="calc-result-label">Volume décapage surface permanente</span><span><span class="calc-result-val">${f2(r.volDecap)}</span><span class="calc-result-unit">m³</span></span></div>
+    <div class="calc-result-row" style="background:var(--surface2);border-radius:6px;padding:8px;margin:4px 0">
+      <span style="font-size:12px;font-weight:700">Volume total</span>
+      <span><span style="font-size:18px;font-weight:800;color:var(--blue)">${f2(r.volTotal)}</span><span class="calc-result-unit">m³</span></span>
+    </div>
+    <div class="calc-slider-wrap">
+      <label style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Épaisseur terre végétale — <span id="ep-veg-label">${_calcInputs.epVeg} cm</span></label>
+      <input type="range" min="5" max="80" step="5" value="${_calcInputs.epVeg}" oninput="_calcInputs.epVeg=+this.value;document.getElementById('ep-veg-label').textContent=this.value+' cm';runCalc()">
+      <div class="calc-slider-labels"><span>5 cm</span><span>25 cm</span><span>80 cm</span></div>
+    </div>
+    <div class="calc-result-row"><span class="calc-result-label">↳ dont terre végétale</span><span><span class="calc-result-val">${f2(r.volVeg)}</span><span class="calc-result-unit">m³</span></span></div>
+    <div class="calc-result-row"><span class="calc-result-label">↳ dont terre autre</span><span><span class="calc-result-val">${f2(r.volAutre)}</span><span class="calc-result-unit">m³</span></span></div>
+  </div>
+  <div class="calc-card">
+    <div class="calc-title">Stockage (H = 2,0 m)</div>
+    ${schemaHtml}${compareHtml}
+  </div>
+  <div class="calc-card">
+    <div class="calc-title">Sauvegarder</div>
+    <div class="calc-field"><label>Nom du calcul</label>
+      <input type="text" id="calc-save-name" value="${esc(_calcInputs.name)}" placeholder="ex: Variante A" oninput="_calcInputs.name=this.value">
+    </div>
+    <button class="calc-btn" onclick="saveCalc()" style="margin-top:8px">💾 Sauvegarder</button>
+  </div>`;
+}
+
+function saveCalc(){
+  const name=(_calcInputs.name||'').trim()||('Calcul du '+new Date().toLocaleDateString('fr-FR'));
+  const now=new Date();
+  const date=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const existing=_calcEditId!==null?S.calculs.findIndex(c=>c.id===_calcEditId):-1;
+  const entry={id:_calcEditId||('calc'+Date.now()),type:'volumes_terres',name,date,inputs:{..._calcInputs},results:{..._calcResults}};
+  // Avertir si un calcul avec ce nom existe déjà (même id = mise à jour, autre id = doublon)
+  const dup=S.calculs.find(c=>c.name===name);
+  if(dup){
+    _pendingSave={type:'volumes',entry,existing};
+    document.getElementById('dup-calc-msg').textContent='Un calcul nommé "'+name+'" existe déjà. Voulez-vous quand même sauvegarder ?';
+    document.getElementById('modal-confirm-dup-calc').classList.add('open');
+    return;
+  }
+  _doSaveCalc(entry,existing);
+}
+function _doSaveCalc(entry,existing){
+  if(existing>=0){S.calculs[existing]=entry;}else{S.calculs.unshift(entry);}
+  _calcEditId=entry.id;save();renderCalculs();
+}
+function resetCalc(){
+  _calcInputs={proj:'',name:'',nbMachines:1,diam:0,hExcav:0,emprPerm:0,epDecap:0,emprChantier:0,epVeg:25};
+  _calcResults=null;renderCalculs();
+}
+function loadCalc(idx){
+  const calc=S.calculs[idx];if(!calc)return;
+  _calcInputs={...calc.inputs};_calcResults=calc.results;_calcEditId=calc.id;
+  renderCalculs();runCalc();
+}
+
+let _delCalcIdx=null;
+function deleteCalc(idx){
+  _delCalcIdx=idx;
+  document.getElementById('modal-confirm-calc').classList.add('open');
+}
+function confirmDeleteCalc(){
+  S.calculs.splice(_delCalcIdx,1);
+  if(_calcEditId&&!S.calculs.find(c=>c.id===_calcEditId)){_calcResults=null;_calcEditId=null;}
+  save();closeConfirmCalc();renderCalculs();
+}
+function closeConfirmCalc(){document.getElementById('modal-confirm-calc').classList.remove('open');_delCalcIdx=null;}
+
+function forceSaveCalc(){
+  document.getElementById('modal-confirm-dup-calc').classList.remove('open');
+  if(!_pendingSave) return;
+  if(_pendingSave.type==='volumes') _doSaveCalc(_pendingSave.entry, _pendingSave.existing??-1);
+  else if(_pendingSave.type==='rayon') _doSaveRayonCalc(_pendingSave.name);
+  else if(_pendingSave.type==='talus') _doSaveTalusCalc(_pendingSave.name,_pendingSave.date);
+  _pendingSave=null;
+}
+function closeConfirmDupCalc(){document.getElementById('modal-confirm-dup-calc').classList.remove('open');_pendingSave=null;}
+
+// ── RAYON DE COURBURE ──
+const RAYON_TABLE=[[35.5,28],[40,32],[45,34],[50,40],[52.5,41],[55,42],[56,43],[58,47],[58.5,48],[60,52],[63,54],[68,58],[69,60],[75,64],[81,69]];
+const MACHINE_MODELS=[{model:'V71',pale:35.5},{model:'V80',pale:40},{model:'V90',pale:45},{model:'V100',pale:50},{model:'V105',pale:52.5},{model:'V110',pale:55},{model:'V112',pale:56},{model:'V116',pale:58},{model:'V117',pale:58.5},{model:'V120',pale:60},{model:'V126',pale:63},{model:'V136',pale:68},{model:'V138',pale:69},{model:'V150',pale:75},{model:'V162',pale:81}];
+
+function getRayon(pale){
+  const lower=RAYON_TABLE.filter(([p])=>p<=pale);
+  const upper=RAYON_TABLE.filter(([p])=>p>=pale);
+  if(!lower.length) return RAYON_TABLE[0][1];
+  if(!upper.length) return RAYON_TABLE[RAYON_TABLE.length-1][1];
+  const [p0,r0]=lower[lower.length-1];
+  const [p1,r1]=upper[0];
+  if(p0===p1) return r0;
+  return r0+(r1-r0)*(pale-p0)/(p1-p0);
+}
+
+let _rayonResult=null;
+
+function renderRayonCalc(){
+  const pc=document.getElementById('page-container');
+  const inp=S.calcRayonInputs;
+  const savedHtml=S.calculs.filter(cl=>cl.type==='rayon_courbure').length
+    ?S.calculs.filter(cl=>cl.type==='rayon_courbure').map(calc=>{
+        const idx=S.calculs.indexOf(calc);
+        return`<div class="calc-saved-item" onclick="loadCalcRayon(${idx})">
+          <div style="flex:1"><span class="calc-saved-name">${esc(calc.name)}</span><br><span class="calc-saved-date">${calc.date}</span></div>
+          <button class="abtn-x" onclick="event.stopPropagation();deleteCalc(${idx})">✕</button>
+        </div>`;}).join('')
+    :'<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun calcul sauvegardé</span>';
+
+  pc.innerHTML=`<div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+    <div style="padding:8px 10px 0;flex-shrink:0">
+      <button class="calc-back-btn" onclick="S.calcType=null;save();renderCalcMenu()">‹ Choisir un autre calcul</button>
+    </div>
+    <div class="calculs-page">
+      <div class="calc-left">
+        <div class="calc-card">
+          <div class="calc-title">Rayon de courbure</div>
+          <div class="calc-field"><label>Diamètre rotor (m)</label>
+            <input type="number" min="10" max="200" step="0.5" value="${inp.valeur||''}" placeholder="ex: 150" oninput="S.calcRayonInputs.valeur=+this.value||''" onkeydown="if(event.key==='Enter')runRayonCalc()">
+          </div>
+          <button class="calc-btn" onclick="runRayonCalc()" style="margin-top:4px">Calculer</button>
+        </div>
+        <div class="calc-card">
+          <div class="calc-title">Calculs sauvegardés</div>
+          ${savedHtml}
+        </div>
+      </div>
+      <div class="calc-right" id="rayon-results-panel">
+        ${_rayonResult?renderRayonResults():'<div class="calc-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--text3);font-size:12px;font-style:italic">Entrez un diamètre et cliquez sur « Calculer »</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function runRayonCalc(){
+  const pale=(+S.calcRayonInputs.valeur)/2;
+  if(!pale||pale<=0){alert('Veuillez renseigner un diamètre valide.');return;}
+  const r_int=getRayon(pale);
+  const secu_route=S.calcRayonInputs.secu_route||3;
+  const secu_foret=S.calcRayonInputs.secu_foret||8;
+  const r_route=r_int+secu_route;
+  const r_foret=r_int+secu_foret;
+  const diametre=pale*2;
+  const closest=MACHINE_MODELS.reduce((prev,curr)=>Math.abs(curr.pale-pale)<Math.abs(prev.pale-pale)?curr:prev);
+  _rayonResult={pale,diametre,r_int,r_route,r_foret,secu_route,secu_foret,closest};
+  const panel=document.getElementById('rayon-results-panel');
+  if(panel) panel.innerHTML=renderRayonResults();
+}
+
+function renderRayonResults(){
+  if(!_rayonResult) return '';
+  const r=_rayonResult;
+  const fmt1=v=>v.toFixed(1).replace('.',',');
+  const fmtR=v=>Math.round(v);
+  const isExact=RAYON_TABLE.some(([p])=>Math.abs(p-r.pale)<0.01);
+  return`<div class="calc-card">
+    <div class="calc-title">Résultats</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">
+      Machine : <b>∅${fmt1(r.diametre)}m</b> (pale ${fmt1(r.pale)}m)
+      ${!isExact?`<span style="font-size:10px;color:var(--amber);margin-left:6px">⚠ valeur interpolée (proche : ${r.closest.model})</span>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:#FFFDE8;border:2px solid #F9A825;border-radius:10px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="font-size:10px;font-weight:700;color:#5D4037;text-transform:uppercase">Route classique</div>
+        <div style="font-size:11px;color:var(--text2)">R int + ${r.secu_route}m sécu</div>
+        <div style="font-size:36px;font-weight:800;color:#E65100">${fmtR(r.r_route)} m</div>
+        <div style="font-size:10px;color:var(--text2)">R int = ${fmtR(r.r_int)} m</div>
+      </div>
+      <div style="background:#E8F5E9;border:2px solid #43A047;border-radius:10px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="font-size:10px;font-weight:700;color:#1B5E20;text-transform:uppercase">Route en forêt</div>
+        <div style="font-size:11px;color:var(--text2)">R int + ${r.secu_foret}m sécu</div>
+        <div style="font-size:36px;font-weight:800;color:#2E7D32">${fmtR(r.r_foret)} m</div>
+        <div style="font-size:10px;color:var(--text2)">R int = ${fmtR(r.r_int)} m</div>
+      </div>
+    </div>
+  </div>
+  <div class="calc-card" style="display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:11px;color:var(--text2)">Rayon courbure pour ∅${S.calcRayonInputs.valeur}m</span>
+    <button class="calc-btn" onclick="saveRayonCalc()">💾 Sauvegarder</button>
+  </div>`;
+}
+
+function saveRayonCalc(){
+  const diam=S.calcRayonInputs.valeur||'?';
+  const name='Rayon courbure pour ∅'+diam+'m';
+  const dup=S.calculs.find(c=>c.name===name);
+  if(dup){
+    _pendingSave={type:'rayon',name};
+    document.getElementById('dup-calc-msg').textContent='Un calcul nommé "'+name+'" existe déjà. Voulez-vous quand même sauvegarder ?';
+    document.getElementById('modal-confirm-dup-calc').classList.add('open');
+    return;
+  }
+  _doSaveRayonCalc(name);
+}
+function _doSaveRayonCalc(name){
+  const now=new Date();
+  const date=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const entry={id:'calc'+Date.now(),type:'rayon_courbure',name,date,inputs:{...S.calcRayonInputs},results:{..._rayonResult}};
+  S.calculs.unshift(entry);save();renderRayonCalc();
+}
+function loadCalcRayon(idx){
+  const calc=S.calculs[idx];if(!calc)return;
+  S.calcRayonInputs={...calc.inputs};_rayonResult=calc.results;renderRayonCalc();
+}
+
+// ── CALCUL TALUS ──
+let _talusResult=null;
+
+function talusSvg(pad,lw,lh,color){
+  var W=lw+pad*2+30, H=lh+pad*2+20;
+  return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
+    +'<polygon points="'+(pad+25)+','+pad+' '+(pad+25)+','+(pad+lh)+' '+(pad+25+lw)+','+(pad+lh)+'" fill="'+color+'" opacity="0.85"/>'
+    +'<line x1="'+(pad+25)+'" y1="'+pad+'" x2="'+(pad+25)+'" y2="'+(pad+lh)+'" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>'
+    +'<line x1="'+(pad+25)+'" y1="'+(pad+lh)+'" x2="'+(pad+25+lw)+'" y2="'+(pad+lh)+'" stroke="#2E7D32" stroke-width="3" stroke-linecap="round"/>'
+    +'</svg>';
+}
+
+function renderTalusResults(){
+  if(!_talusResult) return '';
+  var r=_talusResult;
+  var fmt1=function(v){return v.toFixed(2).replace('.',',');};
+  var scale=Math.min(180/Math.max(r.l_11,r.l_23), 90/r.h);
+  var sw_11=r.l_11*scale, sh=r.h*scale, sw_23=r.l_23*scale;
+  var pad=10;
+  var svg11=talusSvg(pad,sw_11,sh,'#1565C0');
+  var svg23=talusSvg(pad,sw_23,sh,'#E65100');
+  return '<div class="calc-card">'
+    +'<div class="calc-title">Résultats — altitude '+fmt1(r.h)+' m</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:end">'
+    +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px">'
+    +svg11
+    +'<div style="background:#EEF5FF;border:1.5px solid #1565C0;border-radius:8px;padding:8px 12px;font-size:11px;color:#1565C0;text-align:center;width:100%">'
+    +'<b>Talus 1 pour 1</b><br>Base : <b>'+fmt1(r.l_11)+' m</b><br>Longueur : <b>'+fmt1(r.hyp_11)+' m</b></div>'
+    +'<div style="font-size:10px;color:var(--text3);text-align:center">Prend moins de place</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px">'
+    +svg23
+    +'<div style="background:#FFF3EE;border:1.5px solid #E65100;border-radius:8px;padding:8px 12px;font-size:11px;color:#E65100;text-align:center;width:100%">'
+    +'<b>Talus 2 pour 3</b><br>Base : <b>'+fmt1(r.l_23)+' m</b><br>Longueur : <b>'+fmt1(r.hyp_23)+' m</b></div>'
+    +'<div style="font-size:10px;color:var(--text3);text-align:center">Préféré paysager, revégétalisation</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="display:flex;gap:12px;font-size:10.5px;color:var(--text2)">'
+    +'<span><span style="width:12px;height:3px;background:#E53935;display:inline-block;border-radius:2px;margin-right:4px"></span>Altitude à rattraper</span>'
+    +'<span><span style="width:12px;height:3px;background:#2E7D32;display:inline-block;border-radius:2px;margin-right:4px"></span>Longueur talus</span>'
+    +'</div>'
+    +'<button class="calc-btn" onclick="saveTalusCalc()">Sauvegarder</button>'
+    +'</div>'
+    +'</div>';
+}
+
+function renderTalusCalc(){
+  const pc=document.getElementById('page-container');
+  const inp=S.calcTalusInputs;
+  const projOptions='<option value="">— Aucun —</option>'+S.projects.map(p=>`<option value="${p.id}" ${inp.proj===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
+
+  const savedHtml=S.calculs.filter(cl=>cl.type==='talus').length
+    ?S.calculs.filter(cl=>cl.type==='talus').map(calc=>{
+        const idx=S.calculs.indexOf(calc);
+        return`<div class="calc-saved-item" onclick="loadCalcTalus(${idx})">
+          <div style="flex:1"><span class="calc-saved-name">${esc(calc.name)}</span><br><span class="calc-saved-date">${calc.date}</span></div>
+          <button class="abtn-x" onclick="event.stopPropagation();deleteCalc(${idx})">✕</button>
+        </div>`;}).join('')
+    :'<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun calcul sauvegardé</span>';
+
+  pc.innerHTML=`<div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+    <div style="padding:8px 10px 0;flex-shrink:0">
+      <button class="calc-back-btn" onclick="S.calcType=null;save();renderCalcMenu()">‹ Choisir un autre calcul</button>
+    </div>
+    <div class="calculs-page">
+      <div class="calc-left">
+        <div class="calc-card">
+          <div class="calc-title">Calcul talus</div>
+          <div class="calc-field"><label>Projet associé</label>
+            <select onchange="S.calcTalusInputs.proj=this.value">${projOptions}</select>
+          </div>
+          <div class="calc-field"><label>Altitude à rattraper (m)</label>
+            <input type="number" min="0.1" step="0.1" value="${inp.hauteur||''}" placeholder="ex: 2" oninput="S.calcTalusInputs.hauteur=+this.value||''" onkeydown="if(event.key==='Enter')runTalusCalc()">
+          </div>
+          <button class="calc-btn" onclick="runTalusCalc()" style="margin-top:4px">Calculer</button>
+        </div>
+        <div class="calc-card">
+          <div class="calc-title">Calculs sauvegardés</div>
+          ${savedHtml}
+        </div>
+      </div>
+      <div class="calc-right" id="talus-results-panel">
+        ${_talusResult?renderTalusResults():'<div class="calc-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--text3);font-size:12px;font-style:italic">Entrez une altitude et cliquez sur « Calculer »</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function runTalusCalc(){
+  const h=+S.calcTalusInputs.hauteur;
+  if(!h||h<=0){alert('Entrez une altitude valide.');return;}
+  const l_11=h;
+  const l_23=h*(3/2);
+  const hyp_11=Math.sqrt(h*h+l_11*l_11);
+  const hyp_23=Math.sqrt(h*h+l_23*l_23);
+  _talusResult={h,l_11,l_23,hyp_11,hyp_23};
+  const panel=document.getElementById('talus-results-panel');
+  if(panel) panel.innerHTML=renderTalusResults();
+}
+
+function saveTalusCalc(){
+  const now=new Date();
+  const date=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const projName=S.projects.find(p=>p.id===S.calcTalusInputs.proj)?.name||'';
+  const name=(projName?projName+' – ':'')+'Talus '+now.toLocaleDateString('fr-FR');
+  const dup=S.calculs.find(c=>c.name===name);
+  if(dup){
+    _pendingSave={type:'talus',name,date};
+    document.getElementById('dup-calc-msg').textContent='Un calcul nommé "'+name+'" existe déjà. Voulez-vous quand même sauvegarder ?';
+    document.getElementById('modal-confirm-dup-calc').classList.add('open');
+    return;
+  }
+  _doSaveTalusCalc(name,date);
+}
+function _doSaveTalusCalc(name,date){
+  const entry={id:'calc'+Date.now(),type:'talus',name,date,inputs:{...S.calcTalusInputs},results:{..._talusResult}};
+  S.calculs.unshift(entry);
+  save();renderTalusCalc();
+}
+function loadCalcTalus(idx){
+  const calc=S.calculs[idx];if(!calc)return;
+  S.calcTalusInputs={...calc.inputs};
+  _talusResult=calc.results;
+  renderTalusCalc();
+}
+
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -2006,9 +2541,13 @@ function render(){
   renderTabs();
   const subBar=document.getElementById('tabs-bar');
   if(subBar) subBar.style.display=S.mainTab==='projets'?'flex':'none';
+  if(S.mainTab!=='calculs') S.calcType=null;
   if(S.mainTab==='prestas'){
     document.getElementById('page-container').innerHTML='';
     renderPrestas();
+  } else if(S.mainTab==='calculs'){
+    document.getElementById('page-container').innerHTML='';
+    renderCalculs();
   } else {
     renderPage();
   }
@@ -2472,6 +3011,28 @@ document.addEventListener('keydown', function(e){
     <div class="link-modal-btns">
       <button onclick="closeArcRdvLinkModal()">Annuler</button>
       <button class="primary" onclick="saveArchivedRdvLink()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-confirm-calc">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce calcul ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmCalc()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteCalc()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-confirm-dup-calc" style="z-index:500">
+  <div class="modal" style="width:320px">
+    <h3 style="font-size:13px;margin-bottom:10px">Calcul déjà existant</h3>
+    <p id="dup-calc-msg" style="font-size:12px;color:var(--text2);margin-bottom:14px"></p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmDupCalc()">Annuler</button>
+      <button class="primary" onclick="forceSaveCalc()">Sauvegarder quand même</button>
     </div>
   </div>
 </div>
