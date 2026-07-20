@@ -1778,13 +1778,12 @@ function renderCalculs(){
   const savedHtml=S.calculs.filter(cl=>!cl.type||cl.type==='volumes_terres').length
     ?S.calculs.filter(cl=>!cl.type||cl.type==='volumes_terres').map((calc,i)=>{
         const idx=S.calculs.indexOf(calc);
+        const projName=S.projects.find(p=>p.id===(calc.proj||calc.inputs?.proj))?.name||'';
         return`<div class="calc-saved-item" onclick="loadCalc(${idx})">
           <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-              <span class="calc-saved-name">${esc(calc.name)}</span>
-              <span class="calc-saved-proj">${esc(S.projects.find(p=>p.id===calc.inputs?.proj)?.name||'—')}</span>
-            </div>
-            <span class="calc-saved-date">${calc.date}</span>
+            <span class="calc-saved-name">${esc(calc.name)}</span>
+            ${projName?`<span class="calc-saved-proj"> — ${esc(projName)}</span>`:''}
+            <br><span class="calc-saved-date">${calc.date}</span>
           </div>
           <button class="abtn-x" onclick="event.stopPropagation();deleteCalc(${idx})">✕</button>
         </div>`;}).join('')
@@ -1931,20 +1930,20 @@ function saveCalc(){
   const name=(_calcInputs.name||'').trim()||('Calcul du '+new Date().toLocaleDateString('fr-FR'));
   const now=new Date();
   const date=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  const existing=_calcEditId!==null?S.calculs.findIndex(c=>c.id===_calcEditId):-1;
-  const entry={id:_calcEditId||('calc'+Date.now()),type:'volumes_terres',name,date,inputs:{..._calcInputs},results:{..._calcResults}};
-  // Avertir si un calcul avec ce nom existe déjà (même id = mise à jour, autre id = doublon)
-  const dup=S.calculs.find(c=>c.name===name);
+  const proj=_calcInputs.proj||'';
+  const entry={id:'calc'+Date.now(),type:'volumes_terres',name,date,proj,inputs:{..._calcInputs},results:{..._calcResults}};
+  // Doublon = même nom ET même projet
+  const dup=S.calculs.find(c=>c.name===name&&(c.proj||c.inputs?.proj||'')===proj);
   if(dup){
-    _pendingSave={type:'volumes',entry,existing};
-    document.getElementById('dup-calc-msg').textContent='Un calcul nommé "'+name+'" existe déjà. Voulez-vous quand même sauvegarder ?';
+    _pendingSave={type:'volumes',entry};
+    document.getElementById('dup-calc-msg').textContent='Un calcul nommé "'+name+'" existe déjà pour ce projet. Voulez-vous quand même sauvegarder ?';
     document.getElementById('modal-confirm-dup-calc').classList.add('open');
     return;
   }
-  _doSaveCalc(entry,existing);
+  _doSaveCalc(entry);
 }
-function _doSaveCalc(entry,existing){
-  if(existing>=0){S.calculs[existing]=entry;}else{S.calculs.unshift(entry);}
+function _doSaveCalc(entry){
+  S.calculs.unshift(entry);
   _calcEditId=entry.id;save();renderCalculs();
 }
 function resetCalc(){
@@ -1972,7 +1971,7 @@ function closeConfirmCalc(){document.getElementById('modal-confirm-calc').classL
 function forceSaveCalc(){
   document.getElementById('modal-confirm-dup-calc').classList.remove('open');
   if(!_pendingSave) return;
-  if(_pendingSave.type==='volumes') _doSaveCalc(_pendingSave.entry, _pendingSave.existing??-1);
+  if(_pendingSave.type==='volumes') _doSaveCalc(_pendingSave.entry);
   else if(_pendingSave.type==='rayon') _doSaveRayonCalc(_pendingSave.name);
   else if(_pendingSave.type==='talus') _doSaveTalusCalc(_pendingSave.name,_pendingSave.date);
   _pendingSave=null;
@@ -2499,11 +2498,11 @@ function addCL(mid){const inp=document.getElementById('ni');if(!inp||!inp.value.
 
 function uf(f,v){
   const p=proj();p[f]=v;
-  if(f==='type')S.activeMil=null;
   save();
-  if(f==='location')return;
-  if(f==='name')renderTabs();
-  renderPage();
+  if(f==='name') renderTabs();
+  else if(f==='type'){S.activeMil=null;renderPage();}
+  else if(f==='machines'||f==='demolish'||f==='renew'){renderPage();}
+  // location, machineType etc: just save, no re-render
 }
 function addProject(){
   const inp=document.getElementById('new-proj-name');const name=inp.value.trim();if(!name)return;
