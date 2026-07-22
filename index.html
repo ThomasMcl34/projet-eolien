@@ -357,7 +357,7 @@ table.missions{width:100%;border-collapse:collapse;table-layout:fixed}
 table.missions th{font-size:10px;font-weight:700;color:var(--text2);padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;background:var(--surface2);text-transform:uppercase;letter-spacing:.05em}
 table.missions td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:11.5px}
 table.missions tr:last-child td{border-bottom:none}
-.mcol-proj{width:110px}.mcol-type{width:180px}.mcol-prix{width:80px}.mcol-delai{width:110px}.mcol-lien{width:100px}.mcol-com{width:auto}.mcol-act{width:30px}
+.mcol-proj{width:110px}.mcol-type{width:180px}.mcol-prix{width:110px}.mcol-delai{width:110px}.mcol-lien{width:100px}.mcol-com{width:auto}.mcol-act{width:30px}
 .btn-add-mission{font-size:10.5px;padding:4px 10px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-top:8px}
 .btn-add-mission:hover{background:var(--blue-light);color:var(--blue)}
 .badge-delai-ok{background:#D6F0DC;color:#236630;border:1px solid #A8DCB2;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
@@ -514,7 +514,7 @@ function getTypeColor(type){ return TYPE_COLORS[type]||'#888'; }
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',machineType:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',notes:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -540,6 +540,7 @@ S.projects.forEach(p=>{
   if(!p.icps)p.icps=[];
   if(!p.rdvs)p.rdvs=[];
   if(!p.rdvsArchived)p.rdvsArchived=[];
+  if(!p.notes)p.notes='';
 });
 
 // ── PRESTAS DATA ──
@@ -755,6 +756,9 @@ function renderPage(){
         </div>
         <div class="field"><label>Type de machine visé</label>
           <input type="text" value="${esc(p.machineType||'')}" placeholder="ex: Vestas V150, SWT-4.0…" oninput="uf('machineType',this.value)">
+        </div>
+        <div class="field"><label>Notes</label>
+          <textarea rows="3" placeholder="Notes générales…" oninput="uf('notes',this.value)" style="resize:none;line-height:1.5;height:60px;overflow-y:auto">${esc(p.notes||'')}</textarea>
         </div>
       </div>
 
@@ -993,7 +997,8 @@ function renderPrestas(){
   if(missionMode){
     // Collect all matching missions across all prestas
     const missionRows=[];
-    S.prestas.forEach(p=>{
+    const sortedPrestas=[...S.prestas].sort((a,b)=>(a.type||'').localeCompare(b.type||''));
+    sortedPrestas.forEach(p=>{
       if(S.filterPrestaType&&p.type!==S.filterPrestaType) return;
       (p.missions||[]).forEach(m=>{
         if(S.filterMissionType&&m.type!==S.filterMissionType) return;
@@ -1001,7 +1006,7 @@ function renderPrestas(){
         const col=getPrestaColor(p.type);
         const bg=col+'18';
         const delaiHtml=m.delai==='ok'?'<span class="badge-delai-ok">Respecté</span>':m.delai==='ko'?'<span class="badge-delai-ko">Non respecté</span>':'—';
-        const prixHtml=m.prix?m.prix+' € HT':'—';
+        const prixHtml=m.prix?Number(m.prix).toLocaleString('fr-FR')+' € HT':'—';
         const lienHtml=m.link?`<a href="${esc(m.link.url)}" target="_blank" style="font-size:11px;color:var(--blue);font-weight:500">${esc(m.link.name)}</a>`:'—';
         missionRows.push(`<tr style="background:${bg}" onclick="openPrestaView('${p.id}')">
           <td style="padding:0;width:5px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:${col};border-radius:3px 0 0 3px"></div></td>
@@ -1029,7 +1034,7 @@ function renderPrestas(){
       <tbody>${missionRows.join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:22px;font-size:12px">Aucune mission trouvée</td></tr>'}</tbody>
     </table>`;
   } else {
-    const filtered=S.prestas.filter(p=>!S.filterPrestaType||p.type===S.filterPrestaType);
+    const filtered=[...S.prestas].sort((a,b)=>(a.type||'').localeCompare(b.type||'')).filter(p=>!S.filterPrestaType||p.type===S.filterPrestaType);
     const rows=filtered.map(p=>{
       const col=getPrestaColor(p.type);
       const bg=col+'18';
@@ -1220,6 +1225,7 @@ function renderPrestaView(){
       <td><select style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'project',this.value)">
         <option value="">— Projet —</option>
         ${S.projects.map(pr=>`<option value="${pr.name}" ${m.project===pr.name?'selected':''}>${pr.name}</option>`).join('')}
+        <option value="Autre" ${m.project==='Autre'?'selected':''}>Autre</option>
       </select></td>
       <td><div style="position:relative;display:flex;align-items:center">
         <select data-msel="${p.id}-${i}" style="width:100%;padding:2px 18px 2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2);appearance:none" onchange="updateMission('${p.id}',${i},'type',this.value)">
@@ -1229,7 +1235,7 @@ function renderPrestaView(){
         </select>
         <span style="position:absolute;right:4px;pointer-events:none;font-size:9px;color:var(--text3)">▾</span>
       </div></td>
-      <td><input type="number" placeholder="HT €" value="${m.prix||''}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'prix',this.value)"></td>
+      <td><input type="text" inputmode="numeric" placeholder="HT €" value="${m.prix?Number(m.prix).toLocaleString('fr-FR')+' €':''}" style="width:100%;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface2)" onchange="updateMission('${p.id}',${i},'prix',this.value.replace(/[^0-9]/g,''))" onfocus="this.value=m.prix||'';" onblur="this.value=this.value?Number(this.value.replace(/[^0-9]/g,'')).toLocaleString('fr-FR')+' €':'';"></td>
       <td><div style="position:relative;display:flex;align-items:center">
         <select class="${delaiCls}" onchange="updateMissionDelai('${p.id}',${i},this.value,this)">
           <option value="">—</option>
@@ -2516,8 +2522,9 @@ function syncTopRowHeights(){
   const fiche = document.querySelector('.fiche-card');
   if(!fiche) return;
   const h = fiche.offsetHeight;
-  document.querySelectorAll('.links-card').forEach(el=>{
+  document.querySelectorAll('.links-card,.cal-card').forEach(el=>{
     el.style.height = h + 'px';
+    el.style.overflow = 'hidden';
   });
   const tl = document.querySelector('.timeline-card');
   if(tl) tl.style.height = h + 'px';
@@ -2887,8 +2894,8 @@ document.addEventListener('keydown', function(e){
     {id:'arc-overlay', save:null, close:closeArc},
     {id:'icp-overlay', save:saveIcp, close:closeIcpPanel},
     {id:'presta-modal-bg', save:savePresta, close:closePrestaModal},
-    {id:'presta-overlay', save:null, close:closePrestaView},
     {id:'mission-link-modal-bg', save:saveMissionLink, close:closeMissionLinkModal},
+    {id:'presta-overlay', save:null, close:closePrestaView},
     {id:'manage-types-modal', save:null, close:closeManageTypes},
     {id:'rdv-modal-bg', save:saveRdv, close:closeRdvModal},
     {id:'modal-confirm-rdv', save:null, close:closeConfirmRdv},
