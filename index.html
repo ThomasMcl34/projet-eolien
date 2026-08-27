@@ -282,7 +282,7 @@ td input:focus{border-color:var(--blue-mid);background:#fff}
 .com-btn-cancel{padding:6px 14px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit}
 .com-btn-cancel:hover{background:var(--surface2)}
 .arc-overlay.open{display:flex}
-.arc-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:820px;max-width:96%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.14)}
+.arc-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:1100px;max-width:97%;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.14)}
 .arc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
 .arc-hdr h3{font-size:13px;font-weight:700}
 .arc-close{border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:2px 8px;border-radius:6px}
@@ -2493,7 +2493,7 @@ function openArc(){
   const p=proj();
   document.getElementById('arc-proj-name').textContent=p.name;
   document.getElementById('arc-body').innerHTML=p.archivedTasks.length
-    ?`<table class="tasks" style="width:100%"><thead><tr><th class="col-type">Type</th><th class="col-name">Nom</th><th class="col-date">Échéance</th><th class="col-state">État</th><th class="col-prio">Priorité</th><th class="col-com">Commentaire</th><th class="col-act"></th></tr></thead><tbody>${p.archivedTasks.map(t=>taskRow(t,true)).join('')}</tbody></table>`
+    ?`<table class="tasks" style="width:100%"><thead><tr><th class="col-type">Type</th><th class="col-name">Nom</th><th class="col-date">Échéance</th><th class="col-state">État</th><th class="col-prio">Priorité</th><th class="col-com">Commentaire</th><th style="width:120px">Lien</th><th class="col-act"></th></tr></thead><tbody>${p.archivedTasks.map(t=>taskRow(t,true)).join('')}</tbody></table>`
     :'<div class="arc-empty">Aucune tâche archivée</div>';
   document.getElementById('arc-overlay').classList.add('open');
 }
