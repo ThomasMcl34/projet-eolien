@@ -863,6 +863,7 @@ function taskRow(t,archived){
       <td>${pills||'—'}</td><td>${esc(t.name)||'—'}</td><td>${fmt(t.date)||'—'}</td>
       <td>${stBadge}</td><td>${prioBadge}</td>
       <td style="font-size:10.5px;color:var(--text2)">${esc(t.comment)}</td>
+      <td>${t.taskLink?`<a href="${esc(t.taskLink.url)}" target="_blank" style="font-size:10.5px;color:var(--blue);font-weight:500;white-space:nowrap">${esc(t.taskLink.name)}</a>`:'—'}</td>
       <td><div class="act-btns"><button class="abtn abtn-restore" onclick="restoreTask('${t.id}')">Restaurer</button></div></td>
     </tr>`;
   }
