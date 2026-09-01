@@ -451,6 +451,62 @@ table.missions tr:last-child td{border-bottom:none}
 .calc-saved-name{font-size:12px;font-weight:600}
 .calc-saved-date{font-size:10px;color:var(--text3)}
 
+
+/* ── OBJECTIFS ── */
+.obj-page{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.obj-year-tabs{display:flex;align-items:center;gap:4px;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface2);flex-wrap:wrap}
+.obj-year-tab{padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:.12s}
+.obj-year-tab:hover{background:var(--surface);color:var(--text)}
+.obj-year-tab.active{background:var(--blue-mid);color:#fff;border-color:var(--blue)}
+.btn-add-year{font-size:10px;padding:3px 10px;border:1px dashed var(--border2);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer}
+.btn-add-year:hover{border-color:var(--blue-mid);color:var(--blue)}
+.obj-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start}
+.obj-list::-webkit-scrollbar{width:3px}
+.obj-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.obj-card{width:340px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;transition:.12s}
+.obj-card:hover{box-shadow:0 4px 16px rgba(20,40,100,.10);border-color:var(--border2)}
+.obj-card-header{padding:10px 12px 6px;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.obj-card-title{font-size:13px;font-weight:700;color:var(--text);flex:1;line-height:1.3}
+.obj-card-meta{display:flex;align-items:center;gap:6px;padding:0 12px 6px;flex-wrap:wrap}
+.obj-card-date{font-size:10px;color:var(--text3)}
+.obj-card-desc{padding:6px 12px;flex:1}
+.obj-card-desc textarea{width:100%;border:1px solid var(--border);border-radius:6px;font-size:11.5px;padding:5px 8px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;resize:none;line-height:1.5;height:120px;overflow-y:auto}
+.obj-card-desc textarea:focus{border-color:var(--blue-mid);background:#fff}
+.obj-card-footer{padding:6px 12px 10px;display:flex;gap:6px;justify-content:flex-end}
+.btn-obj-open{font-size:10.5px;padding:3px 10px;border:1px solid var(--blue-mid);border-radius:5px;background:var(--blue-light);color:var(--blue);cursor:pointer;font-weight:600}
+.btn-obj-open:hover{background:var(--blue-mid);color:#fff}
+.btn-obj-del{font-size:10.5px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text3);cursor:pointer}
+.btn-obj-del:hover{background:#FDEAEA;color:#A32D2D;border-color:#F0B8B8}
+.btn-add-obj{font-size:11px;padding:5px 14px;border:2px dashed var(--border2);border-radius:var(--radius-lg);background:transparent;color:var(--text3);cursor:pointer;width:340px;height:60px;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit}
+.btn-add-obj:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-light)}
+
+/* Obj state badges */
+.obj-badge-ac{background:#FDEAEA;color:#A32D2D;border:1px solid #F0B8B8;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:700}
+.obj-badge-ec{background:#1E88E5;color:#fff;border:1px solid #1E88E5;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:700}
+.obj-badge-fi{background:#2E7D32;color:#fff;border:1px solid #2E7D32;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:700}
+
+/* Obj detail panel */
+.obj-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.obj-overlay.open{display:flex}
+.obj-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:680px;max-width:96%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.obj-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0;gap:10px}
+.obj-panel-body{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.obj-panel-body::-webkit-scrollbar{width:3px}
+.obj-panel-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.obj-section-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.obj-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.obj-checklist{display:flex;flex-direction:column;gap:4px}
+.obj-check-item{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:5px;background:var(--surface2)}
+.obj-check-item input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--blue-mid)}
+.obj-check-label{flex:1;font-size:12px;color:var(--text)}
+.obj-check-label.done{text-decoration:line-through;color:var(--text3)}
+.obj-check-del{border:none;background:none;cursor:pointer;font-size:10px;color:var(--text3);padding:0 2px;opacity:0}
+.obj-check-item:hover .obj-check-del{opacity:1}
+.obj-check-del:hover{color:#A32D2D}
+.obj-link-item{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:3px 0}
+.obj-link-name{color:var(--blue);font-weight:500;text-decoration:none}
+.obj-link-name:hover{text-decoration:underline}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -562,7 +618,11 @@ if(!S.calculs) S.calculs=[];
 if(!S.calcType) S.calcType=null;
 if(!S.calcRayonInputs) S.calcRayonInputs={valeur:'',secu_route:3,secu_foret:8};
 if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
+if(!S.objectifs) S.objectifs={};  // {year: [{id,name,desc,state,date,links,checklist}]}
+if(!S.objYear) S.objYear=null;
 if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
+if(!S.objectifs) S.objectifs={};  // {year: [{id,name,desc,state,date,links,checklist}]}
+if(!S.objYear) S.objYear=null;
 if(!S.calMonths) S.calMonths={}; // {projectId: 'YYYY-MM'}
 if(!S.filterPrestaType) S.filterPrestaType='';
 if(!S.filterMissionType) S.filterMissionType='';
@@ -628,10 +688,10 @@ function renderTabs(){
   const mainBar=document.getElementById('main-tabs-bar');
   if(mainBar){
     mainBar.innerHTML='';
-    ['projets','prestas','calculs'].forEach(tab=>{
+    ['projets','prestas','calculs','objectifs'].forEach(tab=>{
       const t=document.createElement('div');
       t.className='main-tab'+(S.mainTab===tab?' active':'');
-      t.textContent=tab==='projets'?'Projets':tab==='prestas'?'Prestas':'Calculs';
+      t.textContent=tab==='projets'?'Projets':tab==='prestas'?'Prestas':tab==='calculs'?'Calculs':'Objectifs annuels';
       t.onclick=()=>{S.mainTab=tab;save();render()};
       mainBar.appendChild(t);
     });
@@ -2237,6 +2297,236 @@ function loadCalcTalus(idx){
   renderTalusCalc();
 }
 
+
+// ── OBJECTIFS ANNUELS ──
+const OBJ_STATES={ac:'À faire',ec:'En cours',fi:'Fini'};
+let _objDetailId=null;
+let _objDetailYear=null;
+
+function renderObjectifs(){
+  const pc=document.getElementById('page-container');
+  if(!S.objectifs) S.objectifs={};
+  const years=Object.keys(S.objectifs).sort((a,b)=>b-a);
+  if(!S.objYear||!S.objectifs[S.objYear]) S.objYear=years[0]||null;
+
+  const yearTabs=years.map(y=>`
+    <button class="obj-year-tab${S.objYear===y?' active':''}" onclick="S.objYear='${y}';save();renderObjectifs()">
+      ${y} <span style="font-size:9px;opacity:.7">(${(S.objectifs[y]||[]).length})</span>
+    </button>`).join('');
+
+  const objs=S.objYear?(S.objectifs[S.objYear]||[]):[];
+  const cards=objs.map((obj,i)=>{
+    const badgeCls={'ac':'obj-badge-ac','ec':'obj-badge-ec','fi':'obj-badge-fi'}[obj.state]||'obj-badge-ac';
+    const badgeLabel=OBJ_STATES[obj.state]||'À faire';
+    return`<div class="obj-card" id="objcard-${obj.id}">
+      <div class="obj-card-header">
+        <div class="obj-card-title">${esc(obj.name)}</div>
+        <span class="${badgeCls}">${badgeLabel}</span>
+      </div>
+      <div class="obj-card-meta">
+        ${obj.date?`<span class="obj-card-date">📅 ${fmt(obj.date)}</span>`:''}
+        <span style="font-size:9.5px;color:var(--text3)">${(obj.checklist||[]).filter(x=>x.done).length}/${(obj.checklist||[]).length} tâches</span>
+      </div>
+      <div class="obj-card-desc">
+        <textarea placeholder="Description…" oninput="updateObj('${S.objYear}','${obj.id}','desc',this.value)">${esc(obj.desc||'')}</textarea>
+      </div>
+      <div class="obj-card-footer">
+        <button class="btn-obj-del" onclick="deleteObj('${S.objYear}','${obj.id}')">✕</button>
+        <button class="btn-obj-open" onclick="openObjDetail('${S.objYear}','${obj.id}')">Ouvrir →</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  pc.innerHTML=`<div class="obj-page">
+    <div class="obj-year-tabs">
+      ${yearTabs}
+      <button class="btn-add-year" id="btn-add-year" onclick="addYear()">+ Année</button>
+      ${S.objYear?`<button style="font-size:10px;padding:3px 10px;border:1px solid #F0B8B8;border-radius:20px;background:#FDEAEA;color:#A32D2D;cursor:pointer;margin-left:4px" onclick="deleteYear('${S.objYear}')">Supprimer ${S.objYear}</button>`:''}
+    </div>
+    ${S.objYear?`<div class="obj-list">
+      ${cards}
+      <button class="btn-add-obj" onclick="addObj('${S.objYear}')">+ Ajouter un objectif</button>
+    </div>`:'<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px">Ajoutez une année pour commencer</div>'}
+  </div>`;
+}
+
+function addYear(){
+  const btn=document.getElementById('btn-add-year');
+  if(!btn)return;
+  btn.style.display='none';
+  const wrap=document.createElement('span');
+  wrap.style.cssText='display:inline-flex;align-items:center;gap:4px';
+  const inp=document.createElement('input');
+  inp.type='text';inp.placeholder='ex: 2026';inp.maxLength=4;
+  inp.style.cssText='width:70px;padding:3px 7px;border:1px solid var(--blue-mid);border-radius:20px;font-size:11px;outline:none;font-family:inherit';
+  const ok=document.createElement('button');
+  ok.textContent='OK';
+  ok.style.cssText='padding:3px 9px;border:1px solid var(--blue);border-radius:20px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit';
+  const cancel=document.createElement('button');
+  cancel.textContent='✕';
+  cancel.style.cssText='padding:3px 7px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px';
+  const confirm=()=>{
+    const y=inp.value.trim();
+    if(y&&!isNaN(+y)&&+y>=2000&&+y<=2100){
+      if(!S.objectifs[y])S.objectifs[y]=[];
+      S.objYear=y;save();
+    }
+    renderObjectifs();
+  };
+  ok.onclick=confirm;
+  cancel.onclick=renderObjectifs;
+  inp.onkeydown=e=>{if(e.key==='Enter')confirm();if(e.key==='Escape')renderObjectifs();};
+  wrap.appendChild(inp);wrap.appendChild(ok);wrap.appendChild(cancel);
+  btn.parentNode.insertBefore(wrap,btn);
+  inp.focus();
+}
+function deleteYear(y){
+  _pendingDeleteYear=y;
+  document.getElementById('modal-confirm-obj-year').classList.add('open');
+}
+let _pendingDeleteYear=null;
+function confirmDeleteYear(){
+  delete S.objectifs[_pendingDeleteYear];
+  if(S.objYear===_pendingDeleteYear) S.objYear=null;
+  save();closeConfirmObjYear();renderObjectifs();
+}
+function closeConfirmObjYear(){document.getElementById('modal-confirm-obj-year').classList.remove('open');_pendingDeleteYear=null;}
+
+function addObj(year){
+  if(!S.objectifs[year]) S.objectifs[year]=[];
+  const id='obj'+Date.now();
+  S.objectifs[year].unshift({id,name:'Nouvel objectif',desc:'',state:'ac',date:'',links:[],checklist:[]});
+  save();renderObjectifs();
+  // Open detail immediately
+  setTimeout(()=>openObjDetail(year,id),50);
+}
+
+function updateObj(year,id,field,val){
+  const obj=(S.objectifs[year]||[]).find(o=>o.id===id);
+  if(obj){obj[field]=val;save();}
+}
+
+function deleteObj(year,id){
+  _pendingDeleteObjId={year,id};
+  document.getElementById('modal-confirm-obj').classList.add('open');
+}
+let _pendingDeleteObjId=null;
+function confirmDeleteObj(){
+  if(!_pendingDeleteObjId)return;
+  const {year,id}=_pendingDeleteObjId;
+  S.objectifs[year]=(S.objectifs[year]||[]).filter(o=>o.id!==id);
+  save();closeConfirmObj();
+  // close panel if it was the open obj
+  if(_objDetailId===id){_objDetailId=null;_objDetailYear=null;document.getElementById('obj-overlay').classList.remove('open');}
+  renderObjectifs();
+}
+function closeConfirmObj(){document.getElementById('modal-confirm-obj').classList.remove('open');_pendingDeleteObjId=null;}
+
+// ── OBJ DETAIL PANEL ──
+function openObjDetail(year,id){
+  _objDetailYear=year;_objDetailId=id;
+  renderObjDetail();
+  document.getElementById('obj-overlay').classList.add('open');
+}
+function closeObjDetail(){document.getElementById('obj-overlay').classList.remove('open');_objDetailId=null;_objDetailYear=null;renderObjectifs();}
+function deleteObjFromPanel(){
+  if(!_objDetailId||!_objDetailYear)return;
+  _pendingDeleteObjId={year:_objDetailYear,id:_objDetailId};
+  document.getElementById('modal-confirm-obj').classList.add('open');
+}
+
+function renderObjDetail(){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(!obj)return;
+  document.getElementById('obj-panel-title').textContent=obj.name;
+
+  // State select
+  const sc={'ac':'s-ac','ec':'s-ec','fi':'s-fi'}[obj.state]||'s-ac';
+  document.getElementById('obj-detail-state').innerHTML=`<div class="sel-wrap ${sc}"><select onchange="updateObj('${_objDetailYear}','${obj.id}','state',this.value);document.querySelector('.sel-wrap.s-ac,.sel-wrap.s-ec,.sel-wrap.s-fi').className='sel-wrap '+{'ac':'s-ac','ec':'s-ec','fi':'s-fi'}[this.value];renderObjDetail();renderObjectifs()">
+    <option value="ac" ${obj.state==='ac'?'selected':''}>À faire</option>
+    <option value="ec" ${obj.state==='ec'?'selected':''}>En cours</option>
+    <option value="fi" ${obj.state==='fi'?'selected':''}>Fini</option>
+  </select></div>`;
+
+  // Main fields
+  document.getElementById('obj-detail-name').value=obj.name||'';
+  document.getElementById('obj-detail-date').value=obj.date||'';
+  document.getElementById('obj-detail-desc').value=obj.desc||'';
+
+  // Checklist
+  const cl=obj.checklist||[];
+  document.getElementById('obj-detail-checklist').innerHTML=cl.map((item,i)=>`
+    <div class="obj-check-item">
+      <input type="checkbox" ${item.done?'checked':''} onchange="toggleCheck(${i},this.checked)">
+      <span class="obj-check-label${item.done?' done':''}" contenteditable="true" onblur="renameCheck(${i},this.textContent)">${esc(item.text)}</span>
+      <button class="obj-check-del" onclick="deleteCheck(${i})">✕</button>
+    </div>`).join('')||'<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun élément</span>';
+
+  // Links
+  const links=obj.links||[];
+  document.getElementById('obj-detail-links').innerHTML=links.map((l,i)=>`
+    <div class="obj-link-item">
+      <a class="obj-link-name" href="${esc(l.url)}" target="_blank">${esc(l.name)}</a>
+      <button class="link-icon" onclick="editObjLink(${i})" style="border:none;background:none;cursor:pointer">${linkIconSvg()}</button>
+      <button class="abtn-x" onclick="deleteObjLink(${i})" style="margin-left:2px">✕</button>
+    </div>`).join('')||'<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun lien</span>';
+}
+
+function saveObjDetail(){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(!obj)return;
+  obj.name=document.getElementById('obj-detail-name').value.trim()||obj.name;
+  obj.date=document.getElementById('obj-detail-date').value;
+  obj.desc=document.getElementById('obj-detail-desc').value;
+  save();renderObjDetail();
+}
+
+function toggleCheck(i,val){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(obj&&obj.checklist[i]){obj.checklist[i].done=val;save();renderObjDetail();}
+}
+function renameCheck(i,text){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(obj&&obj.checklist[i]){obj.checklist[i].text=text.trim();save();}
+}
+function deleteCheck(i){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(obj){obj.checklist.splice(i,1);save();renderObjDetail();}
+}
+function addCheck(){
+  const inp=document.getElementById('obj-check-inp');
+  const text=inp.value.trim();if(!text)return;
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(obj){obj.checklist.push({text,done:false});save();renderObjDetail();inp.value='';}
+}
+
+let _objLinkIdx=null;
+function editObjLink(i){
+  _objLinkIdx=i;
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  const l=obj&&obj.links[i];
+  document.getElementById('obj-link-name-inp').value=l?l.name:'';
+  document.getElementById('obj-link-url-inp').value=l?l.url:'';
+  document.getElementById('obj-link-modal').classList.add('open');
+}
+function openObjLinkModal(){_objLinkIdx=null;document.getElementById('obj-link-name-inp').value='';document.getElementById('obj-link-url-inp').value='';document.getElementById('obj-link-modal').classList.add('open');}
+function saveObjLink(){
+  const name=document.getElementById('obj-link-name-inp').value.trim();
+  const url=document.getElementById('obj-link-url-inp').value.trim();
+  if(!name||!url)return;
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(!obj)return;
+  const finalUrl=/^https?:\/\//i.test(url)?url:'https://'+url;
+  if(_objLinkIdx!==null){obj.links[_objLinkIdx]={name,url:finalUrl};}
+  else{obj.links.push({name,url:finalUrl});}
+  save();closeObjLinkModal();renderObjDetail();
+}
+function closeObjLinkModal(){document.getElementById('obj-link-modal').classList.remove('open');_objLinkIdx=null;}
+function deleteObjLink(i){
+  const obj=(S.objectifs[_objDetailYear]||[]).find(o=>o.id===_objDetailId);
+  if(obj){obj.links.splice(i,1);save();renderObjDetail();}
+}
+
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -2549,7 +2839,10 @@ function render(){
   const subBar=document.getElementById('tabs-bar');
   if(subBar) subBar.style.display=S.mainTab==='projets'?'flex':'none';
   if(S.mainTab!=='calculs') S.calcType=null;
-  if(S.mainTab==='prestas'){
+  if(S.mainTab==='objectifs'){
+    document.getElementById('page-container').innerHTML='';
+    renderObjectifs();
+  } else if(S.mainTab==='prestas'){
     document.getElementById('page-container').innerHTML='';
     renderPrestas();
   } else if(S.mainTab==='calculs'){
@@ -3043,5 +3336,85 @@ document.addEventListener('keydown', function(e){
     </div>
   </div>
 </div>
+
+<!-- Obj detail overlay -->
+<div class="obj-overlay" id="obj-overlay">
+  <div class="obj-panel">
+    <div class="obj-panel-hdr">
+      <div style="flex:1;display:flex;align-items:center;gap:10px;min-width:0">
+        <h3 id="obj-panel-title" style="font-size:15px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></h3>
+        <div id="obj-detail-state"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="deleteObjFromPanel()" style="padding:5px 12px;border:1px solid #F0B8B8;border-radius:7px;background:#FDEAEA;color:#A32D2D;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit">Supprimer</button>
+        <button onclick="closeObjDetail()" style="padding:5px 16px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">OK</button>
+      </div>
+    </div>
+    <div class="obj-panel-body">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+        <div class="calc-field"><label style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Nom de l'objectif</label>
+          <input type="text" id="obj-detail-name" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;background:var(--surface2);color:var(--text);outline:none;font-family:inherit" oninput="updateObj(_objDetailYear,_objDetailId,'name',this.value);document.getElementById('obj-panel-title').textContent=this.value">
+        </div>
+        <div class="calc-field"><label style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Échéance</label>
+          <input type="date" id="obj-detail-date" style="padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none" onchange="updateObj(_objDetailYear,_objDetailId,'date',this.value)">
+        </div>
+      </div>
+      <div class="calc-field"><label style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Description</label>
+        <textarea id="obj-detail-desc" rows="3" style="padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit;resize:vertical;line-height:1.5;min-height:60px" oninput="updateObj(_objDetailYear,_objDetailId,'desc',this.value)"></textarea>
+      </div>
+      <div>
+        <div class="obj-section-title">Checklist</div>
+        <div class="obj-checklist" id="obj-detail-checklist"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <input type="text" id="obj-check-inp" placeholder="Nouvel élément…" style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit" onkeydown="if(event.key==='Enter'){event.preventDefault();addCheck();}">
+          <button onclick="addCheck()" style="padding:4px 10px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="obj-section-title">Liens</div>
+        <div id="obj-detail-links"></div>
+        <button onclick="openObjLinkModal()" style="margin-top:6px;border:none;background:none;cursor:pointer;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;padding:3px 0">+ Ajouter un lien</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Obj link modal -->
+<div class="link-modal-bg" id="obj-link-modal" style="z-index:500">
+  <div class="link-modal" style="width:340px">
+    <h3>Lien de l'objectif</h3>
+    <div class="lm-field"><label>Nom affiché</label><input type="text" id="obj-link-name-inp" placeholder="ex: Document de référence…"></div>
+    <div class="lm-field"><label>URL</label><input type="text" id="obj-link-url-inp" placeholder="https://…"></div>
+    <div class="link-modal-btns">
+      <button onclick="closeObjLinkModal()">Annuler</button>
+      <button class="primary" onclick="saveObjLink()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete obj -->
+<div class="modal-bg" id="modal-confirm-obj">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer cet objectif ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmObj()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteObj()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete year -->
+<div class="modal-bg" id="modal-confirm-obj-year">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer cette année ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Tous les objectifs de cette année seront supprimés.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmObjYear()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteYear()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
