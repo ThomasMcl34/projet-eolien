@@ -515,7 +515,7 @@ table.missions tr:last-child td{border-bottom:none}
 .notes-list{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;min-height:80px;align-items:flex-start}
 .notes-list::-webkit-scrollbar{height:3px}
 .notes-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.note-card{width:150px;min-height:80px;background:#FFFDE8;border:1px solid #F9E76B;border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;gap:4px;position:relative;box-shadow:2px 3px 8px rgba(0,0,0,.07);flex-shrink:0;transition:.12s}
+.note-card{width:150px;min-height:48px;background:#FFFDE8;border:1px solid #F9E76B;border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;gap:4px;position:relative;box-shadow:2px 3px 8px rgba(0,0,0,.07);flex-shrink:0;transition:.12s}
 .note-card:hover{box-shadow:2px 4px 14px rgba(0,0,0,.13);transform:translateY(-1px)}
 .note-card-title{font-size:11.5px;font-weight:700;color:#5D4037;line-height:1.3;word-break:break-word}
 .note-card-preview{font-size:9.5px;color:#8D6E63;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;flex:1}
@@ -2639,9 +2639,8 @@ function renderNoteCards(p){
   if(!(p.notesList||[]).length) return '<span style="font-size:10.5px;color:var(--text3);font-style:italic;align-self:center">Aucune note — cliquez sur « + Ajouter une note »</span>';
   return (p.notesList||[]).map(function(n){
     return '<div class="note-card" ondblclick="openNoteEditor(\''+n.id+'\')" title="Double-clic pour modifier">'
-      +'<button class="note-card-del" onclick="event.stopPropagation();deleteNote(\''+n.id+'\')" title="Supprimer">🗑</button>'
+      +'<button class="note-card-del" onclick="event.stopPropagation();deleteNote(\''+n.id+'\')" title="Supprimer">&#x1F5D1;</button>'
       +'<div class="note-card-title">'+esc(n.title||'Sans titre')+'</div>'
-      +'<div class="note-card-preview">'+(n.html?n.html.replace(/<[^>]+>/g,' ').trim().slice(0,120):'…')+'</div>'
       +'</div>';
   }).join('');
 }
@@ -3326,13 +3325,15 @@ document.addEventListener('keydown', function(e){
   for(const m of modalMap){
     const el=document.getElementById(m.id);
     if(el && el.classList.contains('open')){
-      // Don't trigger Enter-save if focus is in a textarea (allow newlines)
+      // Textarea/contenteditable: Enter=newline, Ctrl+Enter=save; input: Enter=save
       const tag=document.activeElement?document.activeElement.tagName:'';
-      if(e.key==='Enter' && tag==='TEXTAREA') return;
-      e.preventDefault();
-      if(e.key==='Enter' && m.save){ m.save(); }
-      else if(e.key==='Escape'){ m.close(); }
-      else if(e.key==='Enter' && !m.save){ m.close(); }
+      const isCE=document.activeElement&&document.activeElement.contentEditable==='true';
+      if(e.key==='Enter' && (tag==='TEXTAREA'||isCE)){
+        if(e.ctrlKey){ e.preventDefault(); if(m.save) m.save(); else m.close(); }
+        return;
+      }
+      if(e.key==='Escape'){ e.preventDefault(); m.close(); return; }
+      if(e.key==='Enter'){ e.preventDefault(); if(m.save) m.save(); else m.close(); }
       return; // only handle the topmost/first matching open modal
     }
   }
