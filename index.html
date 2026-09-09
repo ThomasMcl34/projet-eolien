@@ -507,6 +507,37 @@ table.missions tr:last-child td{border-bottom:none}
 .obj-link-name{color:var(--blue);font-weight:500;text-decoration:none}
 .obj-link-name:hover{text-decoration:underline}
 
+
+/* ── NOTES ── */
+.notes-strip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.notes-strip-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.notes-strip-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em}
+.notes-list{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;min-height:80px;align-items:flex-start}
+.notes-list::-webkit-scrollbar{height:3px}
+.notes-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.note-card{width:150px;min-height:80px;background:#FFFDE8;border:1px solid #F9E76B;border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;gap:4px;position:relative;box-shadow:2px 3px 8px rgba(0,0,0,.07);flex-shrink:0;transition:.12s}
+.note-card:hover{box-shadow:2px 4px 14px rgba(0,0,0,.13);transform:translateY(-1px)}
+.note-card-title{font-size:11.5px;font-weight:700;color:#5D4037;line-height:1.3;word-break:break-word}
+.note-card-preview{font-size:9.5px;color:#8D6E63;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;flex:1}
+.note-card-del{position:absolute;top:4px;right:4px;border:none;background:none;cursor:pointer;opacity:0;font-size:11px;color:#A32D2D;padding:2px;border-radius:3px;line-height:1}
+.note-card:hover .note-card-del{opacity:.7}
+.note-card-del:hover{opacity:1 !important;background:#FDEAEA}
+.btn-add-note{font-size:10.5px;padding:4px 12px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.btn-add-note:hover{background:var(--surface2);color:var(--text)}
+/* Note editor overlay */
+.note-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.note-overlay.open{display:flex}
+.note-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:720px;max-width:96%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.note-panel-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.note-title-inp{flex:1;font-size:15px;font-weight:700;border:none;outline:none;background:transparent;color:var(--text);font-family:inherit;padding:2px 0}
+.note-toolbar{display:flex;align-items:center;gap:3px;padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--surface2)}
+.note-tb-btn{border:1px solid var(--border);background:#fff;cursor:pointer;border-radius:5px;padding:3px 8px;font-size:12px;font-family:inherit;line-height:1.4;min-width:28px;color:var(--text)}
+.note-tb-btn:hover{background:var(--blue-light);border-color:var(--blue-mid)}
+.note-tb-sep{width:1px;height:18px;background:var(--border2);margin:0 3px;flex-shrink:0}
+.note-editor{flex:1;overflow-y:auto;padding:14px 16px;outline:none;font-size:13px;line-height:1.7;color:var(--text);font-family:inherit;min-height:200px}
+.note-editor:focus{outline:none}
+.note-panel-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);flex-shrink:0}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -570,7 +601,7 @@ function getTypeColor(type){ return TYPE_COLORS[type]||'#888'; }
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',machineType:'',notes:'',dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',notes:'',notesList:[],dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -597,6 +628,7 @@ S.projects.forEach(p=>{
   if(!p.rdvs)p.rdvs=[];
   if(!p.rdvsArchived)p.rdvsArchived=[];
   if(!p.notes)p.notes='';
+  if(!p.notesList)p.notesList=[];
 });
 
 // ── PRESTAS DATA ──
@@ -870,7 +902,15 @@ function renderPage(){
       </div>
     </div>
 
-    <div class="card tasks-card">
+    <div class="notes-strip">
+      <div class="notes-strip-header">
+        <span class="notes-strip-title">Notes</span>
+        <button class="btn-add-note" onclick="openNoteEditor(null)">+ Ajouter une note</button>
+      </div>
+      <div class="notes-list">${renderNoteCards(p)}</div>
+    </div>
+
+        <div class="card tasks-card">
       <div class="tasks-header">
         <div class="section-title">Tâches</div>
         <div style="display:flex;gap:7px;align-items:center">
@@ -2527,6 +2567,85 @@ function deleteObjLink(i){
   if(obj){obj.links.splice(i,1);save();renderObjDetail();}
 }
 
+
+// ── NOTES ──
+let _noteEditId=null;
+let _noteEditPid=null;
+
+function openNoteEditor(noteId){
+  _noteEditPid=S.activeId;
+  _noteEditId=noteId;
+  const p=proj();
+  const note=noteId?(p.notesList||[]).find(n=>n.id===noteId):null;
+  document.getElementById('note-title-inp').value=note?note.title:'';
+  document.getElementById('note-editor').innerHTML=note?note.html:'';
+  document.getElementById('note-del-btn').style.display=noteId?'':'none';
+  document.getElementById('note-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('note-title-inp').focus(),50);
+}
+function closeNoteEditor(){
+  document.getElementById('note-overlay').classList.remove('open');
+  _noteEditId=null;_noteEditPid=null;
+}
+function saveNote(){
+  const title=document.getElementById('note-title-inp').value.trim()||'Sans titre';
+  const html=document.getElementById('note-editor').innerHTML.trim();
+  const p=proj();
+  if(!p.notesList)p.notesList=[];
+  if(_noteEditId){
+    const n=p.notesList.find(x=>x.id===_noteEditId);
+    if(n){n.title=title;n.html=html;n.updated=new Date().toLocaleDateString('fr-FR');}
+  } else {
+    p.notesList.unshift({id:'note'+Date.now(),title,html,created:new Date().toLocaleDateString('fr-FR'),updated:''});
+  }
+  save();closeNoteEditor();renderPage();
+}
+
+let _delNoteId=null;
+function deleteNote(id){
+  if(!id||id==='__none__')return;
+  _delNoteId=id;
+  document.getElementById('modal-confirm-note').classList.add('open');
+}
+function confirmDeleteNote(){
+  const p=proj();
+  p.notesList=(p.notesList||[]).filter(n=>n.id!==_delNoteId);
+  save();closeConfirmNote();renderPage();
+}
+function closeConfirmNote(){
+  document.getElementById('modal-confirm-note').classList.remove('open');
+  _delNoteId=null;
+}
+
+// Note formatting
+let _noteSel=null;
+function noteFmt(cmd,val){
+  const ed=document.getElementById('note-editor');
+  ed.focus();
+  if(_noteSel){
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_noteSel);
+  }
+  document.execCommand('styleWithCSS',false,true);
+  document.execCommand(cmd,false,val||null);
+  _noteSel=window.getSelection().rangeCount>0?window.getSelection().getRangeAt(0).cloneRange():null;
+}
+function noteFontSize(v){noteFmt('fontSize',v);}
+function noteColor(col){noteFmt('foreColor',col);}
+function noteHighlight(col){noteFmt('hiliteColor',col);}
+
+function renderNoteCards(p){
+  if(!(p.notesList||[]).length) return '<span style="font-size:10.5px;color:var(--text3);font-style:italic;align-self:center">Aucune note — cliquez sur « + Ajouter une note »</span>';
+  return (p.notesList||[]).map(function(n){
+    return '<div class="note-card" ondblclick="openNoteEditor(\''+n.id+'\')" title="Double-clic pour modifier">'
+      +'<button class="note-card-del" onclick="event.stopPropagation();deleteNote(\''+n.id+'\')" title="Supprimer">🗑</button>'
+      +'<div class="note-card-title">'+esc(n.title||'Sans titre')+'</div>'
+      +'<div class="note-card-preview">'+(n.html?n.html.replace(/<[^>]+>/g,' ').trim().slice(0,120):'…')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -3412,6 +3531,75 @@ document.addEventListener('keydown', function(e){
     <div class="modal-btns">
       <button onclick="closeConfirmObjYear()">Annuler</button>
       <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteYear()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Note editor overlay -->
+<div class="note-overlay" id="note-overlay">
+  <div class="note-panel">
+    <div class="note-panel-hdr">
+      <input type="text" class="note-title-inp" id="note-title-inp" placeholder="Titre de la note…">
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="deleteNote(_noteEditId||'__none__')" id="note-del-btn" style="padding:5px 10px;border:1px solid #F0B8B8;border-radius:7px;background:#FDEAEA;color:#A32D2D;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit">Supprimer</button>
+        <button onclick="saveNote()" style="padding:5px 16px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">Enregistrer</button>
+        <button onclick="closeNoteEditor()" style="padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;font-family:inherit">Annuler</button>
+      </div>
+    </div>
+    <div class="note-toolbar">
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('bold')" title="Gras"><b>G</b></button>
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('italic')" title="Italique"><i>I</i></button>
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('underline')" title="Souligné"><u>S</u></button>
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('strikeThrough')" title="Barré"><s>B</s></button>
+      <div class="note-tb-sep"></div>
+      <select onchange="noteFontSize(this.value);this.value=''" style="padding:3px 4px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:#fff;cursor:pointer;outline:none">
+        <option value="">Taille</option>
+        <option value="1">Très petit</option>
+        <option value="2">Petit</option>
+        <option value="3">Normal</option>
+        <option value="4">Grand</option>
+        <option value="5">Très grand</option>
+        <option value="6">Énorme</option>
+      </select>
+      <div class="note-tb-sep"></div>
+      <span style="font-size:10px;color:var(--text3);margin:0 2px">Couleur texte</span>
+      <div onmousedown="event.preventDefault();noteColor('#1A1A1A')" style="width:16px;height:16px;border-radius:50%;background:#1A1A1A;cursor:pointer;border:1px solid #ccc" title="Noir"></div>
+      <div onmousedown="event.preventDefault();noteColor('#E53935')" style="width:16px;height:16px;border-radius:50%;background:#E53935;cursor:pointer" title="Rouge"></div>
+      <div onmousedown="event.preventDefault();noteColor('#1E88E5')" style="width:16px;height:16px;border-radius:50%;background:#1E88E5;cursor:pointer" title="Bleu"></div>
+      <div onmousedown="event.preventDefault();noteColor('#2E7D32')" style="width:16px;height:16px;border-radius:50%;background:#2E7D32;cursor:pointer" title="Vert"></div>
+      <div onmousedown="event.preventDefault();noteColor('#E65100')" style="width:16px;height:16px;border-radius:50%;background:#E65100;cursor:pointer" title="Orange"></div>
+      <div onmousedown="event.preventDefault();noteColor('#6A1B9A')" style="width:16px;height:16px;border-radius:50%;background:#6A1B9A;cursor:pointer" title="Violet"></div>
+      <div onmousedown="event.preventDefault();noteColor('#78909C')" style="width:16px;height:16px;border-radius:50%;background:#78909C;cursor:pointer" title="Gris"></div>
+      <div class="note-tb-sep"></div>
+      <span style="font-size:10px;color:var(--text3);margin:0 2px">Surlignage</span>
+      <div onmousedown="event.preventDefault();noteHighlight('#FFF176')" style="width:16px;height:16px;border-radius:50%;background:#FFF176;cursor:pointer;border:1px solid #ccc" title="Jaune"></div>
+      <div onmousedown="event.preventDefault();noteHighlight('#A5D6A7')" style="width:16px;height:16px;border-radius:50%;background:#A5D6A7;cursor:pointer;border:1px solid #ccc" title="Vert"></div>
+      <div onmousedown="event.preventDefault();noteHighlight('#90CAF9')" style="width:16px;height:16px;border-radius:50%;background:#90CAF9;cursor:pointer;border:1px solid #ccc" title="Bleu"></div>
+      <div onmousedown="event.preventDefault();noteHighlight('#FFCCBC')" style="width:16px;height:16px;border-radius:50%;background:#FFCCBC;cursor:pointer;border:1px solid #ccc" title="Orange"></div>
+      <div onmousedown="event.preventDefault();noteHighlight('#CE93D8')" style="width:16px;height:16px;border-radius:50%;background:#CE93D8;cursor:pointer;border:1px solid #ccc" title="Violet"></div>
+      <div class="note-tb-sep"></div>
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('insertUnorderedList')" title="Liste à puces">• Liste</button>
+      <button class="note-tb-btn" onmousedown="event.preventDefault();noteFmt('insertOrderedList')" title="Liste numérotée">1. Liste</button>
+    </div>
+    <div class="note-editor" id="note-editor" contenteditable="true"
+      onmouseup="if(window.getSelection().rangeCount>0)_noteSel=window.getSelection().getRangeAt(0).cloneRange()"
+      onkeyup="if(window.getSelection().rangeCount>0)_noteSel=window.getSelection().getRangeAt(0).cloneRange()">
+    </div>
+    <div class="note-panel-footer">
+      <span style="font-size:10px;color:var(--text3)">Double-clic sur un post-it pour modifier</span>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete note -->
+<div class="modal-bg" id="modal-confirm-note" style="z-index:500">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer cette note ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmNote()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteNote()">Supprimer</button>
     </div>
   </div>
 </div>
