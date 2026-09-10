@@ -908,29 +908,28 @@ function renderPage(){
       </div>
     </div>
 
-    <div class="tasks-notes-row"><div class="card tasks-card" style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column">
-      <div class="tasks-header">
-        <div class="section-title">Tâches</div>
-        <div style="display:flex;gap:7px;align-items:center">
-          <button class="btn-arc-view" onclick="openArc()">📁 Archivées (${p.archivedTasks.length})</button>
-          <button class="btn-add-task" onclick="addTask()">+ Nouvelle tâche</button>
+    <div class="tasks-notes-row">
+      <div class="card tasks-card" style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column">
+        <div class="tasks-header">
+          <div class="section-title">Tâches</div>
+          <div style="display:flex;gap:7px;align-items:center">
+            <button class="btn-arc-view" onclick="openArc()">📁 Archivées (${p.archivedTasks.length})</button>
+            <button class="btn-add-task" onclick="addTask()">+ Nouvelle tâche</button>
+          </div>
         </div>
-      </div>
-      <div class="task-table-wrap">
-        <table class="tasks">
-          <thead><tr>
-            <th class="col-type">Type</th>
-            <th class="col-name">Nom</th>
-            <th class="col-date">Échéance</th>
-            <th class="col-state">État</th>
-            
-            <th class="col-com">Commentaire</th>
-            <th class="col-act"></th>
-          </tr></thead>
-          <tbody>${taskRows}</tbody>
-        </table>
-      </div>
-    </div>
+        <div class="task-table-wrap">
+          <table class="tasks">
+            <thead><tr>
+              <th class="col-type">Type</th>
+              <th class="col-name">Nom</th>
+              <th class="col-date">Échéance</th>
+              <th class="col-state">État</th>
+              <th class="col-com">Commentaire</th>
+              <th class="col-act"></th>
+            </tr></thead>
+            <tbody>${taskRows}</tbody>
+          </table>
+        </div>
       </div>
       <div class="notes-panel">
         <div class="notes-panel-header">
