@@ -1003,7 +1003,7 @@ function taskRow(t,archived){
       <option value="ec"${t.state==='ec'?' selected':''}>En cours</option>
       <option value="fi"${t.state==='fi'?' selected':''}>Fini</option>
     </select></div></td>
-    <td><div class="sel-wrap ${pc}"><select onchange="upTask('${t.id}','prio',this.value==='1')">
+    <td class="col-prio" style="display:none"><div class="sel-wrap ${pc}"><select onchange="upTask('${t.id}','prio',this.value==='1')">
       <option value="0"${!t.prio?' selected':''}>Non</option>
       <option value="1"${t.prio?' selected':''}>Oui</option>
     </select></div></td>
