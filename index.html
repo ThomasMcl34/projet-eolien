@@ -39,7 +39,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow)}
 
 /* FICHE */
-.fiche-card{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-self:flex-start}
+.fiche-card{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-self:flex-start}
 .section-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
 .field{display:flex;flex-direction:column;gap:2px}
@@ -103,7 +103,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .add-row button:hover{background:var(--surface2)}
 
 /* TÂCHES — pleine largeur */
-.tasks-card{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.tasks-card{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;width:100%}
 .tasks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
 .btn-arc-view{font-size:10.5px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px}
 .btn-arc-view:hover{background:var(--border)}
@@ -112,13 +112,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .task-table-wrap{flex:1;overflow-y:auto;min-height:0;border:1px solid var(--border);border-radius:8px}
 .task-table-wrap::-webkit-scrollbar{width:3px}
 .task-table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-table.tasks{width:100%;border-collapse:collapse;table-layout:fixed}
+table.tasks{width:100%;border-collapse:collapse;table-layout:auto}
 table.tasks th{font-size:10px;font-weight:700;color:var(--text2);text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2);z-index:1;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 table.tasks td{padding:6px 8px;border-bottom:2px solid var(--border2);vertical-align:middle}
 table.tasks tr:last-child td{border-bottom:none}
 table.tasks tr:hover td{filter:brightness(.97)}
 table.tasks tr.row-ac:not(:last-child) td,table.tasks tr.row-ec:not(:last-child) td,table.tasks tr.row-fi:not(:last-child) td,table.tasks tr.row-prio:not(:last-child) td{border-bottom:2px solid var(--border2)}
-.col-type{width:95px}.col-name{width:280px}.col-date{width:80px}.col-state{width:90px}.col-prio{display:none}.col-com{}.col-act{width:110px}
+.col-type{width:90px;white-space:nowrap}.col-name{width:20%;min-width:140px}.col-date{width:80px;white-space:nowrap}.col-state{width:90px;white-space:nowrap}.col-prio{display:none}.col-com{width:35%;min-width:150px}.col-act{width:100px;white-space:nowrap}
 
 /* Row colors handled by JS via type color */
 tr.row-fi td{opacity:.6}
@@ -377,7 +377,7 @@ table.missions tr:last-child td{border-bottom:none}
 .presta-modal-btns .primary:hover{background:var(--blue)}
 
 /* ── CALENDAR ── */
-.cal-card{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0}
+.cal-card{width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0}
 .cal-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .cal-nav{border:none;background:none;cursor:pointer;font-size:15px;color:var(--text2);padding:0 4px;border-radius:4px;line-height:1}
 .cal-nav:hover{background:var(--surface2);color:var(--text)}
@@ -543,6 +543,64 @@ table.missions tr:last-child td{border-bottom:none}
 .note-editor:focus{outline:none}
 .note-panel-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);flex-shrink:0}
 
+
+/* ── JALONS LIST ── */
+.jalons-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.jalons-list::-webkit-scrollbar{width:3px}
+.jalons-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.jalon-row{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:.1s}
+.jalon-row:hover{background:var(--blue-light);border-color:var(--blue-mid)}
+.jalon-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.jalon-dot.done{background:#2E7D32}
+.jalon-dot.future{background:#E53935}
+.jalon-dot.none{background:#ccc}
+.jalon-name{font-size:11px;font-weight:600;color:var(--text);flex:1}
+.jalon-date{font-size:9.5px;color:var(--text3);white-space:nowrap}
+/* Checklist modal */
+.jalon-modal-bg{display:none;position:fixed;inset:0;background:rgba(20,30,60,.25);z-index:450;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.jalon-modal-bg.open{display:flex}
+.jalon-modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:420px;max-width:95%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.jalon-modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
+.jalon-modal-hdr h3{font-size:14px;font-weight:700}
+.jalon-modal-close{border:none;background:none;cursor:pointer;font-size:20px;color:var(--text2);padding:0 6px;border-radius:5px}
+.jalon-modal-close:hover{background:var(--surface2)}
+
+
+/* ── MÉMO ── */
+.memo-page{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.memo-cat-tabs{display:flex;align-items:center;gap:4px;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface2);flex-wrap:wrap}
+.memo-cat-tab{padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:.12s}
+.memo-cat-tab:hover{background:var(--surface);color:var(--text)}
+.memo-cat-tab.active{background:var(--blue-mid);color:#fff;border-color:var(--blue)}
+.btn-add-cat{font-size:10px;padding:3px 10px;border:1px dashed var(--border2);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer}
+.btn-add-cat:hover{border-color:var(--blue-mid);color:var(--blue)}
+.memo-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start}
+.memo-list::-webkit-scrollbar{width:3px}
+.memo-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.memo-card{width:220px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.12s;overflow:hidden}
+.memo-card:hover{box-shadow:0 4px 16px rgba(20,40,100,.10);border-color:var(--border2)}
+.memo-card-header{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.memo-card-title{font-size:12px;font-weight:700;color:var(--text);flex:1;line-height:1.3}
+.memo-card-footer{padding:6px 10px 10px;display:flex;gap:6px;justify-content:flex-end}
+.btn-memo-open{font-size:10.5px;padding:3px 10px;border:1px solid var(--blue-mid);border-radius:5px;background:var(--blue-light);color:var(--blue);cursor:pointer;font-weight:600}
+.btn-memo-open:hover{background:var(--blue-mid);color:#fff}
+.btn-add-memo{font-size:11px;padding:5px 14px;border:2px dashed var(--border2);border-radius:var(--radius-lg);background:transparent;color:var(--text3);cursor:pointer;width:220px;height:55px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.btn-add-memo:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-light)}
+/* Mémo editor */
+.memo-overlay{display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.memo-overlay.open{display:flex}
+.memo-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:800px;max-width:97%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(20,40,100,.15);overflow:hidden}
+.memo-panel-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.memo-title-inp{flex:1;font-size:15px;font-weight:700;border:none;outline:none;background:transparent;color:var(--text);font-family:inherit;padding:2px 0}
+.memo-toolbar{display:flex;align-items:center;gap:3px;padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--surface2)}
+.memo-tb-btn{border:1px solid var(--border);background:#fff;cursor:pointer;border-radius:5px;padding:3px 8px;font-size:12px;font-family:inherit;line-height:1.4;min-width:28px;color:var(--text)}
+.memo-tb-btn:hover{background:var(--blue-light);border-color:var(--blue-mid)}
+.memo-tb-sep{width:1px;height:18px;background:var(--border2);margin:0 3px;flex-shrink:0}
+.memo-editor{flex:1;overflow-y:auto;padding:14px 16px;outline:none;font-size:13px;line-height:1.7;color:var(--text);font-family:inherit;min-height:200px}
+.memo-editor table{border-collapse:collapse;width:auto;margin:8px 0}
+.memo-editor td,.memo-editor th{border:1px solid var(--border2);padding:5px 10px;min-width:60px;font-size:12px}
+.memo-editor th{background:var(--surface2);font-weight:700}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -606,7 +664,7 @@ function getTypeColor(type){ return TYPE_COLORS[type]||'#888'; }
 const BASE_TYPES=['DEV','Précons','Études','Plans','ENVIRO','Planning','Budget'];
 
 function mkP(id,name,type,machines,demolish,renew){
-  return{id,name,type,machines,demolish,renew,location:'',machineType:'',notes:'',notesList:[],dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
+  return{id,name,type,machines,demolish,renew,location:'',machineType:'',machinesActuelles:'',notes:'',checklistGrid:{plans:'',etudes:'',plansMaps:''},notesList:[],dates:{},checklists:{},tasks:[],archivedTasks:[],links:[],risks:[],icps:[],rdvs:[],rdvsArchived:[]};
 }
 
 let S=JSON.parse(localStorage.getItem('ew_v9')||'null')||{
@@ -633,6 +691,8 @@ S.projects.forEach(p=>{
   if(!p.rdvs)p.rdvs=[];
   if(!p.rdvsArchived)p.rdvsArchived=[];
   if(!p.notes)p.notes='';
+  if(!p.machinesActuelles)p.machinesActuelles='';
+  if(!p.checklistGrid)p.checklistGrid={plans:'',etudes:'',plansMaps:''};
   if(!p.notesList)p.notesList=[];
 });
 
@@ -655,10 +715,14 @@ if(!S.calculs) S.calculs=[];
 if(!S.calcType) S.calcType=null;
 if(!S.calcRayonInputs) S.calcRayonInputs={valeur:'',secu_route:3,secu_foret:8};
 if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
-if(!S.objectifs) S.objectifs={};  // {year: [{id,name,desc,state,date,links,checklist}]}
+if(!S.objectifs) S.objectifs={};
+if(!S.memos) S.memos={Planning:[],Budget:[],Construction:[],Dev:[],Enviro:[]};
+if(!S.memoTab) S.memoTab='Planning';  // {year: [{id,name,desc,state,date,links,checklist}]}
 if(!S.objYear) S.objYear=null;
 if(!S.calcTalusInputs) S.calcTalusInputs={proj:'',hauteur:''};
-if(!S.objectifs) S.objectifs={};  // {year: [{id,name,desc,state,date,links,checklist}]}
+if(!S.objectifs) S.objectifs={};
+if(!S.memos) S.memos={Planning:[],Budget:[],Construction:[],Dev:[],Enviro:[]};
+if(!S.memoTab) S.memoTab='Planning';  // {year: [{id,name,desc,state,date,links,checklist}]}
 if(!S.objYear) S.objYear=null;
 if(!S.calMonths) S.calMonths={}; // {projectId: 'YYYY-MM'}
 if(!S.filterPrestaType) S.filterPrestaType='';
@@ -725,10 +789,10 @@ function renderTabs(){
   const mainBar=document.getElementById('main-tabs-bar');
   if(mainBar){
     mainBar.innerHTML='';
-    ['projets','prestas','calculs','objectifs'].forEach(tab=>{
+    ['projets','prestas','calculs','memo','objectifs'].forEach(tab=>{
       const t=document.createElement('div');
       t.className='main-tab'+(S.mainTab===tab?' active':'');
-      t.textContent=tab==='projets'?'Projets':tab==='prestas'?'Prestas':tab==='calculs'?'Calculs':'Objectifs annuels';
+      t.textContent=tab==='projets'?'Projets':tab==='prestas'?'Prestas':tab==='calculs'?'Calculs':tab==='memo'?'Mémo':'Objectifs annuels';
       t.onclick=()=>{S.mainTab=tab;save();render()};
       mainBar.appendChild(t);
     });
@@ -854,9 +918,16 @@ function renderPage(){
         <div class="field"><label>Type de machine visé</label>
           <input type="text" value="${esc(p.machineType||'')}" placeholder="ex: Vestas V150, SWT-4.0…" oninput="uf('machineType',this.value)">
         </div>
-        <div class="field"><label>Notes</label>
-          <textarea rows="3" placeholder="Notes générales…" oninput="uf('notes',this.value)" style="resize:none;line-height:1.5;height:60px;overflow-y:auto">${esc(p.notes||'')}</textarea>
-        </div>
+        ${isRP?`
+          <div class="field"><label>Machines actuelles</label>
+            <textarea rows="2" placeholder="Modèles, nb, caractéristiques…" oninput="uf('machinesActuelles',this.value)" style="resize:none;line-height:1.5;height:46px;overflow-y:auto">${esc(p.machinesActuelles||'')}</textarea>
+          </div>
+          <div class="field"><label>Notes</label>
+            <textarea rows="2" placeholder="Notes générales…" oninput="uf('notes',this.value)" style="resize:none;line-height:1.5;height:46px;overflow-y:auto">${esc(p.notes||'')}</textarea>
+          </div>`
+          :`<div class="field"><label>Notes</label>
+            <textarea rows="3" placeholder="Notes générales…" oninput="uf('notes',this.value)" style="resize:none;line-height:1.5;height:60px;overflow-y:auto">${esc(p.notes||'')}</textarea>
+          </div>`}
       </div>
 
       <div class="card links-card">
@@ -899,43 +970,78 @@ function renderPage(){
         <div class="card cal-card" id="cal-${p.id}">
           ${renderCalendar(p)}
         </div>
-        <div class="card" style="flex:1;display:flex;flex-direction:column;gap:6px;overflow:hidden;min-width:0">
-          <div class="section-title">Frise chronologique</div>
-          <div class="milestones" id="frise-ms-${p.id}">${progressBar}${msHtml}</div>
-          ${clHtml}
+        <div class="card" style="width:180px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;overflow:hidden">
+          <div class="section-title">Jalons</div>
+          <div class="jalons-list" id="jalons-list-${p.id}">${renderJalonsList(p)}</div>
+        </div>
+        <div class="card notes-panel" style="width:180px;flex-shrink:0">
+          <div class="notes-panel-header">
+            <span class="notes-panel-title">Notes</span>
+            <button class="btn-add-note" onclick="openNoteEditor(null)">+</button>
+          </div>
+          <div class="notes-list">${renderNoteCards(p)}</div>
+        </div>
+        <div class="card" style="width:140px;flex-shrink:0;display:flex;flex-direction:column;gap:8px">
+          <div class="section-title">Checklist Grid</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:10.5px;font-weight:600;color:var(--text2)">Plans</span>
+              <div style="position:relative;display:flex;align-items:center">
+                <select style="width:100%;padding:3px 20px 3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none;font-weight:600;${(p.checklistGrid&&p.checklistGrid.plans==='ok')?'background:#2E7D32;color:#fff;':(p.checklistGrid&&p.checklistGrid.plans==='ko')?'background:#E53935;color:#fff;':'background:var(--surface2);color:var(--text2);'}" onchange="updateChecklistGrid('${p.id}','plans',this.value);renderPage()">
+                  <option value="" ${!(p.checklistGrid&&p.checklistGrid.plans)?'selected':''}>—</option>
+                  <option value="ok" ${p.checklistGrid&&p.checklistGrid.plans==='ok'?'selected':''}>À jour</option>
+                  <option value="ko" ${p.checklistGrid&&p.checklistGrid.plans==='ko'?'selected':''}>Pas à jour</option>
+                </select>
+                <span style="position:absolute;right:6px;pointer-events:none;font-size:9px;color:${(p.checklistGrid&&p.checklistGrid.plans)?'rgba(255,255,255,.8)':'var(--text3)'}">▾</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:10.5px;font-weight:600;color:var(--text2)">Études</span>
+              <div style="position:relative;display:flex;align-items:center">
+                <select style="width:100%;padding:3px 20px 3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none;font-weight:600;${(p.checklistGrid&&p.checklistGrid.etudes==='ok')?'background:#2E7D32;color:#fff;':(p.checklistGrid&&p.checklistGrid.etudes==='ko')?'background:#E53935;color:#fff;':'background:var(--surface2);color:var(--text2);'}" onchange="updateChecklistGrid('${p.id}','etudes',this.value);renderPage()">
+                  <option value="" ${!(p.checklistGrid&&p.checklistGrid.etudes)?'selected':''}>—</option>
+                  <option value="ok" ${p.checklistGrid&&p.checklistGrid.etudes==='ok'?'selected':''}>À jour</option>
+                  <option value="ko" ${p.checklistGrid&&p.checklistGrid.etudes==='ko'?'selected':''}>Pas à jour</option>
+                </select>
+                <span style="position:absolute;right:6px;pointer-events:none;font-size:9px;color:${(p.checklistGrid&&p.checklistGrid.etudes)?'rgba(255,255,255,.8)':'var(--text3)'}">▾</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:10.5px;font-weight:600;color:var(--text2)">Plans sur Maps</span>
+              <div style="position:relative;display:flex;align-items:center">
+                <select style="width:100%;padding:3px 20px 3px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;outline:none;cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none;font-weight:600;${(p.checklistGrid&&p.checklistGrid.plansMaps==='ok')?'background:#2E7D32;color:#fff;':(p.checklistGrid&&p.checklistGrid.plansMaps==='ko')?'background:#E53935;color:#fff;':'background:var(--surface2);color:var(--text2);'}" onchange="updateChecklistGrid('${p.id}','plansMaps',this.value);renderPage()">
+                  <option value="" ${!(p.checklistGrid&&p.checklistGrid.plansMaps)?'selected':''}>—</option>
+                  <option value="ok" ${p.checklistGrid&&p.checklistGrid.plansMaps==='ok'?'selected':''}>Fait</option>
+                  <option value="ko" ${p.checklistGrid&&p.checklistGrid.plansMaps==='ko'?'selected':''}>Pas fait</option>
+                </select>
+                <span style="position:absolute;right:6px;pointer-events:none;font-size:9px;color:${(p.checklistGrid&&p.checklistGrid.plansMaps)?'rgba(255,255,255,.8)':'var(--text3)'}">▾</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="tasks-notes-row">
-      <div class="card tasks-card" style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column">
-        <div class="tasks-header">
-          <div class="section-title">Tâches</div>
-          <div style="display:flex;gap:7px;align-items:center">
-            <button class="btn-arc-view" onclick="openArc()">📁 Archivées (${p.archivedTasks.length})</button>
-            <button class="btn-add-task" onclick="addTask()">+ Nouvelle tâche</button>
-          </div>
-        </div>
-        <div class="task-table-wrap">
-          <table class="tasks">
-            <thead><tr>
-              <th class="col-type">Type</th>
-              <th class="col-name">Nom</th>
-              <th class="col-date">Échéance</th>
-              <th class="col-state">État</th>
-              <th class="col-com">Commentaire</th>
-              <th class="col-act"></th>
-            </tr></thead>
-            <tbody>${taskRows}</tbody>
-          </table>
+    <div class="card tasks-card" style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column">
+      <div class="tasks-header">
+        <div class="section-title">Tâches</div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button class="btn-arc-view" onclick="openArc()">📁 Archivées (${p.archivedTasks.length})</button>
+          <button class="btn-add-task" onclick="addTask()">+ Nouvelle tâche</button>
         </div>
       </div>
-      <div class="notes-panel">
-        <div class="notes-panel-header">
-          <span class="notes-panel-title">Notes</span>
-          <button class="btn-add-note" onclick="openNoteEditor(null)">+</button>
-        </div>
-        <div class="notes-list">${renderNoteCards(p)}</div>
+      <div class="task-table-wrap">
+        <table class="tasks">
+          <thead><tr>
+            <th class="col-type">Type</th>
+            <th class="col-name">Nom</th>
+            <th class="col-date">Échéance</th>
+            <th class="col-state">État</th>
+            <th class="col-com">Commentaire</th>
+            <th class="col-act"></th>
+          </tr></thead>
+          <tbody>${taskRows}</tbody>
+        </table>
       </div>
     </div>
   </div>`;
@@ -994,7 +1100,7 @@ function taskRow(t,archived){
         <div class="type-wrap"><div class="type-trigger" onclick="openDD('${t.id}',this)">${pills||'<span style="color:var(--text3);font-size:10px">Choisir…</span>'}</div></div>
       </div>
     </td>
-    <td style="max-width:180px;overflow:hidden"><input type="text" value="${esc(t.name)}" placeholder="Nom de la tâche" onchange="upTask('${t.id}','name',this.value)" style="width:100%"></td>
+    <td><input type="text" value="${esc(t.name)}" placeholder="Nom de la tâche" onchange="upTask('${t.id}','name',this.value)" style="width:100%"></td>
     <td style="padding:3px 6px;white-space:nowrap">
       <span onclick="editTaskDate('${t.id}',this)" style="display:inline-block;font-size:11px;padding:3px 8px;background:#fff;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:${t.date?'var(--text)':'var(--text3)'};white-space:nowrap">${t.date?fmt(t.date):'+ date'}</span>
     </td>
@@ -2351,6 +2457,8 @@ let _objDetailYear=null;
 function renderObjectifs(){
   const pc=document.getElementById('page-container');
   if(!S.objectifs) S.objectifs={};
+if(!S.memos) S.memos={Planning:[],Budget:[],Construction:[],Dev:[],Enviro:[]};
+if(!S.memoTab) S.memoTab='Planning';
   const years=Object.keys(S.objectifs).sort((a,b)=>b-a);
   if(!S.objYear||!S.objectifs[S.objYear]) S.objYear=years[0]||null;
 
@@ -2650,6 +2758,225 @@ function renderNoteCards(p){
   }).join('');
 }
 
+
+function renderJalonsList(p){
+  const today=new Date(); today.setHours(0,0,0,0);
+  return MS.map(m=>{
+    const d=p.dates[m.id];
+    let dotCls='none', dateStr='+ date';
+    if(d){
+      const dt=new Date(d.replace(/-/g,'/').replace(/T.*/,''));
+      dotCls=dt<=today?'done':'future';
+      dateStr=fmt(d);
+    }
+    return '<div class="jalon-row" onclick="openJalonChecklist(\''+p.id+'\',\''+m.id+'\')">'
+      +'<span class="jalon-dot '+dotCls+'"></span>'
+      +'<span class="jalon-name">'+m.name+'</span>'
+      +'<span class="jalon-date">'+dateStr+'</span>'
+      +'</div>';
+  }).join('');
+}
+
+function openJalonChecklist(pid,mid){
+  const p=S.projects.find(x=>x.id===pid);
+  if(!p)return;
+  const ms=MS.find(m=>m.id===mid);
+  if(!ms)return;
+  document.getElementById('jalon-modal-title').textContent='Checklist — '+ms.name;
+  // Render checklist
+  const cl=p.checklists&&p.checklists[mid]?p.checklists[mid]:[];
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=p.dates[mid];
+  const dt=d?new Date(d.replace(/-/g,'/').replace(/T.*/,'')):null;
+  const done=dt&&dt<=today;
+  const pct=cl.length?Math.round(cl.filter(x=>x.done).length/cl.length*100):0;
+  document.getElementById('jalon-modal-date').textContent=d?fmt(d):'Pas de date';
+  document.getElementById('jalon-modal-pct').textContent=cl.length?pct+'% ('+cl.filter(x=>x.done).length+'/'+cl.length+')':'';
+  const body=document.getElementById('jalon-modal-body');
+  if(!cl.length){body.innerHTML='<span style="font-size:11px;color:var(--text3);font-style:italic">Aucun élément dans cette checklist</span>';
+  } else {
+    body.innerHTML=cl.map((item,i)=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;background:var(--surface2);margin-bottom:3px">
+        <input type="checkbox" ${item.done?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue-mid)" onchange="toggleJalonCheck('${pid}','${mid}',${i},this.checked)">
+        <span style="flex:1;font-size:12px;${item.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text)'}">${esc(item.text||item)}</span>
+      </div>`).join('');
+  }
+  // Add item input
+  body.innerHTML += '<div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="jalon-new-item" placeholder="Ajouter un élément…" style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11.5px;background:var(--surface2);color:var(--text);outline:none;font-family:inherit" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addJalonCheckItem(\''+pid+'\',\''+mid+'\');}"><button onclick="addJalonCheckItem(\''+pid+'\',\''+mid+'\' )" style="padding:4px 10px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit">+</button></div>';
+  document.getElementById('jalon-modal-bg').classList.add('open');
+  setTimeout(()=>{const inp=document.getElementById('jalon-new-item');if(inp)inp.focus&&0;},50);
+  // Store current context
+  document.getElementById('jalon-modal-bg').dataset.pid=pid;
+  document.getElementById('jalon-modal-bg').dataset.mid=mid;
+}
+
+function closeJalonModal(){document.getElementById('jalon-modal-bg').classList.remove('open');}
+
+function toggleJalonCheck(pid,mid,idx,val){
+  const p=S.projects.find(x=>x.id===pid);
+  if(!p||!p.checklists||!p.checklists[mid])return;
+  const item=p.checklists[mid][idx];
+  if(item){item.done=val;save();openJalonChecklist(pid,mid);}
+}
+
+function addJalonCheckItem(pid,mid){
+  const inp=document.getElementById('jalon-new-item');
+  if(!inp)return;
+  const text=inp.value.trim();if(!text)return;
+  const p=S.projects.find(x=>x.id===pid);
+  if(!p)return;
+  if(!p.checklists)p.checklists={};
+  if(!p.checklists[mid])p.checklists[mid]=[];
+  p.checklists[mid].push({text,done:false});
+  save();openJalonChecklist(pid,mid);
+}
+
+
+// ── MÉMO ──
+const MEMO_CATS_DEFAULT=['Planning','Budget','Construction','Dev','Enviro'];
+let _memoEditId=null;
+let _memoEditCat=null;
+
+function renderMemo(){
+  const pc=document.getElementById('page-container');
+  if(!S.memos) S.memos={};
+  MEMO_CATS_DEFAULT.forEach(cat=>{if(!S.memos[cat])S.memos[cat]=[];});
+  const cats=Object.keys(S.memos);
+  if(!S.memoTab||!S.memos[S.memoTab]) S.memoTab=cats[0]||'Planning';
+
+  const catTabs=cats.map(cat=>`
+    <button class="memo-cat-tab${S.memoTab===cat?' active':''}" onclick="S.memoTab='${cat}';save();renderMemo()">${cat}</button>`).join('');
+
+  const memos=S.memos[S.memoTab]||[];
+  const cards=memos.map((m,i)=>`
+    <div class="memo-card">
+      <div class="memo-card-header">
+        <span class="memo-card-title">${esc(m.title||'Sans titre')}</span>
+      </div>
+      <div class="memo-card-footer">
+        <button class="btn-memo-open" onclick="openMemoEditor('${S.memoTab}','${m.id}')">Ouvrir →</button>
+        <button style="font-size:10.5px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--text3);cursor:pointer" onclick="deleteMemo('${S.memoTab}','${m.id}')">✕</button>
+      </div>
+    </div>`).join('');
+
+  pc.innerHTML=`<div class="memo-page">
+    <div class="memo-cat-tabs">
+      ${catTabs}
+      <button class="btn-add-cat" id="btn-add-memo-cat" onclick="addMemoCat()">+ Catégorie</button>
+    </div>
+    <div class="memo-list">
+      ${cards}
+      <button class="btn-add-memo" onclick="openMemoEditor('${S.memoTab}',null)">+ Ajouter un mémo</button>
+    </div>
+  </div>`;
+}
+
+function addMemoCat(){
+  const btn=document.getElementById('btn-add-memo-cat');
+  if(!btn)return;
+  btn.style.display='none';
+  const wrap=document.createElement('span');
+  wrap.style.cssText='display:inline-flex;align-items:center;gap:4px';
+  const inp=document.createElement('input');
+  inp.type='text';inp.placeholder='Nom…';
+  inp.style.cssText='width:100px;padding:3px 7px;border:1px solid var(--blue-mid);border-radius:20px;font-size:11px;outline:none;font-family:inherit';
+  const ok=document.createElement('button');
+  ok.textContent='OK';
+  ok.style.cssText='padding:3px 9px;border:1px solid var(--blue);border-radius:20px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px;font-family:inherit';
+  const cancel=document.createElement('button');
+  cancel.textContent='✕';
+  cancel.style.cssText='padding:3px 7px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px';
+  const confirm=()=>{
+    const name=inp.value.trim();
+    if(name&&!S.memos[name]){S.memos[name]=[];S.memoTab=name;save();}
+    renderMemo();
+  };
+  ok.onclick=confirm;cancel.onclick=renderMemo;
+  inp.onkeydown=e=>{if(e.key==='Enter')confirm();if(e.key==='Escape')renderMemo();};
+  wrap.appendChild(inp);wrap.appendChild(ok);wrap.appendChild(cancel);
+  btn.parentNode.insertBefore(wrap,btn);
+  inp.focus();
+}
+
+function openMemoEditor(cat,id){
+  _memoEditCat=cat;_memoEditId=id;
+  if(!S.memos[cat])S.memos[cat]=[];
+  const memo=id?S.memos[cat].find(m=>m.id===id):null;
+  if(!memo&&!id){
+    // Create immediately
+    const newMemo={id:'memo'+Date.now(),title:'Nouveau mémo',html:''};
+    S.memos[cat].unshift(newMemo);
+    save();_memoEditId=newMemo.id;
+    return openMemoEditor(cat,newMemo.id);
+  }
+  document.getElementById('memo-title-inp').value=memo?memo.title:'';
+  document.getElementById('memo-editor').innerHTML=memo?memo.html:'';
+  document.getElementById('memo-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('memo-title-inp').focus(),50);
+}
+
+function closeMemoEditor(){
+  // Auto-save on close
+  saveMemoContent();
+  document.getElementById('memo-overlay').classList.remove('open');
+  _memoEditId=null;_memoEditCat=null;
+  renderMemo();
+}
+
+function saveMemoContent(){
+  if(!_memoEditId||!_memoEditCat)return;
+  const memo=S.memos[_memoEditCat]&&S.memos[_memoEditCat].find(m=>m.id===_memoEditId);
+  if(!memo)return;
+  memo.title=document.getElementById('memo-title-inp').value.trim()||'Sans titre';
+  memo.html=document.getElementById('memo-editor').innerHTML;
+  save();
+}
+
+let _memoSel=null;
+function memoFmt(cmd,val){
+  const ed=document.getElementById('memo-editor');
+  ed.focus();
+  if(_memoSel){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(_memoSel);}
+  document.execCommand('styleWithCSS',false,true);
+  document.execCommand(cmd,false,val||null);
+  _memoSel=window.getSelection().rangeCount>0?window.getSelection().getRangeAt(0).cloneRange():null;
+}
+function memoFontSize(v){memoFmt('fontSize',v);}
+function memoColor(col){memoFmt('foreColor',col);}
+function memoHighlight(col){memoFmt('hiliteColor',col);}
+
+function insertMemoTable(){
+  const cols=parseInt(document.getElementById('tbl-cols').value)||3;
+  const rows=parseInt(document.getElementById('tbl-rows').value)||3;
+  document.getElementById('memo-table-modal').style.display='none';
+  const ed=document.getElementById('memo-editor');
+  ed.focus();
+  if(_memoSel){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(_memoSel);}
+  let html='<table><thead><tr>'+Array(cols).fill('<th contenteditable="true">&nbsp;</th>').join('')+'</tr></thead><tbody>';
+  for(let r=0;r<rows;r++) html+='<tr>'+Array(cols).fill('<td contenteditable="true">&nbsp;</td>').join('')+'</tr>';
+  html+='</tbody></table><p><br></p>';
+  document.execCommand('insertHTML',false,html);
+}
+
+let _delMemoCat=null,_delMemoId=null;
+function deleteMemo(cat,id){
+  _delMemoCat=cat;_delMemoId=id;
+  document.getElementById('modal-confirm-memo').classList.add('open');
+}
+function confirmDeleteMemo(){
+  if(!_delMemoCat)return;
+  S.memos[_delMemoCat]=(S.memos[_delMemoCat]||[]).filter(m=>m.id!==_delMemoId);
+  save();closeConfirmMemo();renderMemo();
+}
+function closeConfirmMemo(){document.getElementById('modal-confirm-memo').classList.remove('open');_delMemoCat=null;_delMemoId=null;}
+
+function updateChecklistGrid(pid,field,val){
+  const p=S.projects.find(x=>x.id===pid);
+  if(!p)return;
+  if(!p.checklistGrid)p.checklistGrid={};
+  p.checklistGrid[field]=val;
+  save();
+}
 // ── RISKS ──
 const RISK_THEMES=['Turbines','Accès','Intrasite','Planning','Budget','Technique'];
 // Task link
@@ -2965,6 +3292,9 @@ function render(){
   if(S.mainTab==='objectifs'){
     document.getElementById('page-container').innerHTML='';
     renderObjectifs();
+  } else if(S.mainTab==='memo'){
+    document.getElementById('page-container').innerHTML='';
+    renderMemo();
   } else if(S.mainTab==='prestas'){
     document.getElementById('page-container').innerHTML='';
     renderPrestas();
@@ -3606,6 +3936,98 @@ document.addEventListener('keydown', function(e){
     <div class="modal-btns">
       <button onclick="closeConfirmNote()">Annuler</button>
       <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteNote()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="jalon-modal-bg" id="jalon-modal-bg">
+  <div class="jalon-modal">
+    <div class="jalon-modal-hdr">
+      <div>
+        <h3 id="jalon-modal-title"></h3>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;display:flex;gap:10px">
+          <span id="jalon-modal-date"></span>
+          <span id="jalon-modal-pct"></span>
+        </div>
+      </div>
+      <button class="jalon-modal-close" onclick="closeJalonModal()">×</button>
+    </div>
+    <div id="jalon-modal-body" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- Mémo editor overlay -->
+<div class="memo-overlay" id="memo-overlay">
+  <div class="memo-panel">
+    <div class="memo-panel-hdr">
+      <input type="text" class="memo-title-inp" id="memo-title-inp" placeholder="Titre du mémo…" oninput="saveMemoContent()">
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="deleteMemo(_memoEditCat,_memoEditId)" style="padding:5px 10px;border:1px solid #F0B8B8;border-radius:7px;background:#FDEAEA;color:#A32D2D;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit">Supprimer</button>
+        <button onclick="closeMemoEditor()" style="padding:5px 16px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">OK</button>
+      </div>
+    </div>
+    <div class="memo-toolbar">
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('bold')" title="Gras"><b>G</b></button>
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('italic')" title="Italique"><i>I</i></button>
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('underline')" title="Souligné"><u>S</u></button>
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('strikeThrough')" title="Barré"><s>B</s></button>
+      <div class="memo-tb-sep"></div>
+      <select onchange="memoFontSize(this.value);this.value=''" style="padding:3px 4px;border:1px solid var(--border);border-radius:5px;font-size:11px;background:#fff;cursor:pointer;outline:none">
+        <option value="">Taille</option>
+        <option value="1">Très petit</option>
+        <option value="2">Petit</option>
+        <option value="3">Normal</option>
+        <option value="4">Grand</option>
+        <option value="5">Très grand</option>
+        <option value="6">Énorme</option>
+      </select>
+      <div class="memo-tb-sep"></div>
+      <span style="font-size:10px;color:var(--text3);margin:0 2px">Texte</span>
+      <div onmousedown="event.preventDefault();memoColor('#1A1A1A')" style="width:16px;height:16px;border-radius:50%;background:#1A1A1A;cursor:pointer;border:1px solid #ccc"></div>
+      <div onmousedown="event.preventDefault();memoColor('#E53935')" style="width:16px;height:16px;border-radius:50%;background:#E53935;cursor:pointer"></div>
+      <div onmousedown="event.preventDefault();memoColor('#1E88E5')" style="width:16px;height:16px;border-radius:50%;background:#1E88E5;cursor:pointer"></div>
+      <div onmousedown="event.preventDefault();memoColor('#2E7D32')" style="width:16px;height:16px;border-radius:50%;background:#2E7D32;cursor:pointer"></div>
+      <div onmousedown="event.preventDefault();memoColor('#E65100')" style="width:16px;height:16px;border-radius:50%;background:#E65100;cursor:pointer"></div>
+      <div onmousedown="event.preventDefault();memoColor('#6A1B9A')" style="width:16px;height:16px;border-radius:50%;background:#6A1B9A;cursor:pointer"></div>
+      <div class="memo-tb-sep"></div>
+      <span style="font-size:10px;color:var(--text3);margin:0 2px">Surlignage</span>
+      <div onmousedown="event.preventDefault();memoHighlight('#FFF176')" style="width:16px;height:16px;border-radius:50%;background:#FFF176;cursor:pointer;border:1px solid #ccc"></div>
+      <div onmousedown="event.preventDefault();memoHighlight('#A5D6A7')" style="width:16px;height:16px;border-radius:50%;background:#A5D6A7;cursor:pointer;border:1px solid #ccc"></div>
+      <div onmousedown="event.preventDefault();memoHighlight('#90CAF9')" style="width:16px;height:16px;border-radius:50%;background:#90CAF9;cursor:pointer;border:1px solid #ccc"></div>
+      <div onmousedown="event.preventDefault();memoHighlight('#FFCCBC')" style="width:16px;height:16px;border-radius:50%;background:#FFCCBC;cursor:pointer;border:1px solid #ccc"></div>
+      <div onmousedown="event.preventDefault();memoHighlight('#CE93D8')" style="width:16px;height:16px;border-radius:50%;background:#CE93D8;cursor:pointer;border:1px solid #ccc"></div>
+      <div class="memo-tb-sep"></div>
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('insertUnorderedList')">• Liste</button>
+      <button class="memo-tb-btn" onmousedown="event.preventDefault();memoFmt('insertOrderedList')">1. Liste</button>
+      <div class="memo-tb-sep"></div>
+      <button class="memo-tb-btn" onclick="document.getElementById('memo-table-modal').style.display='flex'" style="font-size:11px">+ Tableau</button>
+    </div>
+    <!-- Table insert mini-modal -->
+    <div id="memo-table-modal" style="display:none;position:absolute;z-index:10;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);gap:8px;align-items:center;flex-wrap:wrap;top:130px;left:50%;transform:translateX(-50%)">
+      <span style="font-size:11px;color:var(--text2)">Colonnes</span>
+      <input type="number" id="tbl-cols" value="3" min="1" max="10" style="width:48px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px">
+      <span style="font-size:11px;color:var(--text2)">Lignes</span>
+      <input type="number" id="tbl-rows" value="3" min="1" max="20" style="width:48px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px">
+      <button onclick="insertMemoTable()" style="padding:3px 10px;border:1px solid var(--blue);border-radius:5px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:11px">Insérer</button>
+      <button onclick="document.getElementById('memo-table-modal').style.display='none'" style="padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-size:11px;color:var(--text3)">✕</button>
+    </div>
+    <div class="memo-editor" id="memo-editor" contenteditable="true"
+      onmouseup="if(window.getSelection().rangeCount>0)_memoSel=window.getSelection().getRangeAt(0).cloneRange()"
+      onkeyup="if(window.getSelection().rangeCount>0)_memoSel=window.getSelection().getRangeAt(0).cloneRange();saveMemoContent()">
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete memo -->
+<div class="modal-bg" id="modal-confirm-memo" style="z-index:500">
+  <div class="modal" style="width:280px">
+    <h3 style="font-size:13px;margin-bottom:10px">Supprimer ce mémo ?</h3>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cette action est irréversible.</p>
+    <div class="modal-btns">
+      <button onclick="closeConfirmMemo()">Annuler</button>
+      <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteMemo()">Supprimer</button>
     </div>
   </div>
 </div>
