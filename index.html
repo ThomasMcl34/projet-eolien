@@ -112,13 +112,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;color:var(--text
 .task-table-wrap{flex:1;overflow-y:auto;min-height:0;border:1px solid var(--border);border-radius:8px}
 .task-table-wrap::-webkit-scrollbar{width:3px}
 .task-table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-table.tasks{width:100%;border-collapse:collapse;table-layout:auto}
+table.tasks{width:100%;border-collapse:collapse;table-layout:fixed}
 table.tasks th{font-size:10px;font-weight:700;color:var(--text2);text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2);z-index:1;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
 table.tasks td{padding:6px 8px;border-bottom:2px solid var(--border2);vertical-align:middle}
 table.tasks tr:last-child td{border-bottom:none}
 table.tasks tr:hover td{filter:brightness(.97)}
 table.tasks tr.row-ac:not(:last-child) td,table.tasks tr.row-ec:not(:last-child) td,table.tasks tr.row-fi:not(:last-child) td,table.tasks tr.row-prio:not(:last-child) td{border-bottom:2px solid var(--border2)}
-.col-type{width:95px}.col-name{width:200px}.col-date{width:78px}.col-state{width:90px}.col-prio{display:none}.col-com{min-width:160px}.col-act{width:110px}
+.col-type{width:95px}.col-name{width:280px}.col-date{width:80px}.col-state{width:90px}.col-prio{display:none}.col-com{width:320px}.col-act{width:110px}
 
 /* Row colors handled by JS via type color */
 tr.row-fi td{opacity:.6}
