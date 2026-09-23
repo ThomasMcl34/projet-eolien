@@ -597,9 +597,22 @@ table.missions tr:last-child td{border-bottom:none}
 .memo-tb-btn:hover{background:var(--blue-light);border-color:var(--blue-mid)}
 .memo-tb-sep{width:1px;height:18px;background:var(--border2);margin:0 3px;flex-shrink:0}
 .memo-editor{flex:1;overflow-y:auto;padding:14px 16px;outline:none;font-size:13px;line-height:1.7;color:var(--text);font-family:inherit;min-height:200px}
-.memo-editor table{border-collapse:collapse;width:auto;margin:8px 0}
-.memo-editor td,.memo-editor th{border:1px solid var(--border2);padding:5px 10px;min-width:60px;font-size:12px}
-.memo-editor th{background:var(--surface2);font-weight:700}
+.memo-editor table,.memo-tbl{border-collapse:collapse;width:auto;margin:8px 0}
+.memo-tbl-cell,.memo-tbl-hdr{border:1px solid var(--border2);padding:5px 10px;min-width:60px;font-size:12px;outline:none;vertical-align:top}
+.memo-tbl-hdr{background:var(--surface2);font-weight:700;cursor:pointer;position:relative;user-select:none}
+.memo-tbl-hdr::after{content:'▾';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:8px;color:var(--text3);opacity:.6}
+.memo-tbl-cell:focus,.memo-tbl-hdr:focus{background:var(--blue-light);outline:2px solid var(--blue-mid);}
+.memo-tbl-dd{width:100%;border:none;background:transparent;font-size:11px;cursor:pointer;outline:none;font-family:inherit;padding:2px}
+.memo-tbl-wrap{overflow-x:auto;margin:8px 0}
+/* Context menu */
+#tbl-ctx-menu{display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.14);padding:4px 0;min-width:180px}
+.ctx-item{padding:7px 14px;font-size:12px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px}
+.ctx-item:hover{background:var(--blue-light);color:var(--blue)}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0}
+.ctx-colors{display:flex;gap:4px;padding:5px 14px;flex-wrap:wrap}
+.ctx-color-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.1);transition:.1s}
+.ctx-color-dot:hover{transform:scale(1.2)}
+#tbl-filter-panel{display:none}
 
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -2912,6 +2925,7 @@ function openMemoEditor(cat,id){
   document.getElementById('memo-title-inp').value=memo?memo.title:'';
   document.getElementById('memo-editor').innerHTML=memo?memo.html:'';
   document.getElementById('memo-overlay').classList.add('open');
+  setTimeout(initMemoTableHandlers,100);
   setTimeout(()=>document.getElementById('memo-title-inp').focus(),50);
 }
 
@@ -2952,11 +2966,224 @@ function insertMemoTable(){
   const ed=document.getElementById('memo-editor');
   ed.focus();
   if(_memoSel){const sel=window.getSelection();sel.removeAllRanges();sel.addRange(_memoSel);}
-  let html='<table><thead><tr>'+Array(cols).fill('<th contenteditable="true">&nbsp;</th>').join('')+'</tr></thead><tbody>';
-  for(let r=0;r<rows;r++) html+='<tr>'+Array(cols).fill('<td contenteditable="true">&nbsp;</td>').join('')+'</tr>';
-  html+='</tbody></table><p><br></p>';
+  const tid='mt'+Date.now();
+  let html='<div class="memo-tbl-wrap" data-tid="'+tid+'"><table class="memo-tbl" data-tid="'+tid+'"><thead><tr>';
+  for(let c=0;c<cols;c++) html+='<th class="memo-tbl-hdr" contenteditable="true" data-col="'+c+'">&nbsp;</th>';
+  html+='</tr></thead><tbody>';
+  for(let r=0;r<rows;r++){
+    html+='<tr data-row="'+r+'">';
+    for(let col=0;col<cols;col++) html+='<td class="memo-tbl-cell" contenteditable="true" data-col="'+col+'">&nbsp;</td>';
+    html+='</tr>';
+  }
+  html+='</tbody></table></div><p><br></p>';
   document.execCommand('insertHTML',false,html);
+  initMemoTableHandlers();
 }
+
+function initMemoTableHandlers(){
+  document.querySelectorAll('.memo-tbl').forEach(tbl=>{
+    if(tbl.dataset.init) return;
+    tbl.dataset.init='1';
+
+    // Tab navigation
+    tbl.addEventListener('keydown',function(e){
+      if(e.key==='Tab'){
+        e.preventDefault();
+        const cells=[...tbl.querySelectorAll('th,td')];
+        const idx=cells.indexOf(document.activeElement);
+        if(idx>=0&&idx<cells.length-1) cells[idx+1].focus();
+        else if(idx===cells.length-1) cells[0].focus();
+      }
+    });
+
+    // Context menu on right-click
+    tbl.addEventListener('contextmenu',function(e){
+      e.preventDefault();
+      showTableCtxMenu(e,tbl);
+    });
+    // Filter on header click (the ▾ indicator)
+    tbl.querySelectorAll('.memo-tbl-hdr').forEach(th=>{
+      th.addEventListener('click',function(e){
+        if(!e.target.closest('th').isContentEditable||e.offsetX>th.offsetWidth-20) tblToggleFilter(th);
+      });
+    });
+  });
+}
+
+// Context menu
+let _ctxTbl=null,_ctxCell=null;
+function showTableCtxMenu(e,tbl){
+  _ctxTbl=tbl;
+  _ctxCell=e.target.closest('td,th');
+  const menu=document.getElementById('tbl-ctx-menu');
+  menu.style.cssText='display:block;position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;z-index:9999';
+  setTimeout(()=>document.addEventListener('click',closeTblCtx,{once:true}),10);
+}
+function closeTblCtx(){document.getElementById('tbl-ctx-menu').style.display='none';}
+
+function tblInsertRowAfter(){
+  if(!_ctxTbl||!_ctxCell)return;
+  const tr=_ctxCell.closest('tr');
+  const cols=_ctxTbl.rows[0].cells.length;
+  const newRow=_ctxTbl.insertRow(tr.rowIndex+1);
+  for(let i=0;i<cols;i++){const td=newRow.insertCell(i);td.className='memo-tbl-cell';td.contentEditable='true';td.innerHTML='&nbsp;';}
+  closeTblCtx();
+}
+function tblDeleteRow(){
+  if(!_ctxTbl||!_ctxCell)return;
+  const tr=_ctxCell.closest('tr');
+  if(_ctxTbl.rows.length>2) tr.parentNode.removeChild(tr);
+  closeTblCtx();
+}
+function tblInsertColAfter(){
+  if(!_ctxTbl||!_ctxCell)return;
+  const colIdx=_ctxCell.cellIndex;
+  for(let r=0;r<_ctxTbl.rows.length;r++){
+    const row=_ctxTbl.rows[r];
+    const isHead=row.parentNode.tagName==='THEAD';
+    const cell=isHead?document.createElement('th'):document.createElement('td');
+    cell.className=isHead?'memo-tbl-hdr':'memo-tbl-cell';
+    cell.contentEditable='true';cell.innerHTML='&nbsp;';
+    if(colIdx+1<row.cells.length) row.insertBefore(cell,row.cells[colIdx+1]);
+    else row.appendChild(cell);
+  }
+  closeTblCtx();
+}
+function tblDeleteCol(){
+  if(!_ctxTbl||!_ctxCell)return;
+  const colIdx=_ctxCell.cellIndex;
+  if(_ctxTbl.rows[0].cells.length<=1) return;
+  for(let r=0;r<_ctxTbl.rows.length;r++) _ctxTbl.rows[r].deleteCell(colIdx);
+  closeTblCtx();
+}
+function tblSetBgColor(col){
+  if(!_ctxCell)return;
+  _ctxCell.style.background=col;
+  closeTblCtx();
+}
+function tblSetDropdown(){
+  if(!_ctxCell)return;
+  // Init choices list with 3 default rows
+  renderDdChoices([
+    {label:'',bg:'',color:''},
+    {label:'',bg:'',color:''},
+    {label:'',bg:'',color:''}
+  ]);
+  document.getElementById('tbl-dropdown-modal').style.display='flex';
+  closeTblCtx();
+}
+
+let _ddChoices=[];
+function renderDdChoices(choices){
+  _ddChoices=choices||[{label:'',bg:'',color:''}];
+  const list=document.getElementById('dd-choices-list');
+  list.innerHTML=_ddChoices.map(function(ch,i){
+    return '<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;padding:5px 8px;background:var(--surface2);border-radius:6px">'
+      +'<input type="text" placeholder="Libellé (ex: Oui)" value="'+ch.label+'" oninput="_ddChoices['+i+'].label=this.value" style="padding:4px 7px;border:1px solid var(--border);border-radius:5px;font-size:12px;outline:none;font-family:inherit">'
+      +'<div style="display:flex;align-items:center;gap:4px">'
+      +'  <span style="font-size:10px;color:var(--text3)">Fond</span>'
+      +'  <input type="color" value="'+(ch.bg||'#ffffff')+'" oninput="_ddChoices['+i+'].bg=this.value" style="width:28px;height:24px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px">'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:4px">'
+      +'  <span style="font-size:10px;color:var(--text3)">Texte</span>'
+      +'  <input type="color" value="'+(ch.color||'#000000')+'" oninput="_ddChoices['+i+'].color=this.value" style="width:28px;height:24px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px">'
+      +'</div>'
+      +'<button onclick="_ddChoices.splice('+i+',1);renderDdChoices(_ddChoices)" style="border:none;background:#FDEAEA;color:#A32D2D;cursor:pointer;border-radius:4px;width:22px;height:22px;font-size:11px">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function addDdChoice(){
+  _ddChoices.push({label:'',bg:'#ffffff',color:'#000000'});
+  renderDdChoices(_ddChoices);
+}
+
+function applyTblDropdown(){
+  if(!_ctxCell||!_ctxTbl)return;
+  const scope=document.getElementById('dd-scope').value;
+  const choices=_ddChoices.filter(function(ch){return ch.label.trim();});
+  if(!choices.length) return;
+  const choicesStr=JSON.stringify(choices);
+
+  function applyCell(td){
+    if(td.tagName==='TH') return; // don't apply to headers
+    const sel=document.createElement('select');
+    sel.className='memo-tbl-dd';
+    sel.dataset.choices=choicesStr;
+    sel.innerHTML='<option value="">—</option>'+choices.map(function(ch){
+      return '<option value="'+ch.label+'" style="background:'+ch.bg+';color:'+ch.color+'">'+ch.label+'</option>';
+    }).join('');
+    sel.onchange=function(){
+      const chs=JSON.parse(this.dataset.choices||'[]');
+      const match=chs.find(function(ch){return ch.label===this.value;},this);
+      if(match){
+        this.parentElement.style.background=match.bg||'';
+        this.parentElement.style.color=match.color||'';
+        this.style.background=match.bg||'transparent';
+        this.style.color=match.color||'';
+        this.style.fontWeight='600';
+      } else {
+        this.parentElement.style.background='';
+        this.parentElement.style.color='';
+        this.style.background='transparent';
+        this.style.color='';
+        this.style.fontWeight='';
+      }
+    };
+    td.innerHTML='';td.appendChild(sel);td.contentEditable='false';
+  }
+
+  if(scope==='cell'){
+    applyCell(_ctxCell);
+  } else if(scope==='row'){
+    const tr=_ctxCell.closest('tr');
+    if(tr) tr.querySelectorAll('td').forEach(applyCell);
+  } else if(scope==='col'){
+    const ci=_ctxCell.cellIndex;
+    _ctxTbl.querySelectorAll('td').forEach(function(td){if(td.cellIndex===ci)applyCell(td);});
+  } else {
+    _ctxTbl.querySelectorAll('td').forEach(applyCell);
+  }
+  document.getElementById('tbl-dropdown-modal').style.display='none';
+}
+
+// Filter on header click
+let _activeFilter={tbl:null,col:-1,val:''};
+function tblToggleFilter(th){
+  const tbl=th.closest('table');
+  const col=th.cellIndex;
+  const vals=new Set();
+  tbl.querySelectorAll('tbody tr').forEach(tr=>{
+    const cell=tr.cells[col];
+    if(cell) vals.add(cell.textContent.trim());
+  });
+  const rect=th.getBoundingClientRect();
+  const fp=document.getElementById('tbl-filter-panel');
+  fp.style.cssText='display:block;position:fixed;left:'+rect.left+'px;top:'+(rect.bottom+2)+'px;z-index:9999;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,.12)';
+  let html='<div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:5px">Filtrer</div><div style="display:flex;flex-direction:column;gap:3px">';
+  html+='<label style="font-size:11px;cursor:pointer"><input type="radio" name="filt" value="" data-col="'+col+'"> Tout afficher</label>';
+  [...vals].forEach(function(v){
+    html+='<label style="font-size:11px;cursor:pointer"><input type="radio" name="filt" value="'+v+'" data-col="'+col+'"> '+v+'</label>';
+  });
+  html+='</div><button id="tbl-filter-close" style="margin-top:6px;width:100%;padding:3px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;font-size:10.5px">Fermer</button>';
+  fp.innerHTML=html;
+  fp.querySelectorAll('input[type=radio]').forEach(function(r){
+    r.addEventListener('change',function(){applyTblFilter(this,parseInt(this.dataset.col),tbl);});
+  });
+  fp.querySelector('#tbl-filter-close').onclick=function(){fp.style.display='none';};
+  _activeFilter={tbl,col,val:''};
+  setTimeout(function(){document.addEventListener('click',function hide(ev){if(!fp.contains(ev.target)&&!th.contains(ev.target)){fp.style.display='none';document.removeEventListener('click',hide);}},true);},50);
+}
+
+function applyTblFilter(radio,col,tbl){
+  const val=radio.value;
+  const t=tbl||_activeFilter.tbl;
+  if(!t) return;
+  t.querySelectorAll('tbody tr').forEach(tr=>{
+    const cell=tr.cells[col];
+    tr.style.display=(!val||cell&&cell.textContent.trim()===val)?'':'none';
+  });
+}
+
 
 let _delMemoCat=null,_delMemoId=null;
 function deleteMemo(cat,id){
@@ -4028,6 +4255,63 @@ document.addEventListener('keydown', function(e){
     <div class="modal-btns">
       <button onclick="closeConfirmMemo()">Annuler</button>
       <button class="primary" style="background:#A32D2D;border-color:#791F1F" onclick="confirmDeleteMemo()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Table context menu -->
+<div id="tbl-ctx-menu">
+  <div class="ctx-item" onclick="tblInsertRowAfter()">➕ Insérer ligne dessous</div>
+  <div class="ctx-item" onclick="tblDeleteRow()">🗑 Supprimer ligne</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="tblInsertColAfter()">➕ Insérer colonne à droite</div>
+  <div class="ctx-item" onclick="tblDeleteCol()">🗑 Supprimer colonne</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" style="flex-direction:column;align-items:flex-start;gap:4px">
+    <span style="font-size:10px;color:var(--text3)">Couleur de fond</span>
+    <div class="ctx-colors">
+      <div class="ctx-color-dot" style="background:#fff;border:1px solid #ccc" onclick="tblSetBgColor('#fff')" title="Blanc"></div>
+      <div class="ctx-color-dot" style="background:#FFF9C4" onclick="tblSetBgColor('#FFF9C4')" title="Jaune"></div>
+      <div class="ctx-color-dot" style="background:#C8E6C9" onclick="tblSetBgColor('#C8E6C9')" title="Vert"></div>
+      <div class="ctx-color-dot" style="background:#BBDEFB" onclick="tblSetBgColor('#BBDEFB')" title="Bleu"></div>
+      <div class="ctx-color-dot" style="background:#FFCDD2" onclick="tblSetBgColor('#FFCDD2')" title="Rouge"></div>
+      <div class="ctx-color-dot" style="background:#E1BEE7" onclick="tblSetBgColor('#E1BEE7')" title="Violet"></div>
+      <div class="ctx-color-dot" style="background:#FFE0B2" onclick="tblSetBgColor('#FFE0B2')" title="Orange"></div>
+      <div class="ctx-color-dot" style="background:#ECEFF1" onclick="tblSetBgColor('#ECEFF1')" title="Gris"></div>
+    </div>
+  </div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="tblSetDropdown()">📋 Liste déroulante…</div>
+</div>
+
+<!-- Filter panel -->
+<div id="tbl-filter-panel"></div>
+
+<!-- Dropdown setup modal -->
+<div id="tbl-dropdown-modal" style="display:none;position:fixed;inset:0;background:rgba(20,30,60,.3);z-index:9998;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:520px;max-width:96%;max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(20,40,100,.15)">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:14px">Liste déroulante</h3>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Appliquer à</label>
+      <select id="dd-scope" style="width:100%;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none;background:var(--surface2)">
+        <option value="cell">Cellule sélectionnée</option>
+        <option value="row">Ligne entière</option>
+        <option value="col">Colonne entière</option>
+        <option value="all">Tout le tableau</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:10px">
+      <label style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Choix et mise en forme</label>
+      <div id="dd-choices-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      <button onclick="addDdChoice()" style="margin-top:8px;padding:4px 12px;border:1px dashed var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;font-size:11px;font-family:inherit">+ Ajouter un choix</button>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+      <button onclick="document.getElementById('tbl-dropdown-modal').style.display='none'" style="padding:6px 14px;border:1px solid var(--border);border-radius:7px;background:transparent;cursor:pointer;font-size:12px;font-family:inherit">Annuler</button>
+      <button onclick="applyTblDropdown()" style="padding:6px 16px;border:1px solid var(--blue);border-radius:7px;background:var(--blue-mid);color:#fff;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">Appliquer</button>
     </div>
   </div>
 </div>
