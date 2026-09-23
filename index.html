@@ -598,10 +598,10 @@ table.missions tr:last-child td{border-bottom:none}
 .memo-tb-sep{width:1px;height:18px;background:var(--border2);margin:0 3px;flex-shrink:0}
 .memo-editor{flex:1;overflow-y:auto;padding:14px 16px;outline:none;font-size:13px;line-height:1.7;color:var(--text);font-family:inherit;min-height:200px}
 .memo-editor table,.memo-tbl{border-collapse:collapse;width:auto;margin:8px 0}
-.memo-tbl-cell,.memo-tbl-hdr{border:1px solid var(--border2);padding:5px 10px;min-width:60px;font-size:12px;outline:none;vertical-align:top}
-.memo-tbl-hdr{background:var(--surface2);font-weight:700;cursor:pointer;position:relative;user-select:none}
-.memo-tbl-hdr::after{content:'▾';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:8px;color:var(--text3);opacity:.6}
-.memo-tbl-cell:focus,.memo-tbl-hdr:focus{background:var(--blue-light);outline:2px solid var(--blue-mid);}
+.memo-editor td,.memo-editor th,.memo-tbl-cell,.memo-tbl-hdr{border:1px solid var(--border2);padding:5px 10px;min-width:60px;font-size:12px;outline:none;vertical-align:top}
+.memo-editor th,.memo-tbl-hdr{background:var(--surface2);font-weight:700;cursor:pointer;position:relative;user-select:none}
+.memo-tbl-hdr::after,.memo-editor th::after{content:'▾';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:8px;color:var(--text3);opacity:.6}
+.memo-tbl-cell:focus,.memo-tbl-hdr:focus,.memo-editor td:focus,.memo-editor th:focus{background:var(--blue-light);outline:2px solid var(--blue-mid);}
 .memo-tbl-dd{width:100%;border:none;background:transparent;font-size:11px;cursor:pointer;outline:none;font-family:inherit;padding:2px}
 .memo-tbl-wrap{overflow-x:auto;margin:8px 0}
 /* Context menu */
@@ -2981,10 +2981,14 @@ function insertMemoTable(){
 }
 
 function initMemoTableHandlers(){
-  document.querySelectorAll('.memo-tbl').forEach(tbl=>{
-    if(tbl.dataset.init) return;
-    tbl.dataset.init='1';
-
+  const ed=document.getElementById('memo-editor');
+  if(!ed) return;
+  // Target all tables including old ones without memo-tbl class
+  ed.querySelectorAll('table').forEach(function(tbl){
+    // Add classes to cells if missing (old tables)
+    tbl.querySelectorAll('th').forEach(function(th){th.classList.add('memo-tbl-hdr');});
+    tbl.querySelectorAll('td').forEach(function(td){td.classList.add('memo-tbl-cell');});
+    tbl.classList.add('memo-tbl');
     // Tab navigation
     tbl.addEventListener('keydown',function(e){
       if(e.key==='Tab'){
@@ -3001,10 +3005,11 @@ function initMemoTableHandlers(){
       e.preventDefault();
       showTableCtxMenu(e,tbl);
     });
-    // Filter on header click (the ▾ indicator)
-    tbl.querySelectorAll('.memo-tbl-hdr').forEach(th=>{
+    // Filter on header click
+    tbl.querySelectorAll('th').forEach(function(th){
       th.addEventListener('click',function(e){
-        if(!e.target.closest('th').isContentEditable||e.offsetX>th.offsetWidth-20) tblToggleFilter(th);
+        // Only trigger if clicking the right part or not editing
+        tblToggleFilter(th,tbl);
       });
     });
   });
@@ -3015,6 +3020,7 @@ let _ctxTbl=null,_ctxCell=null;
 function showTableCtxMenu(e,tbl){
   _ctxTbl=tbl;
   _ctxCell=e.target.closest('td,th');
+  if(!_ctxCell) return; // clicked outside cells
   const menu=document.getElementById('tbl-ctx-menu');
   menu.style.cssText='display:block;position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;z-index:9999';
   setTimeout(()=>document.addEventListener('click',closeTblCtx,{once:true}),10);
@@ -3148,8 +3154,8 @@ function applyTblDropdown(){
 
 // Filter on header click
 let _activeFilter={tbl:null,col:-1,val:''};
-function tblToggleFilter(th){
-  const tbl=th.closest('table');
+function tblToggleFilter(th,tbl){
+  if(!tbl) tbl=th.closest('table');
   const col=th.cellIndex;
   const vals=new Set();
   tbl.querySelectorAll('tbody tr').forEach(tr=>{
