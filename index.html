@@ -718,11 +718,13 @@ if(!S.prestas) S.prestas=[];
 if(!S.prestaTypes) S.prestaTypes=[...PRESTA_TYPES_DEFAULT];
 if(!S.prestaTypeColors) S.prestaTypeColors={};
 // Seed colors from defaults
+if(!S.prestaTypeColors) S.prestaTypeColors={};
 Object.entries(PRESTA_TYPE_COLORS).forEach(([k,v])=>{ if(!S.prestaTypeColors[k]) S.prestaTypeColors[k]=v; });
+if(!S.prestaTypes) S.prestaTypes=[...PRESTA_TYPES_DEFAULT];
+if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
 // Merge any new default types not yet in saved state
 PRESTA_TYPES_DEFAULT.forEach(t=>{ if(!S.prestaTypes.includes(t)) S.prestaTypes.push(t); });
 MISSION_TYPES_DEFAULT.forEach(t=>{ if(!S.missionTypes.includes(t)) S.missionTypes.push(t); });
-if(!S.missionTypes) S.missionTypes=[...MISSION_TYPES_DEFAULT];
 if(!S.mainTab) S.mainTab='projets';
 if(!S.calculs) S.calculs=[];
 if(!S.calcType) S.calcType=null;
